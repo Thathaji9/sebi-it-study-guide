@@ -60,9 +60,15 @@ export default function PatternPage() {
           Comprehension 40. Practise typing under a 60-minute clock; this desk
           does not yet host a typing paper.
         </p>
-        <p className="mt-4">
+        <p className="mt-4 flex flex-wrap gap-4">
           <Link href="/mock" className="text-primary underline-offset-2 hover:underline">
             Sit a timed mock →
+          </Link>
+          <Link
+            href="/interview"
+            className="text-primary underline-offset-2 hover:underline"
+          >
+            Interview pattern & mock panels →
           </Link>
         </p>
       </section>

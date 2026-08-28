@@ -7,6 +7,7 @@ import {
   ClipboardList,
   LayoutDashboard,
   Menu,
+  MessagesSquare,
   PenLine,
   Scale,
 } from "lucide-react";
@@ -27,6 +28,7 @@ const links = [
   { href: "/syllabus", label: "Syllabus", icon: BookOpen },
   { href: "/practice", label: "Practice", icon: PenLine },
   { href: "/mock", label: "Mocks", icon: ClipboardList },
+  { href: "/interview", label: "Interview", icon: MessagesSquare },
   { href: "/notes", label: "Notes", icon: BookOpen },
   { href: "/pattern", label: "Pattern", icon: Scale },
 ];
