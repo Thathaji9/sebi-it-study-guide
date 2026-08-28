@@ -2,806 +2,1124 @@ import type { TopicNote } from "@/data/notes";
 
 export const notesNetworking: TopicNote = {
   topic: "networking",
-  title: "Networking Concepts",
+  title: "Networking — techniques (beginner)",
   blurb:
-    "OSI layers and PDUs, TCP versus UDP, IP, LAN media access (Ethernet CSMA/CD, Token Ring), forwarding devices, application ports, the TCP three-way handshake, and NAT. Layer-mapping MCQs are free marks if the stack is memorised with an example protocol at each layer.",
+    "A network is people posting letters through layers of wrapping. Memorise OSI layers, TCP versus UDP, and well-known ports. On every “which layer?” question, name the address type: port, IP, MAC, or bits. A firewall is a policy on those addresses; NAT rewrites private IPs so many hosts share one public number.",
   blocks: [
     {
-      heading: "OSI seven layers, PDUs, and example protocols",
-      body: `The ISO/OSI model is seven layers of encapsulation. A sender walks 7→1 adding a header (and sometimes a trailer) at each layer; a receiver walks 1→7 stripping them. The exam wants the layer name, the protocol data unit (PDU), one example protocol or device, and a one-line job description.
-
-Layer 7 Application is the user-facing protocol: HTTP, HTTPS, FTP, SMTP, POP3, IMAP, DNS, SSH, Telnet. PDU is data (or ‘APDU’ in some texts). Layer 6 Presentation agrees syntax and encoding: ASCII/UTF-8, JPEG, MPEG, encryption and compression. TLS is often placed here or as a 5/6/7 sandwich; tick Presentation if the question says ‘encryption/format’, Application if it names HTTPS. Layer 5 Session sets up, manages and tears down dialogues: RPC, NetBIOS, PPTP, SIP session. Checkpointing and full-duplex/half-duplex session control live here.
-
-Layer 4 Transport gives process-to-process delivery with port numbers: TCP (segment) and UDP (datagram). Reliability, ordering, flow control and congestion control are TCP’s extras. Layer 3 Network gives host-to-host delivery across hops: IPv4/IPv6 packets, ICMP, IPSec, routers. Logical addressing (IP) and path selection live here. Layer 2 Data Link gives hop-to-hop frames on one link: Ethernet, PPP, Wi-Fi (802.11), switches, MAC addresses, CRC trailer. Layer 1 Physical moves bits: voltage, fibre light, connectors, repeaters, hubs, CSMA signalling.
-
-Mnemonics: ‘All People Seem To Need Data Processing’ (7→1) or ‘Please Do Not Throw Sausage Pizza Away’ (1→7). Encapsulation: HTTP data is wrapped in a TCP segment, then an IP packet, then an Ethernet frame, then bits. The exam ‘which layer?’ question is almost always answered by naming the PDU or the address type (port / IP / MAC / bits).
-
-Do not confuse OSI with TCP/IP’s four layers (Application, Transport, Internet, Link). HTTP is Application in both. IP is Internet in TCP/IP and Network in OSI. Ethernet is Link / Data Link. When the paper says ISO/OSI, use seven names.`,
+      heading: "OSI seven layers",
+      body: "The OSI model is seven wrappers around a message. The sender walks 7 → 1 adding a header at each floor; the receiver walks 1 → 7 peeling them. Think of posting a letter: you write the letter (application), choose language/format (presentation), agree a conversation (session), pick registered post or a postcard (transport), write the street address (network), put it in a van-local envelope (data link), and send voltages or light (physical).\n\nPDU names: bits, frame, packet, TCP segment / UDP datagram, then data. TCP/IP’s four layers squash OSI 5–7 into “Application” and 1–2 into “Link”.",
+      howTo: [
+        "Map the clue: URL/HTTP → 7; encoding/encryption-format → 6; dialogue/RPC → 5; port → 4; IP/router/TTL → 3; MAC/switch/CRC → 2; cable/hub/bits → 1.",
+        "Write the wrappers going down: HTTP → TCP ports → IP addresses → Ethernet MACs → bits.",
+        "Each hop rewrites only the L2 envelope. Destination IP stays (until NAT).",
+        "If the paper says ISO/OSI, use seven names. If it says TCP/IP, do not invent Presentation.",
+      ],
       bullets: [
-        "7 Application data — HTTP FTP SMTP DNS POP IMAP SSH.",
-        "6 Presentation data — encoding, compression, encryption (TLS/JPEG/ASCII).",
-        "5 Session data — RPC, NetBIOS, dialogue control.",
-        "4 Transport segment/datagram — TCP, UDP, ports.",
-        "3 Network packet — IP, ICMP, routers.",
-        "2 Data Link frame — Ethernet, PPP, MAC, switches.",
-        "1 Physical bits — cables, hubs, repeaters.",
+        "7 Application — HTTP FTP SMTP DNS SSH. 6 Presentation — format, compression, encryption.",
+        "5 Session — dialogue. 4 Transport — TCP/UDP, ports. 3 Network — IP, routers.",
+        "2 Data Link — Ethernet, MAC, switches, frames. 1 Physical — cables, hubs, bits.",
       ],
       examples: [
         {
-          title: "Which layer? Five one-line scenarios",
+          title: "Which layer? Five clues",
           prompt:
-            "Name the OSI layer: (i) deciding the next-hop IP of a packet, (ii) adding a MAC destination and CRC, (iii) a browser speaking HTTP, (iv) converting UTF-8 to a wire encoding and compressing, (v) delivering bytes to port 443 on the local host.",
-          language: "python",
-          code: `# (i) Network (L3)        — routing, IP
-# (ii) Data Link (L2)     — framing, MAC, CRC
-# (iii) Application (L7)  — HTTP
-# (iv) Presentation (L6)  — syntax, compression
-# (v) Transport (L4)      — ports, TCP`,
+            "(i) next-hop IP (ii) add dest MAC and CRC (iii) browser HTTP (iv) UTF-8 and compress (v) deliver to port 443.",
           steps: [
-            "Next-hop IP is a routing decision. Routers and IP live at Network. The packet’s destination IP is inspected, the routing table is looked up, TTL is decremented.",
-            "MAC destination plus CRC trailer is framing on one physical hop. Switches and Ethernet NICs do this at Data Link. The IP packet is the payload of the frame.",
-            "HTTP is an Application protocol. The browser does not think in segments; it thinks in requests. HTTPS is still Application plus a Presentation/TLS story.",
-            "Character encoding and compression are Presentation. If the question had said ‘SSL handshake records’, many keys still accept Presentation; if it said ‘port 443’ that is Transport.",
-            "Port 443 is a transport-layer address. TCP delivers the byte stream to the process bound to that port. IP does not know ports; Ethernet does not know ports.",
+            {
+              do: "(i) Network (ii) Data Link (iii) Application (iv) Presentation (v) Transport.",
+              why: "IP/routing, MAC/frame, user protocol, syntax, ports. Address types: IP / MAC / URL / encoding / port.",
+            },
+            {
+              do: "HTTPS is still Application data plus a Presentation/TLS story. “Port 443” alone is Transport.",
+              why: "The stem’s noun picks the layer. Port versus HTTP method are different floors.",
+            },
+            {
+              do: "A switch speaks frames (L2). A hub speaks bits (L1). A router speaks packets (L3).",
+              why: "Device class is a layer hint.",
+            },
           ],
           result:
-            "(i) Network (ii) Data Link (iii) Application (iv) Presentation (v) Transport. Address types: IP / MAC / URL-or-method / encoding / port.",
+            "(i) Network (ii) Data Link (iii) Application (iv) Presentation (v) Transport.",
         },
         {
-          title: "Map a packet’s headers as it goes down the stack",
+          title: "Headers going down the stack",
           prompt:
-            "A client sends an HTTP GET to 203.0.113.10 port 80, over Ethernet. List the headers added at layers 7→1 and what address each one names.",
-          language: "java",
-          code: `// L7 HTTP:  GET /index.html HTTP/1.1\\r\\nHost: example.com\\r\\n...
-// L4 TCP:   src port 49152, dst port 80, seq, ack, flags, window, checksum
-// L3 IP:    src 192.0.2.5, dst 203.0.113.10, TTL 64, protocol=TCP, header checksum
-// L2 Eth:   src MAC of NIC, dst MAC of default gateway, EtherType=0x0800 (IPv4), CRC
-// L1 bits:  preamble, voltages on the wire`,
+            "HTTP GET to 203.0.113.10 port 80 over Ethernet. What address does each layer name?",
           steps: [
-            "Application writes the GET text (and headers like Host). No binary address here — the URL and Host name are application data. DNS already resolved the name to 203.0.113.10 before this send.",
-            "Transport prepends a TCP header: ephemeral source port (say 49152), destination port 80, sequence number, window. PDU is now a segment. This is the first binary address (the port).",
-            "Network prepends an IPv4 header: source 192.0.2.5, destination 203.0.113.10, TTL, protocol=6 (TCP). PDU is a packet. The destination IP stays constant across hops (except NAT, later).",
-            "Data Link prepends an Ethernet header for this hop only: destination MAC is the gateway’s MAC on the LAN, not the server’s MAC (the server is not on this L2). EtherType 0x0800 says ‘IPv4 inside’. Trailer CRC. PDU is a frame.",
-            "Physical encodes the frame as bits with a preamble. At the next router the frame is stripped, the packet is re-encapsulated in a new L2 header for the next hop, TTL drops by 1. L7–L4 headers are unchanged by a pure router.",
+            {
+              do: "L7: GET text (Host name is data). L4: dest port 80, ephemeral source port. L3: dest IP 203.0.113.10. L2: dest MAC of the gateway on this LAN, not the server’s MAC. L1: bits.",
+              why: "The server is not on your Ethernet. The van-local envelope is for the next hop. The street address (IP) stays on the letter.",
+            },
+            {
+              do: "At the next router the frame is stripped and a new L2 header is built. TTL drops by 1. L7–L4 stay.",
+              why: "Only the local envelope changes each hop, like swapping trucks.",
+            },
+            {
+              do: "DNS already turned the name into an IP before this send.",
+              why: "The GET itself does not carry a binary IP — that is the IP header’s job.",
+            },
           ],
           result:
-            "Down the stack: HTTP data → TCP (ports) → IP (IPs) → Ethernet (MACs + CRC) → bits. Each hop rewrites only the L2 header; L3 destination IP survives until NAT or the host.",
+            "HTTP data → TCP (ports) → IP (IPs) → Ethernet (MACs + CRC) → bits. Each hop rewrites L2; dest IP survives until NAT or the host.",
         },
         {
-          title: "PDU vocabulary drill",
+          title: "PDU vocabulary",
           prompt:
-            "Fill the PDU name: bits, frame, packet, segment, datagram, data. Which two words both describe a UDP L4 unit? Which device speaks in frames but not packets?",
-          language: "cpp",
-          code: `// L1 bits
-// L2 frame
-// L3 packet (IP datagram is also used for L3)
-// L4 TCP segment ; UDP datagram
-// L5-7 data
-// A switch (L2) forwards frames by MAC; it does not inspect IP packets
-// A hub (L1) forwards bits, not even frames intelligently`,
+            "Fill: bits, frame, packet, segment, datagram. Which two words both describe a UDP L4 unit? Which device speaks frames but not packets?",
           steps: [
-            "Physical: bits (or symbols). No header in the OSI sense, just encoding.",
-            "Data Link: frame. Ethernet frame = dest MAC, src MAC, EtherType, payload, FCS/CRC.",
-            "Network: packet. IPv4 packet = IP header + payload. ‘IP datagram’ is a synonym at L3 and must not be confused with UDP’s L4 datagram.",
-            "Transport: TCP segment, UDP datagram. Both sit on IP. If the question says ‘segment’ they mean TCP; ‘datagram’ without IP usually means UDP.",
-            "A switch is the device that speaks frames: MAC learning, MAC forwarding. It does not need an IP (a management IP is optional). A hub is even lower: bits to every port, collisions included.",
+            {
+              do: "L1 bits, L2 frame, L3 packet (also called IP datagram), L4 TCP segment / UDP datagram, L5–7 data.",
+              why: "“IP datagram” is L3 and must not be confused with UDP’s L4 datagram. If they say segment, they mean TCP.",
+            },
+            {
+              do: "UDP L4 unit = datagram. A switch forwards frames by MAC; it does not inspect IP. A hub is even lower: bits.",
+              why: "A switch is a smart post-sorter for local envelopes. A hub is a loudspeaker.",
+            },
+            {
+              do: "TCP/IP Application = OSI 5+6+7. TCP/IP Internet = OSI 3. TCP/IP Link = OSI 1+2.",
+              why: "HTTP is Application in both models. Read the stem for which stack they want.",
+            },
           ],
           result:
-            "L1 bits, L2 frame, L3 packet, L4 TCP segment / UDP datagram, L5–7 data. UDP L4 unit = datagram. A switch forwards frames, not IP packets.",
+            "UDP L4 = datagram. A switch forwards frames, not IP packets. TCP/IP Application collapses OSI 5–7.",
         },
         {
-          title: "TCP/IP four-layer mapping onto OSI",
+          title: "Device to layer in one line",
           prompt:
-            "Place HTTP, TCP, IP, ICMP, Ethernet, and a hub into the 4-layer TCP/IP model and state the OSI equivalent.",
-          language: "python",
-          code: `# TCP/IP          OSI                 examples
-# Application     5+6+7               HTTP, DNS, SMTP, TLS, FTP
-# Transport       4                   TCP, UDP
-# Internet        3                   IP, ICMP, IGMP, IPSec
-# Link            1+2                 Ethernet, Wi-Fi, PPP, hub, switch`,
+            "Hub, switch, router, HTTP browser, TLS record, TCP port. Name the OSI floor for each.",
           steps: [
-            "HTTP is TCP/IP Application = OSI Application (and it rides TLS which many drawings put in the same bucket). DNS is also Application even though it often uses UDP.",
-            "TCP is Transport in both models. Port numbers appear only here.",
-            "IP and ICMP are Internet in TCP/IP = OSI Network. Ping is ICMP, not an Application protocol in the OSI sense (the ping program is an application, the messages are Network).",
-            "Ethernet plus the hub sit in Link = OSI Data Link + Physical. The hub is Physical; the Ethernet MAC is Data Link; TCP/IP lumps them.",
-            "If the paper says ISO/OSI, do not answer with ‘Internet layer’. If it says TCP/IP, do not invent a Presentation layer. Read the stem.",
+            {
+              do: "Hub = 1 Physical (bits to every port). Switch = 2 Data Link (MAC). Router = 3 Network (IP).",
+              why: "Each box speaks one address type: bits, MAC, or IP.",
+            },
+            {
+              do: "HTTP browser = 7 Application. TLS as a format/lock on the bytes = 6 Presentation (exam mapping). TCP port = 4 Transport.",
+              why: "The user protocol, the encoding/lock, and the port are three different wrappers.",
+            },
+            {
+              do: "If the paper uses TCP/IP not OSI: HTTP+TLS sit in Application, TCP in Transport, IP in Internet, Ethernet in Link.",
+              why: "Do not invent a Presentation layer when the stem said TCP/IP.",
+            },
           ],
           result:
-            "HTTP→Application/L7, TCP→Transport/L4, IP and ICMP→Internet/L3, Ethernet→Link/L2, hub→Link/L1. TCP/IP Application collapses OSI 5–7.",
+            "Hub 1, switch 2, router 3, HTTP 7, TLS/format 6, TCP port 4. Address type picks the floor.",
+        },
+        {
+          title: "Same hop, five wrappers",
+          prompt:
+            "You send https://example.com from a laptop. List the five names the packet carries, bottom to top, on the first hop to the home gateway.",
+          steps: [
+            {
+              do: "L1 bits on Wi-Fi or Ethernet. L2 dest MAC = gateway. L3 dest IP = example.com’s address. L4 dest port 443. L7 HTTP inside TLS.",
+              why: "The van envelope is local (MAC). The street address is the server IP. The apartment number is 443.",
+            },
+            {
+              do: "Source port is ephemeral (e.g. 49152). Source IP is the laptop’s private address until NAT.",
+              why: "Return traffic needs a ticket back to this browser tab.",
+            },
+            {
+              do: "At the gateway NAT may rewrite the source IP/port. Dest IP and dest port 443 stay (until a proxy).",
+              why: "Only the local or edge envelope changes. The server still sees port 443.",
+            },
+          ],
+          result:
+            "Bits → gateway MAC → server IP → TCP/443 → HTTP/TLS. First-hop dest MAC is the gateway, not the server.",
         },
       ],
     },
     {
       heading: "TCP versus UDP",
-      body: `TCP (Transmission Control Protocol) is connection-oriented, reliable, and ordered. It runs a three-way handshake to create a connection, numbers every byte, acknowledges received data, retransmits losses, enforces flow control (receiver window) and congestion control (cwnd: slow start, congestion avoidance). The PDU is a segment. Overhead is a 20-byte minimum header (ports, seq, ack, flags SYN/ACK/FIN/RST/PSH/URG, window, checksum). Use TCP when you need a file, a web page, mail, or a shell — HTTP, HTTPS, SMTP, IMAP, POP, FTP, SSH.
-
-UDP (User Datagram Protocol) is connectionless and unreliable. No handshake, no retransmission, no ordering, no congestion control (applications may add their own). The PDU is a datagram. Header is 8 bytes: source port, dest port, length, checksum. Use UDP when you want low latency or one-shot request/reply: DNS queries, DHCP, VoIP, video streaming, SNMP, NTP, QUIC’s outer datagram (QUIC rebuilds reliability on top).
-
-Both are L4 and both use port numbers. A socket is (local IP, local port, remote IP, remote port, protocol). TCP demultiplexes by the full 4-tuple; UDP by the 2-tuple (local IP, local port) plus the datagram. Port 0 is reserved; well-known ports are 0–1023; registered 1024–49151; ephemeral 49152–65535 (the ranges are the IANA picture the exam expects).
-
-Exam contrasts: ‘which is faster?’ — UDP has less overhead, not magical speed; a lost UDP packet stays lost. ‘which is reliable?’ — TCP. ‘video live stream’ — UDP. ‘bank transfer’ — TCP. TCP’s reliability is not encryption; TLS sits above TCP (or inside QUIC/UDP). Sequence numbers are byte counts, not packet counts.
-
-Flow control protects the receiver (window). Congestion control protects the network (slow start). Mixing the two words is a common wrong option. UDP has neither, unless the application invents them.`,
+      body: "TCP is registered post: you set up a connection (handshake), every byte is numbered, losses are resent, order is kept. Use it for web pages, mail, SSH. Header at least 20 bytes. UDP is a postcard: send and hope. No handshake, no retry, no order. Tiny 8-byte header. Use it for DNS queries, DHCP, live voice — late packets are junk.\n\nBoth are layer 4 and both use port numbers. Reliability is not encryption. Flow control protects the receiver (window). Congestion control protects the shared road (cwnd). UDP has neither unless the app adds them.",
+      howTo: [
+        "Need every byte, in order → TCP. Need speed / broadcast / live media → UDP.",
+        "seq/ack/window/flags in a dump → TCP, not UDP, not IP.",
+        "“Faster?” → UDP has less overhead; a lost UDP packet stays lost.",
+        "Zone transfer and HTTP/3 are named exceptions (DNS AXFR is TCP; HTTP/3 is QUIC on UDP).",
+      ],
       bullets: [
-        "TCP: connection, SYN handshake, reliable, ordered, flow+congestion, 20 B header, segment.",
-        "UDP: no connection, no retry, 8 B header, datagram, DNS/DHCP/VoIP.",
-        "Both: ports. Reliability ≠ encryption.",
-        "Flow control = receiver. Congestion control = network. TCP only.",
+        "TCP: connection, handshake, reliable, ordered, flow+congestion, segment, 20 B header.",
+        "UDP: no connection, no retry, datagram, 8 B header, DNS/DHCP/VoIP.",
+        "Both: ports. Reliability ≠ encryption. Flow = receiver; congestion = network.",
       ],
       examples: [
         {
-          title: "Pick TCP or UDP for five applications",
+          title: "Pick TCP or UDP",
           prompt:
-            "Choose the usual transport: (i) DNS query, (ii) HTTP/1.1 page load, (iii) DHCP discover, (iv) SSH login, (v) live voice call. One-line why.",
-          language: "python",
-          code: `# (i) UDP 53   small request/reply, retry at the app if needed
-# (ii) TCP 80  page must arrive complete and ordered
-# (iii) UDP 67/68  broadcast, no server socket yet
-# (iv) TCP 22  reliable byte stream, login cannot lose bytes
-# (v) UDP      late packets are useless; drop and continue`,
+            "(i) DNS query (ii) HTTP/1.1 page (iii) DHCP discover (iv) SSH (v) live voice.",
           steps: [
-            "DNS query is a small Q/R. UDP/53 is the default; if the reply is truncated the resolver retries with TCP. Tick UDP unless the stem says ‘zone transfer’ (AXFR is TCP).",
-            "HTTP/1.1 runs on TCP/80 (HTTPS TCP/443). A missing byte corrupts HTML. HTTP/3 uses QUIC over UDP, but Grade-A keys still want TCP unless they name HTTP/3.",
-            "DHCP must work before the host has an IP. It broadcasts UDP. TCP cannot bind a connection without addresses in the usual way.",
-            "SSH is an interactive byte stream with integrity needs. TCP/22. Losing a keystroke is unacceptable.",
-            "Live voice: a packet that arrives after its playout point is junk. UDP plus an application jitter buffer. TCP’s retries would increase delay.",
+            {
+              do: "UDP, TCP, UDP, TCP, UDP.",
+              why: "Small Q/R and broadcast → UDP. Complete ordered bytes → TCP. Late voice packets are useless so UDP plus a jitter buffer, not TCP retries.",
+            },
+            {
+              do: "Tick UDP for DNS unless the stem says zone transfer (AXFR is TCP) or truncated retry.",
+              why: "The default query is UDP/53. Exceptions are named.",
+            },
+            {
+              do: "Grade-A keys still want HTTP on TCP unless they name HTTP/3.",
+              why: "HTTP/3/QUIC rides UDP, but the unmarked stem is TCP/80 or TCP/443.",
+            },
           ],
           result:
-            "UDP, TCP, UDP, TCP, UDP. DNS/DHCP/voice = UDP; web/SSH = TCP. Zone transfer and HTTP/3 are the named exceptions.",
+            "UDP, TCP, UDP, TCP, UDP. DNS/DHCP/voice = UDP; web/SSH = TCP.",
         },
         {
-          title: "Header fields you must recognise",
+          title: "Read a TCP dump line",
           prompt:
-            "A dump shows src=49152 dst=80 seq=1000 ack=5000 flags=PSH,ACK window=64240. Which protocol? What does seq=1000 mean? Who is the server?",
-          language: "java",
-          code: `// TCP header (min 20 bytes):
-// src port 49152 (ephemeral)  dst port 80 (HTTP server)
-// seq 1000  ack 5000  flags PSH ACK  window 64240
-// UDP would have no seq, ack, flags, or window — only ports, length, checksum`,
+            "src=49152 dst=80 seq=1000 ack=5000 flags=PSH,ACK window=64240. Protocol? Who is the server? What is seq?",
           steps: [
-            "seq, ack, flags, window exist only in TCP. This is a TCP segment, not UDP and not an IP packet (IP has TTL, not a window).",
-            "Destination port 80 is HTTP. The server is the side that bound 80; the client owns the ephemeral 49152. Direction of this segment is client → server.",
-            "seq=1000 means the first byte of this segment’s payload is TCP byte 1000 of the client’s stream (the ISN was something else, plus bytes already sent).",
-            "ack=5000 means the client has received server bytes up to 4999 and next expects 5000. ACK is valid because the ACK flag is set.",
-            "PSH asks the receiver to deliver buffered data to the application promptly (typical for interactive or request-end). Window 64240 is flow control: the client advertises how many more bytes it can accept.",
+            {
+              do: "seq, ack, flags, window exist only in TCP. Dest port 80 → HTTP server. Client owns ephemeral 49152. Direction client → server.",
+              why: "Well-known port 80 is the bound service. The random high port is the client’s temporary ticket.",
+            },
+            {
+              do: "seq=1000 is the first byte number of this payload in the client’s stream, not “packet 1000”.",
+              why: "TCP counts bytes, like numbering every letter in a book, not every envelope.",
+            },
+            {
+              do: "ack=5000 means “I have server bytes through 4999, next expected 5000”. Window is flow control: how much more the client can take.",
+              why: "Flow control protects one host’s buffer. Congestion control (cwnd) is a different knob.",
+            },
           ],
           result:
-            "TCP client→server HTTP. seq is a byte number, not a packet count. Server is the port-80 side. UDP has none of these fields.",
-        },
-        {
-          title: "Reliability is not a property of IP",
-          prompt:
-            "A student says ‘I use IP so my file transfer is reliable’. Correct the statement in five steps, placing TCP, UDP, IP and Ethernet in the reliability story.",
-          language: "cpp",
-          code: `// Ethernet CRC: detect (not correct) a bad FRAME on one hop; drop it
-// IP: best-effort PACKET; may drop, duplicate, reorder; TTL kills loops
-// UDP: best-effort DATAGRAM; app may add retry (DNS does)
-// TCP: retry, order, checksum end-to-end; this is what makes FTP/HTTP complete`,
-          steps: [
-            "Ethernet’s CRC detects a corrupted frame on a single hop and the NIC drops it. That is not end-to-end reliability and not retransmission of the file.",
-            "IP is best-effort: routers drop packets when congested, paths can reorder, fragments can be lost. IP has a header checksum (IPv4) covering the header only, not the file.",
-            "UDP adds ports and an optional checksum and still will not retry. A file sent with raw UDP can arrive with holes.",
-            "TCP is the layer that retransmits until the byte stream is complete (or the connection dies). FTP/HTTP/SMTP sit on TCP for that reason.",
-            "So ‘I use IP’ is true of every Internet send, including unreliable ones. Reliability was chosen when the application opened a TCP socket, not when it ‘used IP’.",
-          ],
-          result:
-            "IP is best-effort. Ethernet CRC is hop-local detection. End-to-end file reliability is TCP (or an application protocol on UDP). ‘Using IP’ does not imply reliability.",
+            "TCP client→server HTTP. seq is a byte number. Server is the port-80 side. UDP has none of these fields.",
         },
         {
           title: "Flow control versus congestion control",
           prompt:
-            "The receiver advertises window=0. Meanwhile routers are dropping packets and the sender’s cwnd halves. Which mechanism is which? Does UDP have either?",
-          language: "python",
-          code: `# flow control: receiver window (rwnd) in the TCP header
-#   window=0 -> sender must stop (except window probes)
-# congestion control: sender's cwnd, AIMD, slow start, Reno/CUBIC
-#   drop / ECN -> cwnd /= 2
-# sending rate = min(rwnd, cwnd)
-# UDP: neither, unless the application implements them`,
+            "Receiver advertises window=0. Routers drop packets and sender cwnd halves. Which is which? Does UDP have either?",
           steps: [
-            "Window=0 is flow control. The receiver’s buffer is full. The sender pauses so as not to overwrite unread data. This protects one host, not the Internet.",
-            "cwnd halving is congestion control. A loss (or ECN mark) is taken as a congestion signal. This protects the shared path.",
-            "TCP sends at most min(rwnd, cwnd) unacked bytes. Either knob can be the limiter.",
-            "UDP has no rwnd and no cwnd. A careless UDP sender can saturate a link; that is why some exams mention RTP/RTCP or QUIC as ‘UDP plus extra control’.",
-            "Wrong option to avoid: ‘flow control = slow start’. Slow start is a congestion-control phase. Flow control is the advertised window.",
+            {
+              do: "window=0 is flow control (receiver full). cwnd halving is congestion control (shared path is busy).",
+              why: "One protects a desk’s in-tray. The other protects the highway. TCP sends at most min(rwnd, cwnd).",
+            },
+            {
+              do: "UDP has neither built in. A careless UDP sender can flood a link.",
+              why: "Postcard has no “stop, my mailbox is full” card unless the application invents one.",
+            },
+            {
+              do: "Slow start is congestion control, not flow control. Do not mix the words.",
+              why: "Favourite wrong option: “flow control = slow start”.",
+            },
           ],
           result:
-            "window=0 → flow control (receiver). cwnd halving → congestion control (network). UDP has neither built in. TCP rate = min(rwnd, cwnd).",
+            "window=0 → flow (receiver). cwnd halving → congestion (network). UDP has neither built in.",
+        },
+        {
+          title: "Header size and what is missing in UDP",
+          prompt:
+            "TCP header ≥ 20 bytes, UDP 8 bytes. Which TCP fields are absent in UDP? Why can a 40-byte DNS query still prefer UDP?",
+          steps: [
+            {
+              do: "UDP has source port, dest port, length, checksum — 8 bytes. No seq, no ack, no flags, no window.",
+              why: "A postcard does not number pages or book a conversation.",
+            },
+            {
+              do: "TCP’s extra 20+ bytes plus a handshake are worth it when every byte must arrive in order (HTTP, SSH).",
+              why: "Reliability is a feature you pay for. DNS queries are tiny and can retry at the app.",
+            },
+            {
+              do: "A lost UDP DNS packet is not resent by the network stack. The resolver times out and asks again.",
+              why: "‘UDP is faster’ means less overhead, not ‘it magically arrives’.",
+            },
+          ],
+          result:
+            "UDP: 4 fields, 8 bytes, no seq/ack/window. Tiny DNS stays UDP; bulk reliable bytes stay TCP.",
+        },
+        {
+          title: "Connection words: handshake versus a datagram",
+          prompt:
+            "Stem says ‘connection-oriented, ordered, retransmission’. Other stem says ‘one request, one reply, no setup’. Protocols and an example each?",
+          steps: [
+            {
+              do: "First stem is TCP: three-way handshake, byte stream, retries. Example HTTP/1.1 or SSH.",
+              why: "Registered post: agree, number every byte, resend losses.",
+            },
+            {
+              do: "Second stem is UDP: no handshake. Example DNS query or DHCP discover.",
+              why: "Postcard: send and hope. The app may add its own retry.",
+            },
+            {
+              do: "Both still write port numbers. ‘Connection’ does not mean ‘encrypted’. TLS can ride on TCP (or QUIC on UDP).",
+              why: "Reliability and encryption are different jobs.",
+            },
+          ],
+          result:
+            "Connection/order/retry → TCP (HTTP, SSH). No setup, one Q/R → UDP (DNS, DHCP). Ports on both.",
         },
       ],
     },
     {
-      heading: "IP: datagrams, addressing, forwarding",
-      body: `IP (Internet Protocol) is the Network-layer workhorse. IPv4 addresses are 32 bits, usually dotted-quad (192.0.2.1). IPv6 addresses are 128 bits, hex-colon. An IP packet (datagram) carries a source IP, a destination IP, a TTL/Hop Limit, a protocol number (6=TCP, 17=UDP, 1=ICMP), and a payload. IPv4 has a header checksum; IPv6 does not (it delegates to L4). IP does not handshake and does not retransmit.
-
-Forwarding: each router looks up the destination in its routing table (longest prefix match), decrements TTL, and emits the packet on the chosen interface with a new L2 header. If TTL hits 0 the packet dies and an ICMP Time Exceeded is sent — that is traceroute. Packets of one TCP connection may take different paths (load balancing) and may arrive out of order; TCP repairs order, IP does not.
-
-Addressing the exam cares about: public vs private (RFC 1918: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16), loopback 127.0.0.0/8, link-local 169.254.0.0/16, multicast 224.0.0.0/4. CIDR /24 means 256 addresses (254 hosts typically). Default gateway is the L3 next hop for off-subnet destinations. ARP maps IPv4→MAC on the local link; ICMPv6 neighbour discovery does it for v6.
-
-Fragmentation: if a packet is larger than the outgoing MTU, IPv4 routers may fragment (unless DF is set); IPv6 only the source fragments. Reassembly is at the destination. Don’t-Fragment plus ICMP Packet Too Big is path-MTU discovery.
-
-ICMP is Network-layer signalling: echo request/reply (ping), dest unreachable, time exceeded. It is not TCP, not UDP, not an application. Ping ‘failing’ can be a firewall drop of ICMP, not proof that HTTP is down.`,
+      heading: "IP, TTL, and longest prefix",
+      body: "IP is the network-layer letter: source IP, destination IP, TTL (hop budget), payload. It does not handshake and does not resend. IPv4 is 32 bits (dotted), IPv6 128 bits. Private RFC1918 ranges (10/8, 172.16/12, 192.168/16) need NAT to talk to the public web.\n\nA router looks up the destination with longest prefix match, decrements TTL, and wraps a new L2 header. TTL=0 dies and ICMP Time Exceeded comes back — that is traceroute. ARP asks “who has this local IP?” and gets a MAC. DNS asks “what IP is this name?”. Routing asks “which next hop for this IP?”. Three different lookups.",
+      howTo: [
+        "Classify the address: private / public / loopback 127/8 / link-local 169.254 / multicast 224/4.",
+        "Longest matching prefix wins, even if another route is “bigger”.",
+        "Off-subnet → default gateway, then ARP for the gateway’s MAC. Packet dest IP stays the server.",
+        "Ping is ICMP (L3 signalling), not TCP, not an application protocol in OSI terms.",
+      ],
       bullets: [
-        "IPv4 32-bit, IPv6 128-bit. Best-effort datagram. TTL per hop.",
+        "IPv4 32-bit, IPv6 128-bit. Best-effort packet. TTL per hop.",
         "Private: 10/8, 172.16/12, 192.168/16. Longest-prefix routing.",
         "ARP: IPv4→MAC on-link. ICMP: ping and errors, still L3.",
-        "Fragmentation at routers (v4) or source (v6). Reassembly at dest.",
       ],
       examples: [
         {
-          title: "Is 192.168.5.9 routable on the public Internet?",
+          title: "Which addresses need NAT?",
           prompt:
-            "Classify 192.168.5.9, 8.8.8.8, 127.0.0.1, 169.254.1.1, 172.31.255.1, 224.0.0.1. Which need NAT to talk to the public web?",
-          language: "python",
-          code: `# 192.168.5.9   RFC1918 private  192.168.0.0/16   NAT to go public
-# 8.8.8.8       public (Google DNS)
-# 127.0.0.1     loopback, never leaves the host
-# 169.254.1.1   link-local (APIPA), not routed
-# 172.31.255.1  RFC1918 private  172.16.0.0/12    NAT to go public
-# 224.0.0.1     multicast all-hosts, not a unicast web dest`,
+            "Classify 192.168.5.9, 8.8.8.8, 127.0.0.1, 169.254.1.1, 172.31.255.1, 224.0.0.1.",
           steps: [
-            "192.168.5.9 sits in 192.168.0.0/16. Private. A public router must not accept it as a source on the Internet. NAT at the edge rewrites it.",
-            "8.8.8.8 is public unicast. Global DNS anycast. No NAT required for it to be a destination.",
-            "127.0.0.1 loops inside the host. Packets to it never hit a NIC. ‘Server down’ vs ‘bound only to loopback’ is a favourite ops trap.",
-            "169.254.1.1 is APIPA/link-local, used when DHCP fails. Not routed across a router. 172.31.255.1 is inside 172.16.0.0/12, private, NAT needed.",
-            "224.0.0.1 is multicast. A web client does not HTTP to it. Private addresses that need NAT: 192.168.5.9 and 172.31.255.1.",
+            {
+              do: "192.168.5.9 and 172.31.255.1 are private → NAT to go public. 8.8.8.8 is public. 127.0.0.1 never leaves the host. 169.254.1.1 is link-local (DHCP failed). 224.0.0.1 is multicast.",
+              why: "Private is “house numbering”. Public is “street numbering”. Loopback is talking to yourself. Link-local is a hallway-only name.",
+            },
+            {
+              do: "A public router must not accept 192.168.x as a source on the Internet.",
+              why: "Those ranges are reserved so every home can reuse them behind NAT.",
+            },
+            {
+              do: "You do not HTTP to a multicast address as a unicast web dest.",
+              why: "Wrong class of address for a website.",
+            },
           ],
           result:
-            "Private (NAT to go public): 192.168.5.9, 172.31.255.1. Public: 8.8.8.8. Loopback: 127.0.0.1. Link-local: 169.254.1.1. Multicast: 224.0.0.1.",
-        },
-        {
-          title: "TTL and traceroute",
-          prompt:
-            "A traceroute to 203.0.113.10 shows three hops. Explain what the sender set TTL to on probes 1, 2, 3 and which ICMP message comes back.",
-          language: "java",
-          code: `// probe 1: UDP or ICMP with TTL=1 -> first router decrements to 0
-//          returns ICMP Time Exceeded, src = that router's interface
-// probe 2: TTL=2 -> second router Time Exceeded
-// probe 3: TTL=3 -> packet reaches dest, dest returns port-unreachable
-//          (UDP traceroute) or echo-reply (ICMP traceroute)`,
-          steps: [
-            "The sender deliberately sets a tiny TTL so that a router on the path is forced to drop the probe.",
-            "TTL=1 dies at hop 1. That router sends ICMP Time Exceeded to the sender, revealing hop 1’s IP. TTL=2 dies at hop 2, and so on.",
-            "When TTL is large enough to reach the destination, the dest does not send Time Exceeded. UDP traceroute typically gets ICMP Port Unreachable (it sent to an unused high port). ICMP traceroute gets Echo Reply.",
-            "A star * in the output means that hop did not answer ICMP (filtered) but later hops did. That is not necessarily a down router.",
-            "TTL is an IP field, Network layer. Traceroute is not a Transport protocol; it is a tool that abuses TTL. TCP/UDP/ICMP may ride inside the probe.",
-          ],
-          result:
-            "Probes use TTL=1,2,3. Intermediate hops reply ICMP Time Exceeded. The destination replies Echo Reply or Port Unreachable. TTL is IP, not TCP.",
+            "NAT needed: 192.168.5.9, 172.31.255.1. Public: 8.8.8.8. Loopback: 127.0.0.1. Link-local: 169.254.1.1. Multicast: 224.0.0.1.",
         },
         {
           title: "Longest prefix match",
           prompt:
-            "Routing table: 0.0.0.0/0 → gw A, 10.0.0.0/8 → B, 10.1.0.0/16 → C, 10.1.2.0/24 → D. Where is 10.1.2.5 sent? Where is 10.2.0.1 sent? Where is 8.8.8.8 sent?",
-          language: "cpp",
-          code: `// 10.1.2.5  matches /8, /16, /24, /0  -> longest is /24 -> D
-// 10.2.0.1  matches /8 and /0         -> /8 -> B
-// 8.8.8.8   matches only /0           -> A
-// more-specific prefix always wins, even if the metric is larger
-// (unless an admin filter / AD says otherwise; Grade-A wants LPM)`,
+            "Table: 0.0.0.0/0 → A, 10.0.0.0/8 → B, 10.1.0.0/16 → C, 10.1.2.0/24 → D. Where do 10.1.2.5, 10.2.0.1, 8.8.8.8 go?",
           steps: [
-            "10.1.2.5 is in 10.1.2.0/24, also in 10.1.0.0/16, 10.0.0.0/8 and the default. Longest prefix is /24, next hop D.",
-            "10.2.0.1 is not in 10.1.0.0/16. It is in 10.0.0.0/8. Next hop B. The /16 does not ‘cover’ 10.2.",
-            "8.8.8.8 matches none of the 10.x routes, so default 0.0.0.0/0 via A.",
-            "Longest prefix match is the IP forwarding rule. It is why you can advertise a /32 host route that overrides a /24.",
-            "A switch would not do this: it has no IP table. A gateway/router would. That is the device-layer distinction of the next section.",
+            {
+              do: "10.1.2.5 matches /8, /16, /24, /0 → longest /24 → D.",
+              why: "The most specific street wins, like “12 Baker Street” beating “Baker Street” beating “London”.",
+            },
+            {
+              do: "10.2.0.1 is in /8 not /16 → B. 8.8.8.8 only matches default → A.",
+              why: "10.1.0.0/16 does not cover 10.2. Default is the leftover bin.",
+            },
+            {
+              do: "A switch would not do this: it has no IP table. A router would.",
+              why: "Longest prefix is the IP forwarding rule — layer 3.",
+            },
           ],
-          result:
-            "10.1.2.5 → D (/24). 10.2.0.1 → B (/8). 8.8.8.8 → A (default). Longest matching prefix wins.",
+          result: "10.1.2.5 → D (/24). 10.2.0.1 → B (/8). 8.8.8.8 → A (default).",
         },
         {
-          title: "ARP versus DNS versus routing — three different lookups",
+          title: "DNS then route then ARP",
           prompt:
-            "Host 192.168.1.10/24, gateway 192.168.1.1, wants https://example.com. Order the lookups: DNS, routing decision, ARP. What question does each answer?",
-          language: "python",
-          code: `# 1 DNS   name -> 203.0.113.10   (application / L7, usually UDP/53)
-# 2 route dest 203.0.113.10 not on 192.168.1.0/24 -> next hop = 192.168.1.1
-# 3 ARP   192.168.1.1 -> gateway MAC   (on-link L3-to-L2)
-# then frame to gateway MAC, packet dest IP still 203.0.113.10`,
+            "Host 192.168.1.10/24, gateway 192.168.1.1, wants https://example.com. Order the lookups.",
           steps: [
-            "DNS answers ‘what is the IP of example.com?’ It does not tell you the MAC or the next hop. Without DNS you cannot even fill the IP destination (unless you already had the IP).",
-            "The routing table answers ‘is that IP on my subnet? if not, which next-hop IP do I use?’ Here the dest is off-link, so the next hop is the default gateway 192.168.1.1.",
-            "ARP answers ‘what MAC is currently using 192.168.1.1 on this LAN?’ The Ethernet destination is that MAC, not the server’s MAC.",
-            "The IP packet’s destination field is still the server 203.0.113.10. ARP never changes IP headers. Routing never changes the DNS name.",
-            "If the destination had been 192.168.1.20 (same subnet), step 2 would say ‘on-link’ and step 3 would ARP for 192.168.1.20 directly, skipping the gateway.",
+            {
+              do: "DNS: name → 203.0.113.10. Route: dest not on 192.168.1.0/24 → next hop 192.168.1.1. ARP: 192.168.1.1 → gateway MAC.",
+              why: "Three questions: what IP is the name, which neighbour do I hand the packet to, what MAC is that neighbour using today?",
+            },
+            {
+              do: "Frame dest MAC is the gateway. Packet dest IP is still the server.",
+              why: "ARP never rewrites IPs. Routing never changes the DNS name.",
+            },
+            {
+              do: "If dest were 192.168.1.20 (same subnet), skip the gateway and ARP for 192.168.1.20 directly.",
+              why: "On-link means “they share this hallway”.",
+            },
           ],
           result:
-            "Order: DNS (name→IP), then route (IP→next-hop IP), then ARP (next-hop IP→MAC). Packet dest IP stays the server; frame dest MAC is the gateway.",
+            "DNS (name→IP), then route (IP→next-hop IP), then ARP (next-hop IP→MAC). Packet dest IP stays the server.",
+        },
+        {
+          title: "TTL expires: traceroute’s trick",
+          prompt:
+            "A packet is sent with TTL=1, then TTL=2, toward 8.8.8.8. What comes back, from whom, and at which layer is ICMP?",
+          steps: [
+            {
+              do: "First hop (home gateway) decrements TTL 1→0, drops the packet, sends ICMP Time Exceeded to you. That names hop 1.",
+              why: "TTL is a hop budget, not a timer in seconds. Traceroute repeats with a bigger budget to list the path.",
+            },
+            {
+              do: "TTL=2 dies at the next router. Eventually a hop delivers to 8.8.8.8 (or you see ICMP Echo Reply if it was ping).",
+              why: "Each probe is a new packet. Routers on the path are not ‘remembering traceroute’.",
+            },
+            {
+              do: "ICMP is network-layer signalling (L3), not an application like HTTP. Ping is ICMP, not TCP.",
+              why: "Favourite trap: ‘ping is layer 7’.",
+            },
+          ],
+          result:
+            "TTL=1 → ICMP Time Exceeded from hop 1. ICMP is L3. Traceroute maps the path by growing TTL.",
+        },
+        {
+          title: "ARP is not DNS and not routing",
+          prompt:
+            "Host wants 192.168.1.20 on its own /24. Empty ARP cache. Which lookup happens? Which two lookups do not?",
+          steps: [
+            {
+              do: "Dest is on-link, so no default gateway and no DNS (you already have the IP). ARP broadcast: who has 192.168.1.20? Reply is that host’s MAC.",
+              why: "ARP answers ‘what local envelope for this neighbour IP?’",
+            },
+            {
+              do: "DNS would run if you had a name, not an IP. Routing/longest-prefix would run if the dest were off-subnet.",
+              why: "Three different questions. Do not mix the tables.",
+            },
+            {
+              do: "The IP packet’s dest IP stays 192.168.1.20. Only the Ethernet dest MAC is filled from ARP.",
+              why: "ARP never rewrites IPs. NAT is the box that rewrites IPs.",
+            },
+          ],
+          result:
+            "On-link: ARP only. Not DNS, not the default route. Dest IP unchanged; dest MAC from ARP.",
         },
       ],
     },
     {
-      heading: "Hubs, switches, routers, gateways, firewalls",
-      body: `A hub is a Physical-layer multiport repeater. Every bit in comes out every other port. One collision domain for the whole hub. No MAC table, no IP. Half-duplex. Largely historical, but the exam still asks.
-
-A switch is a Data-Link device. It learns source MACs per port, forwards frames only to the port that owns the dest MAC, floods unknown unicast and all broadcast. Each port is its own collision domain (full duplex with no collisions on modern switched Ethernet). All ports remain one broadcast domain (unless you VLAN). A layer-3 switch can route between VLANs, at which point it is also acting as a router.
-
-A router is a Network-layer device. It strips the incoming L2 header, looks up the dest IP, decrements TTL, wraps a new L2 header for the next link. It splits broadcast domains. It needs IP addresses on its interfaces. It is the box that connects your LAN to another network.
-
-A gateway, in exam English, is a device that joins two networks that may not even share a protocol stack — a protocol translator, often at Application layer (mail gateway, payment gateway). Many texts also call the default router ‘the gateway’. If the options distinguish ‘router vs gateway’, pick gateway for protocol conversion and router for IP forwarding.
-
-A firewall filters traffic by policy. A packet filter uses L3/L4 fields (IP, port, protocol). A stateful firewall tracks TCP connections. An application/next-gen firewall inspects HTTP/DNS (L7). It can be a dedicated box, a router ACL, or host software. Placement: at the edge, between zones (DMZ), on the host. A firewall is not a substitute for TLS, and TLS is not a firewall.`,
+      heading: "Hub, switch, router, gateway, firewall",
+      body: "A hub is a loudspeaker: every bit out every port, one collision domain, layer 1. A switch is a smart sorter: learns MACs, sends a frame only to the right port, each port its own collision domain, still one broadcast domain unless you VLAN. A router is layer 3: strips L2, looks up IP, new L2 header, splits broadcasts.\n\nGateway in exam English often means a protocol translator (mail gateway, L7). People also call the default router “the gateway”. If options distinguish them: gateway = dissimilar protocols, router = IP hops. A firewall filters by policy (packet / stateful / application). It is not a substitute for TLS.",
+      howTo: [
+        "Who rewrites what: hub copies bits; switch uses MAC, same IP; router uses IP, new frame, TTL−1.",
+        "Collisions: hub shares one; switch splits per port; broadcasts die at the router.",
+        "Stem “dissimilar protocols” → gateway. Stem “decrements TTL” → router.",
+        "Firewall 5-tuple: protocol, src IP/port, dest IP/port. Stateful remembers TCP established.",
+      ],
       bullets: [
         "Hub L1: bits to all, one collision domain.",
         "Switch L2: MAC table, per-port collision domain, one broadcast domain.",
-        "Router L3: IP lookup, splits broadcasts, new L2 header per hop.",
-        "Gateway: protocol conversion (or ‘default gateway’ = your router).",
-        "Firewall: policy filter, packet / stateful / application.",
+        "Router L3: IP lookup, splits broadcasts. Gateway: protocol conversion (or “default gateway” = your router).",
       ],
       examples: [
         {
-          title: "Collision domains versus broadcast domains",
-          prompt:
-            "Four PCs plugged into a hub, that hub into a switch port, that switch into a router. Count collision domains and broadcast domains for the four PCs plus the router LAN interface.",
-          language: "java",
-          code: `// hub: all 4 PCs + the uplink share ONE collision domain
-// switch: the hub's uplink is one collision domain; each other switch
-//         port (the router) is another collision domain
-// router: LAN interface is its own collision domain (the switch port)
-// broadcasts: hub+switch = one broadcast domain until the router
-// router LAN is a different L3 network / broadcast domain`,
-          steps: [
-            "A hub never splits collisions: the four PCs and the cable to the switch are one collision domain. If two PCs talk at once, they jam.",
-            "The switch port that faces the hub is part of that same collision domain (it is attached to a hub). Each remaining switch port is a separate collision domain. The router’s LAN port is one of those.",
-            "So collision domains ≈ 2 in the minimal reading (hub blob + router port), or more if the switch has other unused ports we ignore. The exam’s intended count for ‘4 PCs on a hub, hub on a switch, switch on a router’ is: 1 collision domain for the hub side, 1 for the router side, total 2 collision domains in that LAN-plus-uplink picture. If all four PCs were on the switch directly, it would be 5 collision domains (4 PCs + router).",
-            "Broadcasts from a PC flood the hub and the switch, and die at the router. One broadcast domain for the four PCs and the switch. The router’s other interface is another broadcast domain.",
-            "Replace the hub with a switch and you get one collision domain per PC. That is why ‘switch instead of hub’ is the textbook upgrade.",
-          ],
-          result:
-            "Hub side = one shared collision domain; router’s switch port = another. One broadcast domain on the LAN, split by the router. Switches cut collisions; routers cut broadcasts.",
-        },
-        {
           title: "Which box rewrites which header?",
           prompt:
-            "A frame carrying an IP packet goes through a hub, then a switch, then a router. Who copies bits blindly, who looks at MAC, who looks at IP and builds a new frame?",
-          language: "python",
-          code: `# hub    : repeat bits on all ports. no MAC, no IP. collisions possible
-# switch : dest MAC -> port. same IP packet untouched. may rewrite VLAN tag
-# router : dest IP -> next hop. TTL--. NEW ethernet header (new MACs)`,
+            "A frame with an IP packet goes through a hub, then a switch, then a router.",
           steps: [
-            "Hub: Physical. It does not parse MAC or IP. If the incoming voltage is a collision, every port sees the collision.",
-            "Switch: Data Link. It reads dest MAC, looks up the CAM/MAC table, emits the same frame (same MACs, same IP) on the matching port. Unknown dest MAC is flooded.",
-            "Router: Network. It drops the incoming Ethernet header, inspects dest IP, decrements TTL, looks up the route, encapsulates in a new Ethernet header whose dest MAC is the next hop.",
-            "Therefore end-to-end MACs change every hop at a router, IPs (without NAT) do not. A switch hop changes neither MAC nor IP.",
-            "A transparent firewall in the path may look at all of the above and still forward without changing IPs (unless it is also NATing). Filtering ≠ rewriting.",
+            {
+              do: "Hub: bits, no MAC, no IP. Switch: dest MAC → port, IP untouched. Router: dest IP → next hop, TTL−1, new Ethernet header (new MACs).",
+              why: "Think loudspeaker, then local sorter, then city post office that puts a new van envelope on.",
+            },
+            {
+              do: "End-to-end MACs change at every router hop. IPs (without NAT) do not. A switch hop changes neither.",
+              why: "The letter’s street address stays; the van label changes.",
+            },
+            {
+              do: "Filtering ≠ rewriting. A transparent firewall may look and still forward the same IPs.",
+              why: "Policy is not the same as NAT.",
+            },
           ],
           result:
-            "Hub = bits. Switch = MAC, frame preserved. Router = IP, new frame, TTL−1. MACs change at routers; IPs stay until NAT.",
+            "Hub = bits. Switch = MAC, frame preserved. Router = IP, new frame, TTL−1.",
         },
         {
-          title: "Default gateway versus application gateway",
+          title: "Default gateway versus mail gateway",
           prompt:
-            "A host’s ‘default gateway’ is 192.168.1.1. A mail gateway translates SMTP to an internal mail API. Which OSI layers? Which device class?",
-          language: "cpp",
-          code: `// default gateway = router IP for off-subnet traffic (L3)
-// mail / payment / protocol gateway = application-layer translator (L7)
-// exam: if both options exist, 'gateway' = protocol conversion
-//       'router' = IP forwarding
-// many MCQs still call 192.168.1.1 'the gateway'`,
+            "Host default gateway 192.168.1.1. A mail gateway translates SMTP to an internal API. Layers? Device class?",
           steps: [
-            "192.168.1.1 in the host’s routing table is the default route’s next hop. That box is a router (L3). People call it ‘the gateway’ in IPv4 configuration (the field name is Default Gateway).",
-            "A mail gateway accepts SMTP on one side and speaks a different protocol on the other. That is an Application-layer gateway (ALG), a true protocol converter.",
-            "If the question lists both router and gateway and the stem says ‘connects two dissimilar networks / protocols’, tick gateway.",
-            "If the stem says ‘forwards IP packets between two subnets / decrements TTL’, tick router.",
-            "A firewall may sit on the same appliance as the router/gateway. Then the box is ‘a filtering gateway’. Still name the function the stem asked for.",
+            {
+              do: "192.168.1.1 is the default route’s next hop — a router (L3). Config screens still call the field “Default Gateway”.",
+              why: "That box forwards IP when the dest is off-subnet.",
+            },
+            {
+              do: "Mail/payment gateway that changes protocol is Application-layer (L7) conversion — a true gateway in the exam contrast.",
+              why: "If both words appear: dissimilar protocols → gateway; IP hops / TTL → router.",
+            },
+            {
+              do: "A firewall may sit on the same appliance. Name the function the stem asked for.",
+              why: "One box, several jobs. Tick the job.",
+            },
           ],
           result:
-            "Default gateway 192.168.1.1 = L3 router. Mail/protocol gateway = L7 converter. Use ‘gateway’ for dissimilar protocols, ‘router’ for IP hops.",
+            "Default gateway 192.168.1.1 = L3 router. Mail gateway = L7 converter.",
         },
         {
-          title: "Packet-filter firewall rule: allow HTTPS out",
+          title: "Allow HTTPS out",
           prompt:
-            "Write a 5-tuple rule that allows internal 10.0.0.0/8 to reach any public HTTPS server, and explain why a matching UDP/443 rule is a different decision. Stateful versus stateless?",
-          language: "java",
-          code: `// allow tcp 10.0.0.0/8  any   any  443   outbound
-// then allow established inbound (stateful) OR
-//    explicit tcp any 443  10.0.0.0/8  any  ack (ugly, stateless)
-// UDP/443 would be QUIC/HTTP3, not classic HTTPS-on-TCP
-// deny all is the implicit last rule`,
+            "Internal 10.0.0.0/8 to any public HTTPS server. Why is UDP/443 a different allow? Stateful vs stateless?",
           steps: [
-            "The 5-tuple is protocol, src IP, src port, dest IP, dest port. Here: TCP, 10.0.0.0/8, any ephemeral, any dest IP, dest 443, direction out.",
-            "Replies come back src 443 → the client’s ephemeral port. A stateful firewall matches them as ‘established’ without an extra rule. A stateless packet filter must allow incoming TCP/443 traffic with ACK set — a cruder approximation.",
-            "UDP dest 443 is not the same protocol. Opening it admits QUIC or any UDP tunnel on 443. Tick it only if the stem asked for HTTP/3.",
-            "A deny-all last rule drops everything else (SMTP, SSH, random scans). Without it an ‘allow HTTPS’ rule on a default-allow box does nothing useful.",
-            "This is L3/L4 filtering. It cannot stop a malware HTTPS session to a C2 server on 443 — that needs L7 / TLS inspection / threat intel, i.e. a different firewall class.",
+            {
+              do: "Allow TCP 10.0.0.0/8:* → *:443 outbound. Stateful firewall then allows established replies without a second guess.",
+              why: "Replies come back src 443 → the client’s high port. State tracks that conversation.",
+            },
+            {
+              do: "UDP dest 443 is QUIC/HTTP3 or any UDP tunnel — a separate decision. Last rule deny-all.",
+              why: "Opening UDP/443 is not “the same HTTPS”. Without deny-all, an allow on a default-allow box does nothing useful.",
+            },
+            {
+              do: "This is L3/L4. It cannot stop malware HTTPS to a bad server on 443 — that needs L7 inspect.",
+              why: "A port allow is not antivirus.",
+            },
           ],
           result:
-            "Allow TCP 10.0.0.0/8:* → *:443 out, plus stateful established back. UDP/443 is a separate allow. Stateless boxes fake established with ACK bits. Last rule deny-all.",
+            "Allow TCP 10/8 → *:443 out plus stateful established back. UDP/443 is separate. Last rule deny-all.",
+        },
+        {
+          title: "Collision domain versus broadcast domain",
+          prompt:
+            "Five PCs on one hub. Then those PCs each on a switch port. Then a router between two switches. Who shares collisions? Who shares broadcasts?",
+          steps: [
+            {
+              do: "Hub: one collision domain (all five share the shout) and one broadcast domain.",
+              why: "A hub is a loudspeaker. Everyone hears bits and broadcasts.",
+            },
+            {
+              do: "Switch: five collision domains (one per port) but still one broadcast domain (ARP ff:ff:ff:ff:ff:ff is flooded).",
+              why: "A switch splits collisions, not broadcasts, unless you VLAN.",
+            },
+            {
+              do: "Router: two broadcast domains. A broadcast on LAN A does not cross to LAN B. Each LAN keeps its own ARP world.",
+              why: "Broadcasts die at L3. That is a reason we subnet.",
+            },
+          ],
+          result:
+            "Hub: 1 collision + 1 broadcast. Switch: per-port collisions, 1 broadcast. Router: splits broadcasts.",
+        },
+        {
+          title: "Firewall is policy, router is forwarding",
+          prompt:
+            "A box has an IP table and also drops TCP/23. Is it a router, a firewall, or both? What does ‘stateful’ add?",
+          steps: [
+            {
+              do: "Forwarding by dest IP (TTL−1, new MAC) is the router job. Dropping Telnet 23 is a firewall job. Home gateways do both.",
+              why: "One appliance, two functions. Tick the function the stem asked.",
+            },
+            {
+              do: "Stateless: each packet is judged alone (5-tuple). Stateful: after an inside TCP handshake, replies are allowed as ‘established’ without a second guess.",
+              why: "State remembers the conversation, like a receptionist who already signed you in.",
+            },
+            {
+              do: "A filter is not NAT. NAT rewrites addresses. A transparent firewall may leave IPs unchanged.",
+              why: "Policy ≠ rewrite. Need both sentences when the stem mixes them.",
+            },
+          ],
+          result:
+            "IP hop = router. Port drop = firewall. Stateful allows established replies. NAT is a third job.",
         },
       ],
     },
     {
       heading: "Ethernet CSMA/CD and Token Ring",
-      body: `Ethernet (IEEE 802.3) is the dominant LAN. Classic shared-medium Ethernet used CSMA/CD: Carrier Sense (listen before talk), Multiple Access (many stations, one coax or hub), Collision Detection (if two talk at once, abort, send a jam, binary exponential backoff, retry). Minimum frame size (64 bytes) and maximum cable length existed so a sender would still be transmitting when the collision came back — otherwise CD would fail.
-
-Switched, full-duplex Ethernet (what you actually have now) has no collisions on a point-to-point link: each port is a collision domain of one. CSMA/CD is then idle. The exam still wants the algorithm, the jam signal, backoff, and the reason hubs collide while switches do not.
-
-MAC addresses are 48-bit burned-in identifiers on the NIC, written as six octets. Frames: dest MAC, src MAC, EtherType (or 802.3 length), payload, FCS. Broadcast MAC ff:ff:ff:ff:ff:ff. A switch floods broadcasts. VLANs (802.1Q) tag frames to split broadcast domains without extra routers (until they need to talk, then a L3 device routes).
-
-Token Ring (IEEE 802.5, IBM) is a token-passing ring. A special token frame circulates; only the holder may transmit a data frame, then releases the token. No collisions by design. Deterministic worst-case wait (useful in old industrial talk). Physical star with a MAU is possible (logical ring). Largely obsolete, still in the SEBI syllabus next to Ethernet.
-
-Compare: Ethernet is probabilistic under load on a hub (collisions explode); Token Ring degrades linearly. Ethernet won on cost and speed (10M → 100M → 1G → 10G) and on switching, which removed the collision problem. If a question says ‘collision’ think Ethernet/hub; if it says ‘token’ think 802.5.`,
+      body: "Classic shared Ethernet uses CSMA/CD: listen before talking, if two talk at once abort, send a jam, wait a random growing time (binary exponential backoff), retry. Minimum 64-byte frame so you are still talking when the collision echo returns. Switched full-duplex Ethernet has no shared shout — CSMA/CD sleeps.\n\nToken Ring (802.5) passes a token; only the holder may send. No collisions by design, fair under load, mostly historical. If the stem says collision/jam/backoff → Ethernet. If it says token/deterministic → Token Ring.",
+      howTo: [
+        "Walk CSMA/CD: sense idle → send → detect → jam → backoff → retry. 64-byte min ↔ max cable length.",
+        "Hub: collisions. Full-duplex switch port: no CD. Autoneg to a hub brings CD back.",
+        "Broadcast MAC ff:ff:ff:ff:ff:ff is flooded in the VLAN; routers do not pass it to another subnet.",
+        "EtherType 0x0800 IPv4, 0x0806 ARP, 0x86DD IPv6.",
+      ],
       bullets: [
-        "CSMA/CD: listen, send, detect collision, jam, exponential backoff.",
+        "CSMA/CD: listen, send, detect, jam, exponential backoff.",
         "Hubs collide; full-duplex switch ports do not.",
-        "Token Ring 802.5: token holder transmits, no CD, deterministic.",
-        "MAC 48-bit, frame + FCS, broadcast all-FFs. VLAN splits broadcasts.",
+        "Token Ring: token holder transmits, no CD, deterministic. MAC 48-bit, broadcast all-FFs.",
       ],
       examples: [
         {
-          title: "CSMA/CD walk-through of one collision",
+          title: "One collision on a hub",
           prompt:
-            "Stations A and B share a hub. Both sense idle and start sending. Describe the five steps until A’s retry succeeds. Why a 64-byte minimum frame?",
-          language: "python",
-          code: `# 1 carrier sense: both see idle
-# 2 both transmit
-# 3 collision detection: voltage anomaly / jabber
-# 4 jam signal so everyone else notices, then stop
-# 5 binary exponential backoff: wait k * slot, k random in 0..2^r - 1
-#    r = retry count (capped, e.g. at 10), then retry from step 1
-# min frame 64 B so transmission lasts at least one round-trip of the wire`,
+            "Stations A and B share a hub. Both sense idle and send. Five steps until a retry. Why 64-byte minimum?",
           steps: [
-            "Carrier sense: A and B listen, hear silence, conclude the medium is free. Multiple access means they are allowed to try.",
-            "They transmit at (almost) the same time. The hub repeats both signals onto the shared electrical domain. The voltages collide.",
-            "Collision detection: each sender hears a garbled signal unlike its own. Both abort. A jam (32 bits of pattern) is sent so that even stations that have not yet noticed will discard the fragment.",
-            "Backoff: attempt r=1, pick k in {0,1}, wait k slot times. If they collide again, r=2, k in {0,1,2,3}, and so on. This is binary exponential backoff. After 16 failures the frame is dropped.",
-            "Minimum 64-byte frame: A must still be transmitting when B’s colliding bits travel to A, otherwise A would have finished, declared success, and missed the collision. Max cable length and min frame size are a pair.",
+            {
+              do: "Both listen, hear silence, transmit. Hub mixes the voltages. Each hears a mess, aborts, jams, then waits k slot times with k random in 0..2^r−1.",
+              why: "Carrier sense + multiple access + collision detection. Jam so late listeners also drop the fragment. Backoff spreads retries so they do not collide forever.",
+            },
+            {
+              do: "A must still be transmitting when B’s colliding bits arrive, else A would think it succeeded. That is the 64-byte minimum + max length pair.",
+              why: "If you finish the shout before the echo, you cannot hear the crash.",
+            },
+            {
+              do: "Switched full-duplex skips this dance. Two sends at once are queued in the switch, not jammed.",
+              why: "There is no shared coaxial tap. Each cable is a private lane.",
+            },
           ],
           result:
-            "Listen → both send → detect → jam → exponential backoff → retry. 64-byte minimum exists so CD can work on the longest legal segment. Switched full-duplex skips this whole dance.",
+            "Listen → both send → detect → jam → exponential backoff. 64-byte min so CD can work. Switched full-duplex skips it.",
         },
         {
-          title: "Token Ring versus Ethernet under heavy load",
+          title: "Token Ring versus hub Ethernet under load",
           prompt:
-            "Ten stations each always have a frame ready. Contrast utilisation on a CSMA/CD hub Ethernet versus a Token Ring. Who transmits when?",
-          language: "java",
-          code: `// Token Ring: token circulates. Station i holds it, sends one frame
-// (or a token-holding timer), releases token. Next station. Fair, no CD.
-// Ethernet hub: many collisions, backoff windows grow, utilisation falls.
-// Switched Ethernet: each station has its own collision domain, full duplex,
-// collisions ~ 0, utilisation high — this is why Token Ring lost the market.`,
+            "Ten stations always have a frame ready. Contrast utilisation. Who transmits when?",
           steps: [
-            "Token Ring: a single token is the right to send. With ten eager stations the token rotates; each sends in turn. Throughput stays high; latency is bounded by (n × frame time).",
-            "Hub Ethernet: many stations sensing idle will collide repeatedly. Backoff intervals grow. Useful utilisation can collapse — the classic ‘Ethernet is non-deterministic under load’ exam line.",
-            "There is still no collision on Token Ring because two data frames are never legally on the ring at once (early token release variants still avoid CD).",
-            "A modern Ethernet switch gives each station a private wire. CSMA/CD becomes irrelevant; Ethernet then beats Token Ring on speed and price. Syllabus still wants both algorithms.",
-            "If the stem says ‘deterministic access / token’ pick Token Ring. If it says ‘collision / backoff / jam’ pick Ethernet CSMA/CD.",
+            {
+              do: "Token Ring: token rotates; each sends in turn. Fair, no CD, latency bounded.",
+              why: "One talking-stick. Two data frames are not legally on the ring at once.",
+            },
+            {
+              do: "Hub Ethernet: collisions explode, backoff windows grow, useful utilisation can collapse.",
+              why: "Many stations sensing “idle” will crash together. Classic “non-deterministic under load”.",
+            },
+            {
+              do: "A modern switch gives each station a private wire — Ethernet then beat Token Ring on speed and price. Syllabus still wants both algorithms.",
+              why: "Exam: collision/backoff → Ethernet CSMA/CD. Token/deterministic → 802.5.",
+            },
           ],
           result:
-            "Token Ring stays fair and collision-free under load. Hub Ethernet collides and backs off. Switched Ethernet also avoids collisions, which is how Ethernet displaced Token Ring.",
+            "Token Ring stays fair and collision-free under load. Hub Ethernet collides and backs off. Switched Ethernet also avoids collisions.",
         },
         {
-          title: "Read an Ethernet frame header",
+          title: "Broadcast Ethernet frame",
           prompt:
-            "Bytes: dest ff:ff:ff:ff:ff:ff, src 00:11:22:33:44:55, EtherType 0x0806, then an ARP request. Who receives it on a switched LAN? Which layer is this?",
-          language: "cpp",
-          code: `// dest all-FFs = broadcast MAC
-// switch floods broadcasts out every port in the VLAN except ingress
-// EtherType 0x0806 = ARP, 0x0800 = IPv4, 0x86DD = IPv6
-// ARP is usually drawn at L2/L3 boundary; the FRAME is Data Link`,
+            "Dest ff:ff:ff:ff:ff:ff, src 00:11:22:33:44:55, EtherType 0x0806 (ARP). Who receives it on a switched LAN?",
           steps: [
-            "The destination MAC is the broadcast address. Every NIC on the LAN (the VLAN) will accept the frame. A switch floods it; a router will not forward it to another subnet.",
-            "Source MAC 00:11:22:33:44:55 is the sender’s NIC. The switch learns that MAC on the ingress port (MAC table update).",
-            "EtherType 0x0806 identifies ARP in the payload. 0x0800 would have been IPv4, 0x86DD IPv6. This field is how L2 demultiplexes L3.",
-            "The PDU is a frame, Data Link layer. ARP’s job (IP↔MAC) sits at the L2/L3 boundary, but the question asked about the Ethernet header, which is L2.",
-            "A hub would also deliver it to everyone, including the sender’s other ears, and would not learn a MAC table. The learning is the switch’s extra.",
+            {
+              do: "Every NIC in the VLAN accepts it. The switch floods all ports except ingress and learns the source MAC on the ingress port.",
+              why: "All-FFs is “everyone in this hall”. A router will not forward it to another subnet.",
+            },
+            {
+              do: "The PDU is a frame (Data Link). ARP’s job (IP↔MAC) sits on the L2/L3 boundary, but the header you were shown is L2.",
+              why: "Answer the layer of the bytes they printed.",
+            },
+            {
+              do: "A hub would also deliver it to everyone, but would not learn a MAC table.",
+              why: "Learning is the switch’s extra.",
+            },
           ],
           result:
-            "Broadcast frame, flooded by the switch to all ports in the VLAN. Data Link. EtherType 0x0806 = ARP. Routers do not pass it between subnets.",
+            "Broadcast frame, flooded in the VLAN. Data Link. EtherType 0x0806 = ARP. Routers do not pass it between subnets.",
         },
         {
-          title: "Why full-duplex switched Ethernet disables CSMA/CD",
+          title: "Binary exponential backoff after two collisions",
           prompt:
-            "PC A — switch — PC B, both links 1 Gbit full duplex. A and B send at the same time. Is there a collision? Which CSMA/CD steps still run?",
-          language: "python",
-          code: `# each cable is two independent directions (or paired lanes)
-# switch has a buffer: A-to-B frame stored and forwarded to B
-# B-to-A frame stored and forwarded to A
-# no shared medium, no collision, no jam, no backoff
-# autonegotiation: if a hub (half duplex) is detected, CD comes back`,
+            "A and B collide, r=1. They collide again, r=2. What is the backoff window in slot times? Why random?",
           steps: [
-            "Full duplex means A can send and receive on its link at once. The switch can do the same on B’s link. There is no shared coaxial tap.",
-            "Both sending at once is fine: the switch queues each frame on the opposite port. Overload causes buffer drops (or pause frames), not CD jams.",
-            "Carrier sense is unused because the medium is not multiple-access in the old sense. Collision detection has nothing to detect. Backoff never runs.",
-            "Plug the same PCs into a hub (or force half duplex) and CSMA/CD returns. The algorithm is a property of the shared medium, not of ‘being Ethernet’ in the marketing sense.",
-            "Exam sentence: ‘in a switched full-duplex LAN the collision domain is a single port and CSMA/CD is effectively disabled.’ Tick that, not ‘Ethernet never had collisions’.",
+            {
+              do: "After the first collision r=1, pick k in 0..1 (2¹−1). After the second, r=2, pick k in 0..3 (2²−1) slot times.",
+              why: "The window doubles so two stubborn stations are less likely to pick the same k again.",
+            },
+            {
+              do: "Random matters: if both always waited 1 slot they would collide forever.",
+              why: "Backoff without randomness is just a scheduled crash.",
+            },
+            {
+              do: "Give up after a cap (classic 16 tries). Switched full-duplex never runs this loop.",
+              why: "CSMA/CD is the shared-medium algorithm, not modern full-duplex Ethernet’s daily life.",
+            },
           ],
           result:
-            "No collision. The switch buffers both frames. CSMA/CD is idle on full-duplex point-to-point links; it still matters on hubs and half-duplex links.",
+            "r=1 → k in 0..1. r=2 → k in 0..3. Window 2^r−1. Random so retries spread.",
+        },
+        {
+          title: "Why CSMA/CD sleeps on a full-duplex switch port",
+          prompt:
+            "Laptop — switch, both ends full-duplex, no hub. Two frames at once, opposite directions. Collision? Jam?",
+          steps: [
+            {
+              do: "No shared coaxial tap. Send and receive use separate lanes (or the switch queues). There is nothing to ‘hear as a mess’.",
+              why: "Collision detection needs a shared shout. Full-duplex removed the shout.",
+            },
+            {
+              do: "The switch may buffer. That is queuing, not a CD jam. No exponential backoff on the wire.",
+              why: "Do not draw jam/backoff on a modern switched exam topology unless they put a hub back in.",
+            },
+            {
+              do: "If autoneg falls back to a hub or half-duplex, CSMA/CD returns. The algorithm follows the medium.",
+              why: "Device class (hub vs switch) picks the story.",
+            },
+          ],
+          result:
+            "Full-duplex switch port: no CD, no jam. Buffering ≠ collision. Hub/half-duplex brings CD back.",
         },
       ],
     },
     {
-      heading: "Application protocols and well-known ports",
-      body: `Memorise the port, the transport, and the one-line job. DNS 53/UDP (queries) and 53/TCP (zone transfers, truncated replies). SMTP 25/TCP (MTA-to-MTA mail transfer); submission 587/TCP; SMTPS 465/TCP. POP3 110/TCP (download and usually delete from the mailbox); POP3S 995. IMAP 143/TCP (folders stay on the server); IMAPS 993. FTP 21/TCP control, 20/TCP active data; PASV uses a dynamic data port. HTTP 80/TCP. HTTPS 443/TCP (HTTP over TLS). SSH 22, Telnet 23, DHCP 67 server / 68 client UDP, SNMP 161/UDP, NTP 123/UDP.
-
-SMTP pushes mail between servers and from a submission client. POP pulls mail down and is weak at multi-device. IMAP is the multi-device folder protocol. The exam loves ‘which protocol leaves mail on the server?’ → IMAP.
-
-FTP is two channels (control and data) and is firewall-hostile; SFTP is not FTP, it is SSH file transfer on port 22. TFTP 69/UDP is the LAN bootstrap toy. HTTP is stateless request/reply; cookies and TLS sit on top. HTTPS is HTTP over a TLS session, same HTTP semantics, different port and encryption.
-
-DNS maps names to addresses (and more: MX, CNAME, TXT). A stub resolver queries a recursive resolver; that resolver walks from the root if needed. Poisoning and cache issues belong to the security paper; here you need port 53 and UDP-vs-TCP.
-
-When two protocols could fit, the stem’s verb decides: ‘send mail between MTAs’ SMTP, ‘read mail from two phones without deleting’ IMAP, ‘old client that downloads and removes’ POP, ‘resolve www.sebi.gov.in’ DNS, ‘fetch a page encrypted’ HTTPS.`,
+      heading: "Application protocols and ports",
+      body: "Memorise port, transport, and one-line job. DNS 53 UDP (queries) / TCP (zone transfers). SMTP 25 (server mail). POP3 110 (download, often delete). IMAP 143 (folders stay on the server). FTP 21 control (20 data). HTTP 80. HTTPS 443. SSH 22. Telnet 23. DHCP 67/68 UDP.\n\nIMAP keeps mail on the server for two phones. POP typically pulls it down. SFTP is not FTP — it is SSH file transfer on 22. HTTPS is HTTP inside TLS, same language, locked envelope, port 443.",
+      howTo: [
+        "Verb in the stem: send between MTAs → SMTP 25; folders on server → IMAP 143; download-and-delete → POP 110; resolve a name → DNS 53; encrypted page → HTTPS 443.",
+        "TLS twins: POP3S 995, IMAPS 993, SMTPS 465. SSH 22 ≠ Telnet 23.",
+        "FTP active data is inbound to the client (NAT-hostile). Passive is client-outbound. SFTP: one TCP/22.",
+        "HTTPS-direct uses dest 443. A non-intercepting observer sees IPs/ports, not the HTTP path.",
+      ],
       bullets: [
-        "DNS 53 UDP/TCP. SMTP 25. POP 110. IMAP 143. FTP 21/20. HTTP 80. HTTPS 443.",
-        "Secure variants: POP3S 995, IMAPS 993, SMTPS 465, SSH 22 (not Telnet 23).",
+        "DNS 53. SMTP 25. POP 110. IMAP 143. FTP 21/20. HTTP 80. HTTPS 443. SSH 22.",
         "IMAP keeps folders on the server; POP typically downloads.",
         "FTP ≠ SFTP. HTTPS = HTTP + TLS on 443.",
       ],
       examples: [
         {
-          title: "Port table: fill the blanks",
+          title: "Fill the port table",
           prompt:
-            "Name protocol and port: (i) encrypted web, (ii) name resolution query, (iii) mail between two MTAs, (iv) mail folders on the server, (v) download-and-delete mailbox, (vi) file transfer control channel.",
-          language: "python",
-          code: `# (i) HTTPS 443/TCP
-# (ii) DNS 53/UDP (TCP if needed)
-# (iii) SMTP 25/TCP
-# (iv) IMAP 143/TCP  (993 if TLS)
-# (v) POP3 110/TCP   (995 if TLS)
-# (vi) FTP 21/TCP    (SFTP would be 22, different protocol)`,
+            "(i) encrypted web (ii) name query (iii) mail between MTAs (iv) folders on server (v) download-and-delete (vi) FTP control.",
           steps: [
-            "Encrypted web is HTTPS on 443/TCP. HTTP 80 is the cleartext twin. The application data is still HTTP.",
-            "Name resolution queries go to 53/UDP. Zone transfer (AXFR) uses 53/TCP. A truncated UDP answer also retries TCP.",
-            "MTA-to-MTA is SMTP/25. A mail client submitting to its ISP often uses 587 (submission) instead of 25, because ISPs block outbound 25 to fight bots.",
-            "Folders on the server = IMAP/143. Download-and-delete = POP3/110. That pair is the highest-yield mail distinction.",
-            "FTP control is 21. Data is 20 in active mode. SFTP is not FTP-over-TLS (that is FTPS); SFTP is the SSH subsystem on 22.",
+            {
+              do: "443 HTTPS, 53 DNS, 25 SMTP, 143 IMAP, 110 POP3, 21 FTP control.",
+              why: "Encrypted web is still HTTP data, just in TLS on 443. IMAP vs POP is the highest-yield mail pair.",
+            },
+            {
+              do: "SFTP would be 22 — a different protocol, not “FTP on 22”. FTPS is FTP + TLS and still two channels.",
+              why: "The exam loves that distinction.",
+            },
+            {
+              do: "DNS queries UDP/53; AXFR and truncated retries use TCP/53.",
+              why: "Same port, different transport when the answer is bulk or too big.",
+            },
           ],
           result:
-            "443 HTTPS, 53 DNS, 25 SMTP, 143 IMAP, 110 POP3, 21 FTP control. Remember the TLS twins 995/993/465 and SSH 22.",
+            "443 HTTPS, 53 DNS, 25 SMTP, 143 IMAP, 110 POP3, 21 FTP. Remember TLS twins 995/993/465 and SSH 22.",
         },
         {
-          title: "A day in the life of sending an email",
+          title: "Send mail, then read it on IMAPS",
           prompt:
-            "User on IMAPS composes mail in a phone, sends it, recipient reads it on another IMAPS client. Which protocols and ports fire, in order?",
-          language: "java",
-          code: `// 1 client --587/TCP or 465--> submission SMTP (with STARTTLS or SMTPS)
-// 2 sending MTA --25/TCP--> recipient MX (DNS MX lookup on 53 first)
-// 3 recipient MTA stores mailbox
-// 4 recipient client --993/TCP IMAPS--> fetches the message
-// POP3 would have been 995 and might delete off the server`,
+            "Phone submits mail, servers relay, another device reads folders. Ports in order?",
           steps: [
-            "The phone does not usually speak to the destination MX on port 25 (blocked, and needs auth). It submits to its provider on 587 or 465, authenticated.",
-            "The sending MTA asks DNS (53) for the recipient domain’s MX record, then SMTP/25 to that MX. This is server-to-server.",
-            "The message sits in the recipient’s mailbox store. No POP/IMAP yet.",
-            "The recipient’s second device opens IMAPS/993, lists the inbox, fetches the body. The first device still sees the same folder — that is IMAP.",
-            "If the recipient had used POP3S/995 with ‘delete on download’, the phone would not see the mail later. That is why corporate questions prefer IMAP.",
+            {
+              do: "Phone → submission 587 or 465 (auth). Sending MTA DNS/53 for MX, then SMTP/25 to the recipient MX. Store. Recipient client IMAPS/993.",
+              why: "Clients rarely speak to the dest MX on 25 (blocked, needs auth). Server-to-server is 25. Reading shared folders is IMAP, not POP.",
+            },
+            {
+              do: "POP3S/995 with delete-on-download would hide the mail from the second device.",
+              why: "That is why corporates prefer IMAP.",
+            },
+            {
+              do: "No POP/IMAP runs during the SMTP hop — the message is just sitting in the store.",
+              why: "Sending and reading are different protocols.",
+            },
           ],
           result:
-            "Submit SMTP 587/465 → DNS 53 for MX → SMTP 25 MTA-to-MTA → store → IMAPS 993 to read. POP3 would download (and maybe delete) instead of sharing folders.",
+            "Submit 587/465 → DNS 53 MX → SMTP 25 → store → IMAPS 993. POP would download (and maybe delete).",
         },
         {
-          title: "HTTP versus HTTPS versus the port a proxy sees",
+          title: "Active FTP dies on NAT; SFTP does not",
           prompt:
-            "A GET https://sebi.gov.in/ is issued. Which port leaves the client? What can a corporate HTTP proxy still see without TLS interception? What would port 80 have exposed?",
-          language: "cpp",
-          code: `// client TCP dest port 443, SNI (in TLS ClientHello, now often encrypted)
-// HTTP method, path, headers, cookies are inside TLS - proxy sees IPs and SNI maybe
-// port 80: GET /path, Host, cookies, body all in clear on the LAN`,
+            "FTP control 21. Active: server connects back to the client for data. Passive: client connects out to a server port. Which fails through home NAT? What does SFTP do?",
           steps: [
-            "The client opens TCP to the server (or proxy) on 443. There is no port 80 in the HTTPS-direct path.",
-            "TLS then encrypts the HTTP request. A non-intercepting proxy or path observer sees IPs, ports, maybe SNI, and traffic sizes — not the URL path or cookie.",
-            "On port 80 the GET line, Host header, cookies and body travel in cleartext. Anyone on the hub / mirrored switch / coffee-shop Wi-Fi can read them.",
-            "A TLS-intercepting (break-and-inspect) proxy installs a corporate CA on the client, terminates TLS, and can read HTTP. That is a firewall/security topic; the port is still 443 on both legs, with a different cert.",
-            "‘HTTPS is Application’ remains true: HTTP methods sit in L7, TLS wraps them (Presentation), TCP 443 is Transport.",
+            {
+              do: "Active data is inbound to the client — NAT and client firewalls drop it. Passive is outbound — usually allowed.",
+              why: "Home NAT only has mappings for conversations the inside started, unless you port-forward.",
+            },
+            {
+              do: "SFTP uses one SSH TCP/22. No second channel, no FTP ALG. It is not FTP.",
+              why: "One hose through the firewall. That is the operational replacement.",
+            },
+            {
+              do: "FTPS still has two channels and is painful with TLS (the ALG cannot rewrite hidden PORT/PASV).",
+              why: "Encrypting FTP commands blinds the helper that used to fix NAT.",
+            },
           ],
           result:
-            "Client uses 443. Without interception the proxy does not see the HTTP path. Port 80 would have exposed the whole request. HTTPS = HTTP + TLS, not a different application language.",
+            "Active FTP data dies on NAT. Passive is client-outbound. SFTP on 22 avoids a second channel. FTP 21/20 ≠ SFTP 22.",
         },
         {
-          title: "FTP active versus passive, and why firewalls hate it",
+          title: "Well-known versus ephemeral ports",
           prompt:
-            "FTP control is on 21. In active mode the server connects back to the client’s port 20-story (client port given in PORT). In passive, the client connects to a server-chosen data port. Which direction fails through a typical NAT firewall, and what is SFTP’s answer?",
-          language: "python",
-          code: `# active: server-to-client data connection (PORT). inbound to client - NAT fails
-# passive: client-to-server data (PASV). outbound, NAT-friendly
-# SFTP: one SSH TCP/22 multiplexed channel, no second TCP, firewall-friendly
-# FTPS: FTP + TLS, still two channels, still painful`,
+            "Client 192.168.1.10:51732 talks to 93.184.216.34:443. Which side is the server? Who chose 51732? After close, can another app reuse 443?",
           steps: [
-            "Control channel: client → server :21. Commands USER, PASV, RETR live here. This channel is easy to allow.",
-            "Active data: the server initiates a connection to the client (source port 20 historically). Home NAT and client firewalls drop unsolicited inbound. Active mode breaks.",
-            "Passive data: the server returns a port in PASV; the client originates the data TCP. Outbound is usually allowed. Passive is the NAT-friendly FTP.",
-            "A stateful FTP ALG can rewrite PORT/PASV addresses, which is fragile with TLS (FTPS hides the commands).",
-            "SFTP (SSH file transfer) uses a single TCP/22. No second port, no ALG. That is the operational replacement, and it is not ‘FTP on 22’.",
+            {
+              do: "443 is well-known HTTPS — the bound service, the server. 51732 is ephemeral — the client’s temporary source port.",
+              why: "Well-known ports (0–1023, plus familiar 1433/3306/…) name the application. High ports are tickets for one conversation.",
+            },
+            {
+              do: "The OS picked 51732 from a pool so two browser tabs do not share the same 5-tuple.",
+              why: "A connection is protocol + two IPs + two ports. The extra number multiplexes clients.",
+            },
+            {
+              do: "Port 443 on the server stays bound. Many clients share dest 443 with different source ports. After a client close, 51732 goes back to the pool (after TIME-WAIT on TCP).",
+              why: "The service port does not move just because one client left.",
+            },
           ],
           result:
-            "Active FTP data is inbound to the client and dies on NAT. Passive is client-outbound. SFTP on 22 avoids a second channel entirely. FTP 21/20 ≠ SFTP 22.",
+            "Server = :443. Client chose ephemeral 51732. 443 stays the service; the high port is per-connection.",
+        },
+        {
+          title: "DNS 53, mail 25/143/110, remote 22/23 — pick four",
+          prompt:
+            "(i) SSH (ii) Telnet (iii) IMAP folders (iv) SMTP between servers. Why is 22 encrypted and 23 not, by syllabus default?",
+          steps: [
+            {
+              do: "22 SSH, 23 Telnet, 143 IMAP, 25 SMTP.",
+              why: "Remote shell pair and mail pair are high-yield. Do not swap IMAP 143 with POP 110.",
+            },
+            {
+              do: "SSH encrypts the session (and can carry SFTP on the same 22). Telnet 23 is cleartext — passwords on the wire.",
+              why: "That is why Telnet is a museum piece and a finding in audits.",
+            },
+            {
+              do: "SMTP 25 is server-to-server. User submission is often 587/465. Same family, different door.",
+              why: "Read ‘between MTAs’ versus ‘phone sends mail’.",
+            },
+          ],
+          result:
+            "SSH 22, Telnet 23, IMAP 143, SMTP 25. SSH is encrypted; Telnet is not. SFTP is 22, not FTP 21.",
         },
       ],
     },
     {
-      heading: "TCP three-way handshake and connection teardown",
-      body: `A TCP connection is a 4-tuple plus two sequence spaces. Creation is the three-way handshake. (1) Client sends SYN with its Initial Sequence Number ISN_c = x, ACK flag off (or ACK=0). State SYN-SENT. (2) Server replies SYN-ACK, ISN_s = y, acknowledgement number x+1. State SYN-RECEIVED. (3) Client sends ACK, acknowledgement y+1, sequence x+1. Both sides ESTABLISHED. Each SYN consumes one sequence number even with no payload.
-
-The handshake negotiates MSS, window scaling, SACK permitted, and timestamps in TCP options. It also proves both sides can send and receive. A half-open connection is one that finished only one direction (classic SYN flood: many SYNs, no third ACK, backlog of SYN-RECEIVED). SYN cookies are a defence.
-
-Teardown is a four-way exchange because each direction closes independently: FIN, ACK of that FIN, FIN the other way, ACK. TIME-WAIT (2MSL) sits on the side that closed first so stray duplicates die. RST aborts immediately (error or abort). A simultaneous close (both send FIN) is legal.
-
-Exam dry-run: write flags, seq, ack at each of the three steps. Remember ack = peer_seq + 1 for the SYN (because SYN counts as one). Data after ESTABLISHED uses the next byte numbers. Do not put payload on the SYN in the textbook trace (TCP Fast Open exists but is not the syllabus default).
-
-Related: UDP has no handshake — a datagram is just sent. QUIC on UDP has its own crypto handshake. The three-way handshake is TCP-specific and is a Transport-layer ritual, not Network and not Data Link.`,
+      heading: "TCP three-way handshake",
+      body: "TCP setup is three segments: SYN (I want to talk, my start number is x) → SYN-ACK (I agree, my start is y, I heard x+1) → ACK (I heard y+1). Then ESTABLISHED. Each SYN eats one sequence number even with no payload. Think “knock, knock-back, thanks”.\n\nClose is four segments (each direction hangs up with FIN). RST aborts. SYN flood: many SYNs, no third ACK, backlog fills. UDP has no handshake — one datagram each way for a tiny DNS query.",
+      howTo: [
+        "Write flags, seq, ack. ack of a SYN is peer_seq+1. First data uses the next byte numbers.",
+        "Client: SYN-SENT → ESTABLISHED. Server: LISTEN → SYN-RECEIVED → ESTABLISHED.",
+        "SYN flood fills SYN-RECEIVED. Defence: SYN cookies, rate limits.",
+        "UDP DNS: two datagrams, no SYN. TCP DNS only for truncation, zone transfer, DoT.",
+      ],
       bullets: [
         "SYN (seq=x) → SYN-ACK (seq=y, ack=x+1) → ACK (seq=x+1, ack=y+1).",
-        "SYN consumes one sequence number. Then ESTABLISHED.",
-        "Close: FIN/ACK, FIN/ACK (four segments). RST aborts.",
+        "SYN consumes one sequence number. Close: FIN/ACK × 2. RST aborts.",
         "SYN flood = many SYNs, no third ACK. UDP: no handshake.",
       ],
       examples: [
         {
-          title: "Handshake SYN / SYN-ACK / ACK with numbers",
+          title: "Handshake with numbers",
           prompt:
-            "Client ISN=1000, server ISN=5000. Write flags, seq, ack of the three segments. After the handshake, the client sends 100 bytes of data. What seq and ack does that segment use?",
-          language: "python",
-          code: `# 1 client -> server  SYN     seq=1000         ack=-        flags=SYN
-# 2 server -> client  SYN-ACK seq=5000         ack=1001     flags=SYN,ACK
-# 3 client -> server  ACK     seq=1001         ack=5001     flags=ACK
-# 4 client -> server  data    seq=1001 len=100 ack=5001     flags=PSH,ACK
-#    server's next ACK will be ack=1101`,
+            "Client ISN=1000, server ISN=5000. Three segments. Then client sends 100 bytes. seq/ack of that data? Server’s next ack?",
           steps: [
-            "Step 1: client SYN, seq=1000. No ACK required. Client state SYN-SENT. The ISN is 1000, chosen (in real stacks, randomly) to avoid old-connection collisions.",
-            "Step 2: server SYN-ACK, seq=5000 (its own ISN), ack=1001 (client ISN + 1 because SYN ate one number). Server state SYN-RECEIVED.",
-            "Step 3: client ACK, seq=1001, ack=5001 (server ISN + 1). Both ESTABLISHED. This ACK may piggy-back on the first data, but the textbook draws it alone.",
-            "First 100-byte data: seq=1001 (next client byte), ack=5001 (still waiting for server byte 5001, which is the server’s first data byte). Length 100 covers bytes 1001..1100.",
-            "Server’s ACK of that data: ack=1101. If you wrote ack=1001 after the data you forgot that 100 bytes had been consumed. Byte counting, not segment counting.",
+            {
+              do: "SYN seq=1000. SYN-ACK seq=5000 ack=1001. ACK seq=1001 ack=5001.",
+              why: "Each SYN counts as one imaginary byte. ack = the number you next expect.",
+            },
+            {
+              do: "First data: seq=1001, length 100 (bytes 1001..1100), ack=5001. Server ACK ack=1101.",
+              why: "Byte counting, not packet counting. If you wrote ack=1001 after the data you forgot the 100 bytes.",
+            },
+            {
+              do: "Textbook draws the third ACK alone. Real stacks may piggy-back it on the first data.",
+              why: "Same numbers either way.",
+            },
           ],
           result:
-            "SYN seq=1000; SYN-ACK seq=5000 ack=1001; ACK seq=1001 ack=5001. First data seq=1001 ack=5001, 100 bytes. Next server ack=1101.",
+            "SYN 1000; SYN-ACK 5000/1001; ACK 1001/5001. Data seq=1001 ack=5001. Next server ack=1101.",
         },
         {
-          title: "What each side’s state machine does",
+          title: "SYN flood",
           prompt:
-            "Name the TCP states on client and server through the handshake and a normal client-led close.",
-          language: "java",
-          code: `// client: CLOSED -> SYN-SENT -> ESTABLISHED
-//         -> FIN-WAIT-1 -> FIN-WAIT-2 -> TIME-WAIT -> CLOSED
-// server: CLOSED -> LISTEN -> SYN-RECEIVED -> ESTABLISHED
-//         -> CLOSE-WAIT -> LAST-ACK -> CLOSED
-// simultaneous close uses CLOSING; abort uses RST from almost anywhere`,
+            "Attacker sends millions of SYNs to port 80 with spoofed sources, never the third ACK. What fills up? Two defences?",
           steps: [
-            "Server is LISTEN (passive open). Client is CLOSED then sends SYN and enters SYN-SENT (active open).",
-            "Server receives SYN, replies SYN-ACK, enters SYN-RECEIVED. Client receives SYN-ACK, sends ACK, enters ESTABLISHED. Server receives that ACK, enters ESTABLISHED.",
-            "Client close: sends FIN, FIN-WAIT-1. Server ACKs the FIN, CLOSE-WAIT, and tells the application. Client gets the ACK, FIN-WAIT-2 (half-closed: it can still receive).",
-            "Server application closes, server sends FIN, LAST-ACK. Client ACKs, TIME-WAIT (2MSL). Server gets the ACK, CLOSED. Client’s TIME-WAIT expires, CLOSED.",
-            "TIME-WAIT belongs to the side that sent the last ACK of the close (usually the active closer). It stops old duplicates from confusing a new connection with the same 4-tuple.",
+            {
+              do: "Each SYN holds a small control block in SYN-RECEIVED. Spoofed sources never complete. Backlog full → real clients dropped (DoS).",
+              why: "The missing piece is the third ACK. The handshake is half-open on purpose.",
+            },
+            {
+              do: "SYN cookies encode state in the ISN and allocate a real block only when the matching ACK arrives. Also rate-limit SYNs.",
+              why: "Do not store a chair for a guest who will never sit down.",
+            },
+            {
+              do: "This is Transport-layer DoS. UDP has no SYN flood; it has amplification floods instead.",
+              why: "Different protocol, different abuse.",
+            },
           ],
           result:
-            "Client SYN-SENT → ESTABLISHED → FIN-WAIT-1/2 → TIME-WAIT. Server LISTEN → SYN-RECEIVED → ESTABLISHED → CLOSE-WAIT → LAST-ACK. TIME-WAIT is 2MSL on the closer.",
+            "SYN-RECEIVED backlog exhausts. Defences: SYN cookies, rate limits. The missing piece is the third ACK.",
         },
         {
-          title: "SYN flood as a half-open attack",
+          title: "Why UDP DNS has no handshake",
           prompt:
-            "Attacker sends 10 million SYNs to port 80 with spoofed sources, never the third ACK. What state fills up, and name two defences.",
-          language: "cpp",
-          code: `// each SYN allocates a TCB in SYN-RECEIVED (backlog)
-// third ACK never comes (spoofed source will not complete)
-// backlog full -> legitimate SYNs dropped -> DoS
-// defences: SYN cookies (encode state in the ISN, no TCB until ACK)
-//           backlog increase, SYN rate limit, anycast/load balancer, RST orphans`,
+            "40-byte DNS query, 80-byte answer. Contrast opening TCP. When does DNS still use TCP?",
           steps: [
-            "A legitimate handshake holds a small control block while waiting for the third ACK. The attack multiplies that wait with no intention of completing.",
-            "The server’s SYN-RECEIVED backlog (or analogue) fills. New SYNs, including real clients, are dropped. Availability dies; confidentiality and integrity of existing connections may be untouched.",
-            "Spoofed source IPs mean the SYN-ACKs go into the void, so the third ACK never returns. The server cannot ‘just reply RST’ to a real host that never sent SYN.",
-            "SYN cookies: the server encodes the handshake state into a carefully computed ISN, allocates a TCB only when a matching third ACK arrives. Backlog stays empty.",
-            "This is a Transport-layer DoS. A firewall can rate-limit SYNs (network security), but the protocol-level fix is cookies / proxies. UDP has no SYN flood; it has its own amplification floods instead.",
+            {
+              do: "UDP: one datagram each way, one RTT, no SYN, no TIME-WAIT.",
+              why: "A postcard does not book a conversation. Fine for a tiny lookup.",
+            },
+            {
+              do: "TCP would add SYNs and later FINs before/after the same tiny Q/R — wasteful, so queries default to UDP.",
+              why: "TCP’s extra trips buy reliability and large messages you do not need for 40 bytes.",
+            },
+            {
+              do: "DNS uses TCP for truncated answers (TC bit), zone transfers, and DNS-over-TLS 853.",
+              why: "Bulk or “please send the rest” — then the registered-post path is worth it.",
+            },
           ],
           result:
-            "SYN-RECEIVED backlog exhausts → DoS. Defences: SYN cookies, rate limits, offload. The missing piece is the third ACK of the three-way handshake.",
+            "UDP DNS = two datagrams, no handshake. TCP for truncation, AXFR, DoT — not for a normal tiny query.",
         },
         {
-          title: "Why UDP DNS has no three-way handshake",
+          title: "Four-way close versus RST",
           prompt:
-            "A stub resolver sends one 40-byte DNS query and gets one 80-byte answer. Contrast with opening TCP for the same query. When does DNS still use TCP?",
-          language: "python",
-          code: `# UDP: one datagram each way.  no SYN, no connection, no TIME-WAIT
-# TCP: SYN, SYN-ACK, ACK, query, reply, FIN...  extra RTTs and state
-# DNS TCP: zone transfer, or TC-bit (truncated) UDP answer, or DNS-over-TLS 853`,
+            "Each side still has data it might send. Why can close take four segments? When is RST the right word?",
           steps: [
-            "UDP: the query is a datagram to 53; the answer is a datagram back. Two packets, one RTT. No ISN, no ESTABLISHED, no teardown.",
-            "TCP: three packets before the query even starts, then the query, then the answer, then FINs. For a 40-byte lookup that is wasteful, which is why queries default to UDP.",
-            "The cost TCP pays buys reliability and large messages. A 4 KB DNS answer may not fit a 512-byte classic UDP DNS payload (EDNS0 raised this); the TC bit says ‘retry TCP’.",
-            "AXFR/IXFR zone transfers are TCP by design (bulk, must be complete). DNS-over-TLS uses 853/TCP. Those are the ‘DNS on TCP’ ticks.",
-            "The handshake is therefore a TCP feature, not a ‘Network’ or ‘DNS’ feature. IP and UDP will happily carry a one-shot message without it.",
+            {
+              do: "TCP is two one-way streams. FIN says ‘I will send no more’. The peer may still send. So: FIN, ACK of that FIN, later FIN the other way, ACK. Four segments.",
+              why: "Hanging up one phone while the other person is still talking. Each direction closes itself.",
+            },
+            {
+              do: "If the peer’s FIN is piggy-backed with its ACK you may see three packets; the exam still wants the four-step idea.",
+              why: "Same flags, maybe combined.",
+            },
+            {
+              do: "RST aborts: no orderly FIN, discard state. Used on a closed port or a smashed session. Not a graceful close.",
+              why: "Reset is ‘slam the door’, not ‘goodbye’.",
+            },
           ],
           result:
-            "UDP DNS = two datagrams, no handshake. TCP would add SYNs and FINs. DNS uses TCP for truncation, zone transfers, and DoT — not for a normal tiny query.",
+            "Close: FIN/ACK each way (four segments). RST aborts. Handshake is three; close is four.",
+        },
+        {
+          title: "ISN is not ‘packet 1’",
+          prompt:
+            "Client ISN=4000, no payload on SYN. After the handshake, client sends 3 bytes ‘GET’. Sequence numbers of SYN, third ACK, and the data?",
+          steps: [
+            {
+              do: "SYN seq=4000 (consumes 1). Third ACK seq=4001. Data seq=4001, bytes 4001..4003.",
+              why: "SYN ate the imaginary byte 4000. First real payload starts at ISN+1.",
+            },
+            {
+              do: "Server ack after those 3 bytes is 4004 (next expected).",
+              why: "TCP counts bytes, not packets. Three letters move the number by 3.",
+            },
+            {
+              do: "Do not write ‘seq=1 for the first packet’. ISNs are random (or cookie-encoded) on purpose.",
+              why: "Predictable ISNs were an old attack. Exams still use small numbers for traces.",
+            },
+          ],
+          result:
+            "SYN 4000; ACK seq=4001; data seq=4001 length 3; next ack=4004. Byte counts, not packet counts.",
         },
       ],
     },
     {
-      heading: "NAT: hiding and multiplexing private addresses",
-      body: `Network Address Translation rewrites IP addresses (and usually ports) at a boundary. The common home/office form is NAPT / PAT / ‘NAT overload’: many private RFC1918 hosts share one public IPv4. Outbound packet: source 192.168.1.10:49152 becomes 203.0.113.5:40000, and the NAT box remembers the mapping. Inbound reply to 203.0.113.5:40000 is rewritten back to 192.168.1.10:49152 and forwarded inside.
-
-NAT conserves IPv4, hides internal topology (a weak security side-effect, not a firewall), and breaks end-to-end addressing. Inbound unsolicited connections fail unless you port-forward (DNAT) or the host uses a hole-punch / relay. ALGs rewrite embedded addresses in FTP/SIP — fragile. IPv6 was supposed to make NAT unnecessary; in practice NAT66/NPTv6 exist but the exam’s NAT is IPv4 PAT.
-
-Static NAT 1:1 maps one private to one public. Dynamic NAT maps onto a pool, still 1:1 while the binding lasts. PAT is many-to-one using ports. SNAT = rewrite source (outbound). DNAT = rewrite destination (port forwarding / load balancer). Hairpin NAT is when two internals talk via the public mapping.
-
-Exam: ‘which device?’ — the edge router/firewall. ‘which layer?’ — Network (addresses) plus Transport (ports) for PAT. ‘does NAT encrypt?’ — no. ‘does NAT replace a firewall?’ — no, though they share a box. ‘why did FTP active mode die?’ — the server cannot open a connection to a private client IP; PAT plus no port-forward blocks it.`,
+      heading: "NAT: sharing one public IP",
+      body: "NAT rewrites addresses at the edge. Home PAT/NAPT: many private hosts share one public IPv4, distinguished by ports — like a building’s front desk that rewrites apartment numbers into one street address plus a ticket. Outbound creates a mapping; replies use it. Unsolicited inbound dies unless you port-forward (DNAT).\n\nNAT saves IPv4 and hides internal numbers. It does not encrypt, and it is not a full firewall. PAT is L3 (IPs) plus L4 (ports). Checksums must be updated.",
+      howTo: [
+        "Draw inside 5-tuple, WAN 5-tuple, table row. Dest IP of the server usually stays. Source IP (and maybe port) change on the way out.",
+        "No mapping ⇒ drop inbound SYN. DNAT 80→inside:80 makes a server reachable.",
+        "NAT ≠ TLS ≠ firewall. Malware inside can still phone home (outbound PAT works).",
+        "Switches/hubs cannot PAT. IPv4 header checksum and TCP/UDP checksums must refresh.",
+      ],
       bullets: [
-        "PAT/NAPT: many private IPs → one public IP, distinguished by ports.",
-        "Outbound SNAT creates a mapping; inbound uses it. Unsolicited inbound is dropped.",
-        "Conserves IPv4, hides topology, breaks end-to-end (FTP, IPSec, peer-to-peer).",
-        "Not encryption, not a complete firewall. Port-forward = DNAT.",
+        "PAT: many private IPs → one public IP, distinguished by ports.",
+        "Outbound creates a mapping; unsolicited inbound is dropped. Port-forward = DNAT.",
+        "Not encryption, not a complete firewall. Conserves IPv4, breaks end-to-end (active FTP).",
       ],
       examples: [
         {
           title: "PAT table for one HTTPS flow",
           prompt:
-            "Inside host 10.0.0.8:51000 talks to 93.184.216.34:443. Public address of the NAT is 198.51.100.2. Fill the NAT table row and the packet’s IP/ports on the WAN after SNAT.",
-          language: "java",
-          code: `// inside 5-tuple:  tcp  10.0.0.8:51000  ->  93.184.216.34:443
-// WAN packet:      tcp  198.51.100.2:40000 ->  93.184.216.34:443
-// table: proto tcp  10.0.0.8 51000  198.51.100.2 40000  93.184.216.34 443
-// reply WAN: 93.184.216.34:443 -> 198.51.100.2:40000
-// reply LAN: 93.184.216.34:443 -> 10.0.0.8:51000`,
+            "Inside 10.0.0.8:51000 → 93.184.216.34:443. NAT public 198.51.100.2. WAN packet after SNAT?",
           steps: [
-            "The host sends with its private source. That packet is not globally routable, so the NAT must rewrite the source IP before the packet hits the Internet.",
-            "Source port may also change (to avoid colliding with another host’s 51000). Suppose it becomes 40000. Dest IP and dest port stay 93.184.216.34:443 — the server is still the destination.",
-            "The NAT installs a mapping (10.0.0.8, 51000) ↔ (198.51.100.2, 40000) for this remote 5-tuple, with a timeout.",
-            "The server replies to 198.51.100.2:40000, the only address it knows. The NAT reverse-rewrites dest to 10.0.0.8:51000 and forwards on the LAN.",
-            "A second inside host 10.0.0.9:51000 gets a different WAN port, say 40001. Ports are the multiplexer that make many-to-one possible.",
+            {
+              do: "WAN: src 198.51.100.2:40000 (example port) dst 93.184.216.34:443. Table maps 10.0.0.8:51000 ↔ that WAN port.",
+              why: "Private source is not globally routable. Dest stays the server. Ports multiplex many insides onto one public IP.",
+            },
+            {
+              do: "Server replies to 198.51.100.2:40000. NAT reverse-maps dest to 10.0.0.8:51000.",
+              why: "The server only knows the public ticket, like posting back to the front desk.",
+            },
+            {
+              do: "A second inside host with the same 51000 gets a different WAN port.",
+              why: "That is how many-to-one is possible.",
+            },
           ],
           result:
-            "WAN packet src 198.51.100.2:40000 dst 93.184.216.34:443. Table maps 10.0.0.8:51000 to that WAN port. Reply is reverse-mapped to the private host.",
+            "WAN src 198.51.100.2:40000 dst 93.184.216.34:443. Reply is reverse-mapped to the private host.",
         },
         {
-          title: "Unsolicited inbound is dropped — why servers need DNAT",
+          title: "Inbound without a mapping dies",
           prompt:
-            "An external client tries to open TCP to 198.51.100.2:80, but the web server is 10.0.0.8:80 behind PAT. Without a port-forward, what happens? With DNAT?",
-          language: "python",
-          code: `# no mapping for dest 198.51.100.2:80 from this new 4-tuple
-# NAT has no inside host to send to -> drop (or RST)
-# DNAT rule: wan :80 -> 10.0.0.8:80
-# then the inbound SYN creates/uses a mapping, replies SNAT back out`,
+            "External SYN to 198.51.100.2:80, web server is 10.0.0.8:80 behind PAT, no port-forward. Then with DNAT?",
           steps: [
-            "PAT mappings are created by outbound traffic (or by an explicit rule). A fresh inbound SYN has no row. The NAT cannot choose which of 200 inside hosts should get it.",
-            "The SYN is dropped. From the Internet the public IP does not ‘have port 80 open’. That is why a house PC is not a web server by accident — a security accident-avoider, not a real firewall policy engine.",
-            "A DNAT / port-forward rule says: dest 198.51.100.2:80 → 10.0.0.8:80. The NAT rewrites the destination (not the source) and forwards inside.",
-            "The server’s replies still need SNAT on the way out so they appear from 198.51.100.2. Both directions are rewritten, opposite fields.",
-            "A load-balancer is DNAT (or a proxy at L7) onto a pool. Same idea, several insides.",
+            {
+              do: "No table row for this new conversation. NAT cannot pick which inside host. Drop.",
+              why: "PAT mappings are born from outbound (or from an explicit rule). A house PC is not a web server by accident.",
+            },
+            {
+              do: "DNAT: wan:80 → 10.0.0.8:80. Rewrites destination inbound; replies still SNAT on the way out.",
+              why: "Port-forward is “send ticket 80 to apartment 8”. Opposite field to SNAT.",
+            },
+            {
+              do: "A load balancer is DNAT (or an L7 proxy) onto a pool.",
+              why: "Same idea, several insides.",
+            },
           ],
           result:
-            "Without a mapping, inbound SYN dies. DNAT port-forward 80→10.0.0.8:80 makes the server reachable. PAT alone is outbound-only.",
+            "Without a mapping, inbound SYN dies. DNAT 80→10.0.0.8:80 makes the server reachable. PAT alone is outbound-only.",
         },
         {
-          title: "NAT is not encryption and not a full firewall",
+          title: "NAT is not encryption",
           prompt:
-            "A candidate writes ‘we have NAT so our traffic is confidential and attackers cannot reach us, so we skip TLS and skip the firewall’. List five things that are still wrong.",
-          language: "cpp",
-          code: `// 1 NAT does not encrypt; a WAN sniffer sees payload of HTTP on 80
-// 2 malware inside can still phone home (outbound PAT works)
-// 3 port-forwards and UPnP punch holes
-// 4 NAT is not application filtering, no AV, no IDS
-// 5 IPv6 or a leaked VPN can bypass the 'hidden' topology`,
+            "A candidate says “we have NAT so traffic is confidential and we can skip TLS and the firewall”. List what is still wrong.",
           steps: [
-            "Confidentiality is TLS/IPsec, not NAT. NAT rewrites addresses; the HTTP body is still clear on port 80 across the ISP.",
-            "Availability to inbound scanners is reduced, but compromised insides can still make outbound connections (C2, exfiltration). PAT helps those connections.",
-            "UPnP IGD and manual port-forwards reopen inbound. A single mapped camera is a worldwide target.",
-            "A firewall adds policy (who can talk to whom, which ports, application inspect). NAT adds a mapping table. Combine them; do not substitute.",
-            "Integrity of payloads is a MAC/signature job (security notes). NAT does not detect a modified packet except insofar as TCP checksums cover the pseudo-header and must be updated — that is bookkeeping, not cryptography.",
+            {
+              do: "NAT rewrites addresses; HTTP on 80 is still clear on the WAN. Confidentiality is TLS.",
+              why: "The front desk changes the envelope, not the letter.",
+            },
+            {
+              do: "Malware inside can still phone home — outbound PAT helps it. UPnP/port-forwards reopen inbound.",
+              why: "Hiding numbers is not a policy engine and not antivirus.",
+            },
+            {
+              do: "PAT = L3+L4. IPv4 and TCP checksums must be updated. A pure L2 switch cannot NAT.",
+              why: "Ports live at transport. Changing IPs/ports without fixing checksums kills the connection.",
+            },
           ],
           result:
-            "NAT hides addresses and conserves IPv4. It does not encrypt, does not stop outbound malware, and is not a complete firewall. Still use TLS and a real policy filter.",
+            "NAT hides addresses and conserves IPv4. It does not encrypt, does not stop outbound malware, and is not a complete firewall. Still use TLS and a real filter.",
         },
         {
-          title: "Which layer is PAT, and what checksums must change?",
+          title: "Two inside hosts, one public IP",
           prompt:
-            "PAT rewrites IP addresses and TCP/UDP ports. Which OSI layers are involved? Why must IPv4 and TCP checksums be recomputed?",
-          language: "java",
-          code: `// L3: source (or dest) IP rewritten
-// L4: source (or dest) port rewritten
-// IPv4 header checksum covers the IP header -> must refresh
-// TCP/UDP checksum covers a pseudo-header including IPs and the L4 ports
-//    -> must refresh (incremental checksum is the usual implementation)
-// Ethernet CRC recomputed anyway because the frame is new on the egress NIC`,
+            "10.0.0.8:51000 and 10.0.0.9:51000 both fetch the same HTTPS site. Public 198.51.100.2. How does NAT tell the replies apart?",
           steps: [
-            "Rewriting IPs is Network layer. Rewriting ports is Transport. PAT is therefore an L3+L4 function, which is why it sits on routers/firewalls, not on L2 switches.",
-            "IPv4’s header checksum is a 16-bit one-complement of the header. Change the source IP, the checksum is wrong unless updated. IPv6 has no header checksum; L4 still does.",
-            "TCP and UDP checksums include a pseudo-header with src/dst IP and the port fields. Both changed, so both checksums change. A box that rewrote IPs and forgot TCP checksums would kill every connection.",
-            "The Ethernet CRC is hop-local and is computed by the egress interface on the new frame. No ‘NAT CRC’ field exists.",
-            "Exam pick: ‘NAT device = router/firewall, layers 3 and 4’. A hub or a pure L2 switch cannot PAT.",
+            {
+              do: "Both cannot keep WAN source 198.51.100.2:51000 toward the same dest. NAT remaps at least one to a free WAN port (e.g. 40000 and 40001).",
+              why: "The 5-tuple on the WAN must be unique. Ports are the multiplex tickets.",
+            },
+            {
+              do: "Reply to :40000 reverse-maps to .8:51000. Reply to :40001 reverse-maps to .9:51000.",
+              why: "The table row is the whole trick. The server never sees 10.0.0.0/8.",
+            },
+            {
+              do: "If the two insides talk to different dest IPs, some NATs could keep 51000 on both — still unique 5-tuples. Exam default: show two WAN ports.",
+              why: "Uniqueness is on the full tuple, but drawing two ports is the safe story.",
+            },
           ],
           result:
-            "PAT = Network + Transport. IPv4 header checksum and TCP/UDP checksums must be updated. Switches/hubs cannot do this. Ethernet CRC is just a new frame on the way out.",
+            "PAT assigns distinct WAN ports. Replies demux by dest port on the public IP. Same inside port is fine.",
+        },
+        {
+          title: "NAT layer: why a switch cannot PAT",
+          prompt:
+            "PAT rewrites IPv4 source and a TCP port. Which layers? Why must checksums change? Why will an L2-only switch fail this?",
+          steps: [
+            {
+              do: "IPv4 header is L3; TCP/UDP ports are L4. PAT is L3+L4. Ethernet MACs are rewritten by the router hop anyway, not as the NAT idea.",
+              why: "Apartment number (port) plus street address (IP) both change at the front desk.",
+            },
+            {
+              do: "IPv4 header checksum covers the IP header. TCP/UDP checksums cover a pseudo-header that includes IPs and the ports. Both must be recomputed.",
+              why: "Stale checksums make the next hop drop the packet as corrupt.",
+            },
+            {
+              do: "A pure L2 switch has no IP table and no port rewrite. It only matches MACs. NAT lives on a router/firewall edge.",
+              why: "Wrong box, wrong layer.",
+            },
+          ],
+          result:
+            "PAT = L3 IPs + L4 ports. Refresh IPv4 and TCP/UDP checksums. A switch cannot NAT.",
+        },
+      ],
+    },
+    {
+      heading: "Firewall rules and NAT together",
+      body: "A firewall is a bouncer with a list: allow or drop using protocol, IPs, and ports (the 5-tuple). Default deny means ‘if no line matches, drop’. Stateful inspection remembers TCP that already shook hands, so replies do not need a matching inbound allow for every high port.\n\nNAT is a different job on the same edge box: rewrite private IPs (and ports) to a public IP. Order to remember: the inside host starts a flow → firewall must allow it out → NAT creates a mapping → replies come back to the public IP/port → NAT reverse-maps → firewall sees established state and lets them in. Unsolicited inbound still dies unless you port-forward and allow that dest port. A firewall is not TLS. NAT is not a full firewall.",
+      howTo: [
+        "Write the 5-tuple: proto, src IP, src port, dest IP, dest port. Last rule deny-all.",
+        "Stateful: allow outbound new, then allow established/related back. Do not open every high port inbound.",
+        "NAT mapping is born from outbound (or from DNAT). No mapping + no DNAT ⇒ drop inbound SYN.",
+        "Port-forward (DNAT) still needs an allow to that WAN port. Rewrite without allow still drops.",
+      ],
+      bullets: [
+        "Firewall: policy on 5-tuple, default deny, stateful established.",
+        "NAT: rewrite addresses/ports. Outbound mapping; inbound needs DNAT.",
+        "Both can sit on one box. NAT ≠ encryption ≠ ‘the firewall is done’.",
+      ],
+      examples: [
+        {
+          title: "Default deny and one HTTPS allow",
+          prompt:
+            "Inside 10.0.0.0/8 may browse HTTPS. Write three rules (out, established back, deny). Why not allow inbound :443 to the LAN?",
+          steps: [
+            {
+              do: "1) allow TCP 10.0.0.0/8:* → 0.0.0.0/0:443 new outbound. 2) allow established,related. 3) deny all.",
+              why: "Browsers start inside. Replies use dest = the client’s high port, which state already knows.",
+            },
+            {
+              do: "An inbound allow to LAN:443 would make every PC a public web server. That is the opposite of ‘browse out’.",
+              why: "Direction and who starts the conversation matter.",
+            },
+            {
+              do: "UDP/443 is not covered. Add a separate line only if you mean HTTP/3.",
+              why: "Protocol is part of the 5-tuple. TCP ≠ UDP.",
+            },
+            {
+              do: "Without deny-all on a default-allow box, the allow line teaches nothing.",
+              why: "Policy is the last matching action, plus the default.",
+            },
+          ],
+          result:
+            "Allow TCP 10/8 → *:443 out, allow established back, deny-all. Do not publish LAN:443.",
+        },
+        {
+          title: "Stateful vs stateless on the return path",
+          prompt:
+            "Client 10.0.0.8:51999 → 93.184.216.34:443. Stateless firewall has only the outbound allow. Does the SYN-ACK from :443 survive? How does stateful fix it?",
+          steps: [
+            {
+              do: "Return packet is src 93.184.216.34:443 dest 10.0.0.8:51999. It does not match ‘dest port 443 outbound’. Stateless drops it unless you also allowed inbound from :443 to high ports.",
+              why: "Each packet is a stranger. Opening all high ports inbound is a wide hole.",
+            },
+            {
+              do: "Stateful: the outbound SYN created a flow record. The SYN-ACK matches that record (established) and is allowed. High ports stay closed to random SYNs.",
+              why: "The receptionist remembers who went out.",
+            },
+            {
+              do: "A forged inbound SYN to 10.0.0.8:51999 still dies — no matching state, and deny-all.",
+              why: "State is not ‘any packet to a high port’.",
+            },
+            {
+              do: "UDP is harder to track (no SYN). Timeouts and ‘related’ (FTP ALG) are extra stories; exams still want TCP established.",
+              why: "TCP flags make state easy. UDP is guesswork plus timers.",
+            },
+          ],
+          result:
+            "Stateless drops the SYN-ACK unless you punch high ports. Stateful allows established replies only.",
+        },
+        {
+          title: "Port-forward needs DNAT and an allow",
+          prompt:
+            "Public 198.51.100.2:80 should reach inside web 10.0.0.8:80. NAT table plus firewall. What if you DNAT but default-deny with no allow?",
+          steps: [
+            {
+              do: "DNAT: wan dest 198.51.100.2:80 → 10.0.0.8:80. That rewrite picks the apartment. SNAT on the way out still hides 10.0.0.8.",
+              why: "Forward is ‘ticket 80 to apartment 8’. Without it, PAT has no inbound row.",
+            },
+            {
+              do: "Firewall must allow TCP any → 198.51.100.2:80 (or to 10.0.0.8:80, depending when filter runs). Then established back to the client.",
+              why: "NAT without allow is a rewrite into a closed door.",
+            },
+            {
+              do: "DNAT but deny-all and no allow: packet is dropped. Allow but no DNAT: NAT still cannot choose a host, drop.",
+              why: "Need both jobs. Filter and rewrite are not substitutes.",
+            },
+            {
+              do: "This still is not TLS. HTTP/80 is clear on the WAN unless you terminate TLS on 443.",
+              why: "Publishing a port is reachability, not confidentiality.",
+            },
+          ],
+          result:
+            "DNAT 80→10.0.0.8:80 plus an allow on TCP/80. Either piece alone still drops. Not encryption.",
+        },
+        {
+          title: "Outbound malware and why NAT is not the bouncer",
+          prompt:
+            "PC 10.0.0.8 is infected and connects TCP to 203.0.113.50:445. PAT is on. Default firewall allows inside outbound any. What happens? Which control would stop it?",
+          steps: [
+            {
+              do: "PAT happily maps the outbound flow. The malware phones home. NAT hid 10.0.0.8 but helped the flow leave.",
+              why: "NAT is a translator, not a policy that understands ‘this is malware’.",
+            },
+            {
+              do: "A firewall egress policy (allow 80/443, deny 445 SMB out) would drop it. So would DNS/IP intel at L7.",
+              why: "The bouncer’s list is the firewall. Tighten outbound, do not ‘trust NAT’.",
+            },
+            {
+              do: "Inbound default deny still holds — attackers cannot SYN in. That does not stop the inside traitor.",
+              why: "CIA: inbound filter helps C of servers; egress filter helps C of data leaving.",
+            },
+            {
+              do: "Exam line: NAT conserves IPv4 and hides numbers. A firewall enforces allow/deny. Use both, plus TLS.",
+              why: "Three tools, three jobs.",
+            },
+          ],
+          result:
+            "PAT lets the malware out. Egress firewall (deny 445) would stop that flow. NAT is not the bouncer.",
+        },
+        {
+          title: "Order of operations on a home gateway",
+          prompt:
+            "Laptop 10.0.0.8:51000 → 1.1.1.1:443. Name firewall then NAT on the way out, and the reverse on the way back.",
+          steps: [
+            {
+              do: "Out: firewall checks ‘may 10.0.0.8 start TCP to 1.1.1.1:443?’ If yes, NAT SNAT source to the public IP:port and stores a row.",
+              why: "Policy on the real inside 5-tuple, then rewrite for the WAN.",
+            },
+            {
+              do: "WAN packet: src public:40000 dst 1.1.1.1:443. Return: dst public:40000.",
+              why: "The server only knows the public ticket.",
+            },
+            {
+              do: "In: NAT reverse-maps dest to 10.0.0.8:51000. Stateful firewall sees established and allows. Laptop receives the SYN-ACK.",
+              why: "Undo the rewrite, then the flow record matches. Unsolicited inbound would fail both steps.",
+            },
+            {
+              do: "Vendors may filter pre-NAT or post-NAT. For the exam, say: allow the conversation, map the addresses, established back.",
+              why: "Do not invent vendor-specific zone names unless given.",
+            },
+          ],
+          result:
+            "Out: firewall allow, then SNAT. In: reverse NAT, then established allow. No mapping ⇒ inbound drop.",
         },
       ],
     },

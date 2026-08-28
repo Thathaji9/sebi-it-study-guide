@@ -2,503 +2,830 @@ import type { TopicNote } from "@/data/notes";
 
 export const notesWarehouse: TopicNote = {
   topic: "warehouse",
-  title: "Data Warehousing & OLAP — worked notes",
+  title: "Warehouse — techniques (beginner)",
   blurb:
-    "SEBI Grade A IT warehouse items are process-and-model questions: ETL order, staging and metadata, star versus snowflake, grain, mart versus warehouse, and OLAP operators on a small cube. Walk every cube with actual numbers; do not recite definitions without a slice.",
+    "A data warehouse is a calm copy of business facts for questions, not for live trading. Learn ETL order, star versus snowflake, and the cube moves slice, dice, and roll-up. Walk every cube with real numbers.",
   blocks: [
     {
-      heading: "ETL order and what happens at each stage",
-      body: "ETL is Extract, Transform, Load — in that order in the classical warehouse. Extract copies data from source systems (OMS, depositories, HR, GL) without making the warehouse the system of record. Transform cleanses, conforms, deduplicates, applies business rules, assigns surrogate keys, and converts source codes to warehouse codes. Load writes the results into warehouse tables, usually in bulk, often overnight, sometimes micro-batched.\n\nELT reverses the last two letters: load raw extracts into a staging or lake area first, then transform with SQL inside the platform. SEBI papers still expect the letters ETL in extract-transform-load order unless they name a lakehouse. The operational source keeps running; the warehouse is not updated in the same ACID transaction as the trade.\n\nA typical nightly pipeline for a market-surveillance warehouse: extract today’s trades and member master deltas; land them in staging; reject rows that fail schema checks; look up surrogate keys; compute daily position facts; load dimension upserts first, then facts (facts depend on dimension keys). Loading facts before dimensions produces late-arriving-dimension problems (unknown member_key).\n\nFailures are not retries of the whole alphabet. If transform fails, you do not re-extract unless the extract files were discarded. Idempotent loads (delete-and-insert a partition for that business date, or merge on a natural key) matter because overnight jobs do re-run. Exam phrase: “ETL is pull-clean-publish; OLTP is the source, OLAP is the target.”",
+      heading: "ETL: extract, transform, load",
+      body: "ETL is the nightly pipeline: Extract (copy from the live systems), Transform (clean, rename, look up keys), Load (put tidy rows into warehouse tables). Think unpack groceries, wash and chop, then put them in the fridge — in that order.\n\nELT loads the raw bag into a lake first, then chops inside the platform. Exams still want E-T-L unless they name a lake. Load dimension tables (the “who/what/when” cards) before facts (the numbers), because facts store those cards’ surrogate keys.",
+      howTo: [
+        "Name the stage: copy file = Extract; reject/clean/lookup = Transform; insert into FACT_ = Load.",
+        "Dimensions before facts. A missing broker key is a late-arriving dimension — stub first, then the fact.",
+        "Reruns must not double-count: delete/truncate that date’s partition or MERGE on a natural key.",
+        "Live position for trading is OLTP. Yesterday’s conformed snapshot is ETL. Do not mix the jobs.",
+      ],
       bullets: [
-        "Classical order: Extract from OLTP → Transform (clean, conform, surrogate keys) → Load into the warehouse.",
-        "Load dimensions before facts. Facts store dimension surrogate keys.",
-        "ELT: land raw first, transform in-place. Same three jobs, different machine.",
+        "Classical order: Extract → Transform (clean, conform, keys) → Load.",
+        "Load dimensions before facts. Facts store dimension keys.",
+        "ELT: land raw first, transform in place. Same three jobs, different machine.",
       ],
       examples: [
         {
-          title: "Place five jobs on the ETL timeline",
+          title: "Place five jobs on the timeline",
           prompt:
-            "Jobs: (A) ASSIGN member_sk by looking up DIM_MEMBER, (B) COPY yesterday’s TRADE_FILL file from the exchange, (C) BULK INSERT into FACT_TRADE, (D) STANDARDISE city names (“BOM” → “Mumbai”), (E) REJECT rows with qty ≤ 0 into an error file. Order them and name the stage of each.",
+            "Jobs: (A) lookup member_sk, (B) copy yesterday’s trade file, (C) bulk insert FACT_TRADE, (D) map city “BOM” → “Mumbai”, (E) reject qty ≤ 0. Order them.",
           steps: [
-            "B is Extract: pull the source file. Nothing in the warehouse has changed yet.",
-            "E is a Transform quality gate (sometimes done as a staging constraint). You cannot load negative qty into a fact that grain-assumes a fill.",
-            "D is Transform: conforming a descriptive attribute to a reference list. This may also update a city lookup dimension later.",
-            "A is Transform (key resolution): replace the natural member_id with the warehouse surrogate member_sk. Requires DIM_MEMBER to already contain that member (dimension load first).",
-            "C is Load: facts land only after keys exist and rules have passed.",
-            "Order: B (Extract), then E and D and A (Transform; E usually before A so you do not look up keys for doomed rows), then C (Load). A compact answer: B → E → D → A → C.",
+            {
+              do: "B is Extract — pull the source file. Nothing in the warehouse has changed yet.",
+              why: "Extract is photocopying the shopping list, not cooking.",
+            },
+            {
+              do: "E, D, A are Transform (reject bad rows, standardise names, replace IDs with warehouse keys). Then C is Load.",
+              why: "Do not look up keys for doomed rows. Do not load facts before keys exist.",
+            },
+            {
+              do: "Compact order: B → E → D → A → C.",
+              why: "Unpack, throw rotten fruit, rewrite labels, stamp IDs, then fridge.",
+            },
           ],
           result:
-            "B extract; E, D, A transform (reject, conform, surrogate); C load. Sequence B → E → D → A → C.",
+            "B extract; E, D, A transform; C load. Sequence B → E → D → A → C.",
         },
         {
-          title: "Why facts cannot load before dimensions",
+          title: "Facts cannot load before dimensions",
           prompt:
-            "New broker BR9 appears in today’s fill file and is not yet in DIM_BROKER. What happens if FACT_TRADE is loaded first with broker_sk = NULL, versus if the pipeline inserts a dimension stub then the fact?",
+            "New broker BR9 is in today’s fills but not in DIM_BROKER. What if you load FACT_TRADE first?",
           steps: [
-            "FACT_TRADE.broker_sk is a foreign key to DIM_BROKER. Loading the fact first with a real sk that does not exist violates referential integrity and the load should fail.",
-            "Loading with NULL broker_sk succeeds only if the FK is nullable. The fact then cannot be sliced by broker: every BR9 trade piles into “unknown broker”. That is a silent analytic error.",
-            "Correct ETL: detect the unknown natural key during transform, insert a stub row into DIM_BROKER (sk = 904, name = 'BR9 pending', type-2 dates open), then load the fact with broker_sk = 904.",
-            "A later master-data extract for BR9 updates the stub (Type 1 overwrite of name, or Type 2 new version). Facts already pointing at 904 now display the proper name if Type 1, or you must decide whether old facts stay on the stub version.",
-            "Late-arriving dimension is the name of this pattern. Late-arriving fact is the opposite (dimension existed, the fill file showed up tomorrow) and is easier: just load the fact with the existing sk.",
-            "Exam line: dimension first, fact second; never park a production sk of 0 without an explicit Unknown member that analysts know about.",
+            {
+              do: "A real broker_sk that is missing violates the foreign key — the load should fail.",
+              why: "Facts point at dimension keys the way a marksheet points at a roll number that must exist.",
+            },
+            {
+              do: "NULL broker_sk (if allowed) dumps BR9 into “unknown” — a silent wrong slice.",
+              why: "The number loaded, but you can no longer cut the cube by broker.",
+            },
+            {
+              do: "Correct: insert a stub dimension row, then load the fact with that surrogate. Later, fill in the proper name (Type 1 or Type 2).",
+              why: "Late-arriving dimension = the person arrived in the numbers before their ID card.",
+            },
           ],
           result:
-            "Fact-first either fails the FK or dumps trades into Unknown. Insert a dimension stub, then load the fact with that surrogate.",
+            "Fact-first fails the FK or piles trades into Unknown. Stub the dimension, then load the fact.",
         },
         {
-          title: "Idempotent reload of one business date",
+          title: "Idempotent reload of one date",
           prompt:
-            "FACT_TRADE is partitioned by trade_date. Monday’s job loaded 1.2 lakh rows for 2026-04-06, then crashed after half of 2026-04-07. The operator re-runs Monday’s extractor for both dates. What must Transform/Load do so you do not double-count 2026-04-06?",
+            "Monday’s job loaded 1.2 lakh rows for 2026-04-06, then crashed halfway through 2026-04-07. The operator re-runs both dates. How do you avoid double-counting the 6th?",
           steps: [
-            "Extract will produce another full file for 2026-04-06. A naive INSERT would duplicate every Monday trade and double every cube total.",
-            "Idempotent pattern: DELETE FROM fact_trade WHERE trade_date IN ('2026-04-06','2026-04-07') (or TRUNCATE those partitions), then INSERT the fresh extract. Re-running yields the same warehouse state.",
-            "Alternative: MERGE on (exchange_trade_id, trade_date) so duplicates update in place. Requires a durable natural key from the exchange.",
-            "Do not DELETE the whole fact table: Tuesday’s already-committed 2026-04-07 fragment is mixed with older dates you must keep.",
-            "Dimensions for those dates may also need a rerun if Type-2 rows were half-written; facts are the usual double-count victim.",
-            "A checkpoint “loaded_dates” metadata table should record 2026-04-06 = success and 2026-04-07 = fail, so a smart scheduler re-extracts only the failed date. That is still ETL, plus metadata.",
+            {
+              do: "A naive second INSERT would duplicate 2026-04-06 and double every total.",
+              why: "Extract will send the same file again. Load must be a replace, not a pile-on.",
+            },
+            {
+              do: "DELETE/TRUNCATE those date partitions, then INSERT, or MERGE on (exchange_trade_id, trade_date).",
+              why: "Re-running then yields the same warehouse state — that is idempotent, like wiping a chalkboard date before rewriting it.",
+            },
+            {
+              do: "Do not DELETE the whole fact table. Keep other dates. Metadata should record which dates succeeded.",
+              why: "Only the failed slice needs a redo.",
+            },
           ],
           result:
-            "Replace (delete/truncate partition or MERGE) the business-date slice before insert. Naive INSERT on rerun double-counts.",
+            "Replace the business-date slice (partition delete or MERGE) before insert. Naive INSERT double-counts.",
         },
         {
-          title: "ETL versus OLTP trigger: who computes the daily position?",
+          title: "ELT lands raw first",
           prompt:
-            "Position-at-day-close can be (i) a trigger on the OMS trade table that upserts POSITION, or (ii) a warehouse transform that sums FACT_TRADE overnight into FACT_POSITION_DAILY. Which belongs where, and what breaks if the warehouse tries to be the OMS?",
+            "Jobs: (F) copy the NSE fill file into a lake folder, (G) reject qty ≤ 0 inside the lake, (H) map “BOM” → “Mumbai” in a lake table, (I) lookup member_sk, (J) INSERT FACT_TRADE. Label ETL vs ELT and order them.",
           steps: [
-            "The OMS must show a trader their position immediately. That is OLTP and belongs in the source system (or a streaming store), not in last-night’s warehouse.",
-            "The warehouse FACT_POSITION_DAILY is an analytic grain: one row per member, ISIN, date, after conforming and after late trades have been repaired. It is allowed to lag.",
-            "If the warehouse is treated as the OMS, a failed nightly load would freeze live trading — durability and availability requirements of ACID OLTP, not of ETL.",
-            "Extract should read either the OMS POSITION table (if trusted) or rebuild from trades. Rebuilding from FACT_TRADE is Transform, and it must use the warehouse grain (include/exclude cancelled fills).",
-            "Do not put SEBI-report numbers that need yesterday’s close into an OLTP trigger that can see in-flight uncommitted fills; that is a dirty-read of an operational total.",
-            "Split: OLTP = current position for trading; ETL = conformed daily snapshot for surveillance cubes and statutory reports.",
+            {
+              do: "F is still Extract, but in ELT you Load the raw bag next — the lake folder is the landing zone.",
+              why: "ELT unpacks groceries into the fridge first, then chops inside the kitchen. The three jobs are the same; the machine changes.",
+            },
+            {
+              do: "G, H, I are Transform in the platform (reject, conform, keys). J is the modelled Load into the star.",
+              why: "Do not look up keys for doomed rows. Do not load facts before keys exist — that rule did not vanish.",
+            },
+            {
+              do: "ELT order: F → land raw (lake load) → G → H → I → J. Exams still want E-T-L unless they name a lake.",
+              why: "If the stem says “classical warehouse”, write Extract → Transform → Load. If it says “data lake / ELT”, land raw then transform.",
+            },
+            {
+              do: "F is not Transform. Copying bytes is Extract even when the destination is a lake.",
+              why: "Transform is clean/rename/lookup, not “the file moved”.",
+            },
+            {
+              do: "Live OMS position for trading is still OLTP. Yesterday’s lake copy is not the trading book.",
+              why: "Do not mix the jobs. ELT does not make the warehouse a cash market.",
+            },
           ],
           result:
-            "Live position is OLTP; daily conformed snapshot is ETL. The warehouse must not be the trading system of record.",
+            "ELT: F extract, land raw, then G/H/I transform, then J load the star. Sequence F → land → G → H → I → J.",
+        },
+        {
+          title: "Date dimension before member before fact",
+          prompt:
+            "Tonight’s batch: DIM_DATE for 2026-08-21 is missing, new member MP44 is missing, 900 fills wait. In which order do you load, and what if you skip DIM_DATE?",
+          steps: [
+            {
+              do: "Load DIM_DATE first (the calendar card), then DIM_MEMBER (stub MP44 if the name file is late), then FACT_FILL with those surrogate keys.",
+              why: "Facts store dimension keys the way a marksheet points at roll numbers that must exist.",
+            },
+            {
+              do: "If FACT_FILL is loaded with a missing date_sk, the foreign key fails — or worse, every fill piles into Unknown date.",
+              why: "A silent unknown date wrecks every time slice. Fail loud or stub on purpose; do not skip.",
+            },
+            {
+              do: "Late-arriving MP44: insert a stub member row (natural key MP44, name = 'Unknown'), load the 900 fills on that member_sk, later Type-1 or Type-2 the proper name.",
+              why: "The person arrived in the numbers before their ID card. Stub first, then the fact.",
+            },
+            {
+              do: "Do not load 900 facts, then dimensions “when you have time”. Replay would then need a rewrite of keys.",
+              why: "Dimensions before facts is the nightly rule, not a preference.",
+            },
+            {
+              do: "Conformed DIM_DATE is shared with other facts. Build it once, not once per mart.",
+              why: "One calendar spelling is how drill-across stays honest.",
+            },
+          ],
+          result:
+            "DIM_DATE, then stub DIM_MEMBER for MP44, then FACT_FILL. Fact-first fails the date FK or dumps fills into Unknown.",
         },
       ],
     },
     {
-      heading: "Metadata and the staging area",
-      body: "Staging is a landing zone between the source and the warehouse proper. It holds today’s extracts, rejected rows, and sometimes a persistent history of raw files. Staging tables are not for dashboards: they may lack keys, may contain duplicates, and may use source codes. Analysts who query staging by mistake mix unconformed data into a SEBI report.\n\nMetadata is data about the pipeline and the model. Technical metadata: column types, source-to-target maps, job last-run, row counts, checksums. Business metadata: definition of “active member”, owner of DIM_ISIN, grain of FACT_TRADE (“one row per fill”). Operational metadata: start time, rows extracted, rows rejected, SLA breach. The warehouse without metadata is a pile of tables; with metadata it is a governed system.\n\nA staging design choice: transient (truncate every night after a successful load) versus persistent (keep raw extracts for 90 days so you can rebuild). Persistent staging costs disk and eases audits. Transient staging is simpler and dangerous if the warehouse load succeeded but you later discover a transform bug — you have nothing to replay except the source, which may already have overwritten yesterday.\n\nDo not put Type-2 history in staging. History of dimensions is a warehouse concern (SCD). Staging may keep a file-level history of extracts, which is not the same thing as a slowly changing dimension.",
+      heading: "Staging and metadata",
+      body: "Staging is the kitchen counter: today’s raw extracts, rejects, maybe a few days of files. It is not for dashboards. Rows may be messy, duplicated, still in source codes.\n\nMetadata is data about the pipeline — the recipe card. Technical: types and source-to-target maps. Business: “one FACT_TRADE row is one fill”. Operational: last run, rows in, rows rejected. Without metadata you have a pile of tables, not a governed warehouse.",
+      howTo: [
+        "Classify: raw dated copy → staging; surrogate keys + grain → warehouse; run log / wiki grain sentence → metadata.",
+        "Reconcile: extract − reject should equal loaded. Do not trust job SUCCESS alone.",
+        "Rejects are a hospital. If analysts need them, model a warehouse fact, do not cube the reject file.",
+        "Write the unit conversion in metadata (paise → crore) so the next person does not invent a factor.",
+      ],
       bullets: [
-        "Staging: land, check, reject; not a semantic layer. Warehouse: conformed, keyed, queryable.",
-        "Metadata: technical (maps, types), business (definitions, grain), operational (run logs, counts).",
-        "Persistent staging lets you replay; transient staging needs the source to still have the data.",
+        "Staging: land and check. Warehouse: conformed and keyed. Dashboards query the warehouse.",
+        "Metadata: technical maps, business definitions, operational counts.",
+        "Persistent staging lets you replay; transient staging needs the source to still have yesterday.",
       ],
       examples: [
         {
-          title: "Classify four artefacts as staging, warehouse, or metadata",
+          title: "Tag four artefacts",
           prompt:
-            "Artefacts: (1) table STG_TRADE_20260407 with columns copied byte-for-byte from the exchange file, (2) table FACT_TRADE with member_sk and qty_cr, (3) table ETL_JOB_LOG with rows_in, rows_reject, ended_at, (4) a wiki sentence “FACT_TRADE grain is one executed fill”. Tag each.",
+            "(1) STG_TRADE_20260407 byte-copy of the exchange file (2) FACT_TRADE with member_sk (3) ETL_JOB_LOG (4) “FACT_TRADE grain is one fill”.",
           steps: [
-            "STG_TRADE_20260407 is staging: source layout, dated landing, not conformed.",
-            "FACT_TRADE is warehouse (presentation area): surrogate keys, analytic grain.",
-            "ETL_JOB_LOG is operational metadata. It is not a fact about the market; it is a fact about the pipeline.",
-            "The wiki sentence is business metadata: it tells an analyst what one row means. It should also live in a data-dictionary table, not only in a wiki.",
-            "A fifth artefact people mix up: DIM_MEMBER. That is warehouse, not metadata, even though it describes members — it is dimensional data, not data-about-data.",
-            "If STG_TRADE is queried by a dashboard, the architecture is wrong even if the numbers look plausible on a quiet day.",
+            {
+              do: "(1) staging (2) warehouse fact (3) operational metadata (4) business metadata.",
+              why: "Staging still looks like the source. Facts have warehouse keys. Logs describe the job, not the market. Grain is a definition.",
+            },
+            {
+              do: "DIM_MEMBER is warehouse data, not metadata, even though it “describes” members.",
+              why: "Metadata is data-about-data (maps, grain, run counts), not the dimension itself.",
+            },
+            {
+              do: "A dashboard on STG_TRADE is the wrong layer even if a quiet day looks fine.",
+              why: "Unconformed codes will bite on the next synonym (“Bombay” vs “Mumbai”).",
+            },
           ],
           result:
-            "(1) staging, (2) warehouse fact, (3) operational metadata, (4) business metadata (grain).",
+            "(1) staging (2) warehouse fact (3) operational metadata (4) business metadata (grain).",
         },
         {
-          title: "Row-count metadata that catches a silent truncate",
+          title: "Count check catches an empty load",
           prompt:
-            "Last night ETL_JOB_LOG said extract_rows = 120000, reject_rows = 12, fact_insert_rows = 119988. Tonight extract_rows = 120000, reject_rows = 12, fact_insert_rows = 0, job status SUCCESS because the load step was skipped by a bad if-condition. What metadata check fails the SLA?",
+            "Last night: extract 120000, reject 12, loaded 119988. Tonight: extract 120000, reject 12, loaded 0, job SUCCESS. What fails?",
           steps: [
-            "Technical success of the scheduler (exit code 0) is not business success. Operational metadata must include a reconciliation: extract − reject = loaded.",
-            "Tonight 120000 − 12 = 119988 ≠ 0. A control that asserts loaded = extract − reject would fail.",
-            "A second control compares today’s extract_rows to a trailing average. 120000 matching yesterday is plausible; 0 loaded is not.",
-            "Business metadata is not what catches this: the grain definition did not change. Operational metadata did.",
-            "Staging still holds the 120000 rows, so a replay is possible if staging is persistent. If staging was truncated at the start of the job, you must re-extract.",
-            "Exam answer: reconcile counts, do not trust job SUCCESS. Warehouse QA is metadata, not a SELECT from FACT that an analyst might skip.",
+            {
+              do: "Check extract − reject = loaded. 119988 ≠ 0. Fail the SLA.",
+              why: "Exit code 0 is not business success. Operational metadata must reconcile counts.",
+            },
+            {
+              do: "Grain (business metadata) did not change — the run log did.",
+              why: "This is an operational miss, not a modelling miss.",
+            },
+            {
+              do: "If staging was truncated at the start, you must re-extract to replay. Persistent staging still holds the 120000.",
+              why: "Replay needs either the landing zone or the source.",
+            },
           ],
           result:
-            "Reconciliation extract − reject = loaded fails (119988 ≠ 0). SUCCESS without that check is a silent empty load.",
+            "Reconciliation 120000 − 12 = 119988 ≠ 0. SUCCESS without that check is a silent empty load.",
         },
         {
-          title: "Should rejected qty ≤ 0 rows stay in staging?",
+          title: "Map one column in metadata",
           prompt:
-            "12 fills have qty 0 because they are administrative busts. Transform writes them to STG_TRADE_REJECT. A surveillance analyst wants them in a cube of “busted fills”. Where should they live after ETL?",
+            "Source t_qty is INTEGER paise. Target qty_cr is DECIMAL crore. Write the map and the factor (1 rupee = 100 paise, 1 crore rupees = 10^7 rupees).",
           steps: [
-            "Staging reject files are a hospital, not a mart. Analysts should not build a cube on STG_TRADE_REJECT.",
-            "If busted fills are an analytic subject, define a warehouse fact FACT_TRADE_BUSTED or a status column on FACT_TRADE (status = 'BUST') with grain still one fill.",
-            "That is a business-metadata decision: are busts in or out of FACT_TRADE’s grain? Write it down, then Transform implements it.",
-            "Leaving them only in staging means they disappear when staging is truncated, and they never pick up member_sk.",
-            "Loading them into FACT_TRADE without a status flag would pollute qty sums (zeros) but more dangerously would mix busts into counts of trades. COUNT(*) would include them.",
-            "Pipeline: reject from the “valid fill” stream, then a second explicit load path into a busted-fill fact if the grain says so. Staging is the fork, not the destination.",
+            {
+              do: "Record source OMS.FILL.t_qty INTEGER → FACT_TRADE.qty_cr DECIMAL(18,4).",
+              why: "Technical metadata is the wiring diagram so nobody reverse-engineers a 400-line script.",
+            },
+            {
+              do: "1 crore rupees = 10^7 rupees = 10^9 paise, so qty_cr = t_qty / 1e9.",
+              why: "A wrong 1e8 halves the market. Write the factor on the recipe card.",
+            },
+            {
+              do: "Operational check: SUM(qty_cr) * 1e9 ≈ SUM(t_qty) for the run.",
+              why: "Metadata plus a sum check catches unit bugs before a SEBI report.",
+            },
           ],
           result:
-            "Keep rejects in staging only briefly; if analysts need busts, load a modelled warehouse fact (or a status on FACT_TRADE), not the reject file.",
+            "Map t_qty INTEGER → qty_cr DECIMAL, formula t_qty/1e9 (paise to crore). Reconcile sums.",
         },
         {
-          title: "Technical metadata map for one column",
+          title: "Persistent staging lets you replay Tuesday",
           prompt:
-            "Source OMS column t_qty is INTEGER paise. Warehouse FACT_TRADE.qty_cr is DECIMAL(18,4) crore. Write the source-to-target metadata line and the transform formula a developer should not have to reverse-engineer from code.",
+            "Tuesday extract 88000 fills landed in STG_FILL_20260825. The warehouse load failed after truncate of that date. The exchange now only keeps Wednesday. Can you replay Tuesday?",
           steps: [
-            "Technical metadata row: source_system = OMS, source_table = FILL, source_col = t_qty, source_type = INTEGER, target_table = FACT_TRADE, target_col = qty_cr, target_type = DECIMAL(18,4).",
-            "Transform rule: qty_cr = t_qty / 1e8, because 1 crore rupees = 10^8 paise (1 rupee = 100 paise, 1 crore rupees = 10^7 rupees = 10^9 paise — stop and check units on paper).",
-            "Unit check: 1 rupee = 100 paise. 1 crore rupees = 10^7 rupees = 10^7 × 100 = 10^9 paise. So qty_cr = t_qty / 1e9, not 1e8. The metadata must record the factor or the next developer halves the market.",
-            "Business metadata: “qty_cr is signed fill quantity in crore rupees, buys positive.” That sentence is not a data type.",
-            "Operational metadata later stores, for a run, SUM(t_qty) and SUM(qty_cr) so the factor can be regression-tested: SUM(qty_cr) * 1e9 ≈ SUM(t_qty).",
-            "Without this map, ELT SQL buried in a 400-line script is the only documentation. That fails an audit, which is the point of metadata in a SEBI-grade warehouse.",
+            {
+              do: "Persistent staging still holds the 88000. Replay Transform + Load from STG_FILL_20260825 without calling the exchange.",
+              why: "The kitchen counter kept yesterday’s bag. That is the point of a dated landing zone.",
+            },
+            {
+              do: "Transient staging that truncated itself at 06:00 cannot replay — the source no longer has Tuesday.",
+              why: "If you throw the bag away, you need the shop to still have the list. Here it does not.",
+            },
+            {
+              do: "Job SUCCESS on Wednesday does not repair Tuesday’s empty fact partition. Operational metadata should show Tuesday loaded = 0.",
+              why: "Exit code 0 on a later date is not a backfill. Check the run log per business date.",
+            },
+            {
+              do: "Do not cube STG_FILL. Analysts query FACT_FILL after keys and rejects.",
+              why: "Staging may be messy, duplicated, still in source codes. Dashboards belong on the warehouse.",
+            },
+            {
+              do: "Keep a few days of persistent files so a late reject fix can be re-run. Metadata should name the retention.",
+              why: "Without the recipe card (how long we keep STG), the next operator guesses.",
+            },
           ],
           result:
-            "Map OMS.FILL.t_qty INTEGER → FACT_TRADE.qty_cr DECIMAL, formula t_qty/1e9 (paise to crore). Reconcile sums in operational metadata.",
+            "Persistent STG_FILL_20260825 can replay Tuesday. Transient staging cannot once the exchange dropped the day.",
+        },
+        {
+          title: "Rejects are a hospital, not a cube",
+          prompt:
+            "Last night: extract 50000, reject 40 (qty ≤ 0), loaded 49960. Surveillance wants a chart of the 40 rejects by broker. Where do the 40 rows live?",
+          steps: [
+            {
+              do: "The 40 rows sit in a reject file / STG_REJECT — the hospital. extract − reject = 49960 matches loaded.",
+              why: "Operational metadata must reconcile. Do not trust SUCCESS alone.",
+            },
+            {
+              do: "Do not point a cube at STG_REJECT. Codes are unconformed and grain is “failed row”, not “fill”.",
+              why: "A dashboard on the kitchen counter will break on the next synonym.",
+            },
+            {
+              do: "If analysts truly need reject counts, model a small warehouse fact (grain: one rejected extract row) with conformed DIM_BROKER, then mart from that.",
+              why: "Promote it on purpose. Do not pretend the reject file is FACT_TRADE.",
+            },
+            {
+              do: "The 49960 loaded rows are warehouse facts. Mixing them with 40 rejects in one SUM would lie about turnover.",
+              why: "Rejected qty ≤ 0 must not enter market totals.",
+            },
+            {
+              do: "Write “reject reason = qty ≤ 0” in business metadata so the next person does not invent a new rule.",
+              why: "Metadata is the recipe card. The hospital needs a diagnosis label.",
+            },
+          ],
+          result:
+            "40 rows stay in reject/staging. Cube the warehouse, not the hospital. Promote rejects only if you model a real fact.",
         },
       ],
     },
     {
       heading: "Star versus snowflake, fact versus dimension, grain",
-      body: "A star schema puts a fact table in the centre, surrounded by denormalised dimension tables. DIM_MEMBER carries city, state and region on the same row. A snowflake normalises dimensions: DIM_MEMBER.city_sk references DIM_CITY, which references DIM_STATE. Stars are simpler to query and faster for OLAP; snowflakes save some space and enforce city–state consistency. SEBI answers: prefer star unless the question stresses normalisation of dimensions.\n\nA fact table stores measures (qty, value, count) at a declared grain. Additive facts (trade value) sum across every dimension. Semi-additive facts (account balance, inventory) sum across some dimensions (member) but not time — you cannot add today’s balance to yesterday’s. Non-additive facts (ratio, interest rate) do not sum; they must be recomputed from additive components.\n\nA dimension stores the descriptive context: who, what, where, when. Degenerate dimensions are fact-table columns that look like dimensions but have no dimension table (exchange_trade_id). Conformed dimensions are reused across facts (the same DIM_DATE and DIM_MEMBER in FACT_TRADE and FACT_ALERT) so a drill-across query is meaningful.\n\nGrain is a sentence: “one row per executed fill”, “one row per member per ISIN per day”. Change the grain and every measure and every join changes. Mixing two grains in one fact table (a daily snapshot row plus a fill row) is the classic modelling error.",
+      body: "A star schema puts a fact table (the numbers) in the middle, like a sun, with denormalised dimension tables as rays — city, state, region all sit on DIM_MEMBER. A snowflake normalises those rays: member → city → state. Stars are simpler to query. Exams prefer star unless they stress tidy dimensions.\n\nGrain is a sentence: “one row per fill”, not a pile of column names. Additive facts (value) sum everywhere. Semi-additive (end-of-day position) sum across members on one date, not across dates. Non-additive (a ratio) must be recomputed after you add the parts.",
+      howTo: [
+        "Write the grain in one sentence. If two measures need different sentences, split the fact tables.",
+        "Star: hierarchy columns on the dimension. Snowflake: extra tables and extra joins. Grain of the fact does not change.",
+        "Ask of each measure: can I SUM across this axis? If not, last-of-period or recompute.",
+        "High-cardinality id with no attributes → degenerate (store on the fact). Low-cardinality flags → junk dimension or fact flags.",
+      ],
       bullets: [
         "Star: denormalised dimensions. Snowflake: normalised dimension hierarchy.",
-        "Fact = measures at a grain. Dimension = descriptive context. Degenerate = id sitting on the fact.",
-        "Additive / semi-additive / non-additive. Grain is a sentence, not a list of columns.",
+        "Fact = measures at a grain. Dimension = who / what / where / when.",
+        "Additive / semi-additive / non-additive. Grain is a sentence.",
       ],
       examples: [
         {
-          title: "Name the grain and reject a mixed-grain design",
+          title: "Reject mixed grain",
           prompt:
-            "A designer proposes FACT_MARKET with columns date, member_sk, isin_sk, fill_qty, fill_value, eod_position_qty. Fills occur many times a day; eod_position_qty is one number per member-ISIN-day. Why is this illegal, and how do you split it?",
+            "FACT_MARKET has fill_qty (many per day) and eod_position_qty (one per member-ISIN-day) on the same row. Why split?",
           steps: [
-            "fill_qty has grain “one fill”. Several fills share the same (date, member, isin).",
-            "eod_position_qty has grain “one member-ISIN-day”. Repeating it on every fill row would multiply the position when a user SUMs, and putting it on only one fill row would hide it from the others.",
-            "Those two grains cannot share a table. SUM(fill_qty) and SUM(eod_position_qty) would mean different things on the same row set.",
-            "Split: FACT_FILL grain = one executed fill, measures fill_qty, fill_value. FACT_POSITION_DAILY grain = member × ISIN × date, measure eod_position_qty (semi-additive across time).",
-            "Both facts share conformed DIM_MEMBER, DIM_ISIN, DIM_DATE. Drill-across is allowed; UNION of the two facts is not.",
-            "A count-of-fills measure belongs on FACT_FILL (additive 1 per row) or as COUNT(*) ; putting “number_of_fills” on FACT_POSITION_DAILY is a different grain (daily aggregate), which is fine if declared.",
+            {
+              do: "fill_qty’s grain is one fill. eod_position_qty’s grain is one member-ISIN-day.",
+              why: "Two different “what is one row?” answers cannot share a table.",
+            },
+            {
+              do: "Repeating eod_position on every fill would multiply it when a user SUMs. Putting it on only one fill would hide it.",
+              why: "SUM would mean two different things on the same row set.",
+            },
+            {
+              do: "Split FACT_FILL and FACT_POSITION_DAILY. Share DIM_MEMBER, DIM_ISIN, DIM_DATE (conformed).",
+              why: "You may drill across shared dimensions. You must not UNION mixed grains.",
+            },
           ],
           result:
-            "Illegal mixed grain. FACT_FILL (per fill) and FACT_POSITION_DAILY (per member-ISIN-day) with conformed dimensions.",
+            "Illegal mixed grain. Per-fill fact and per-member-ISIN-day fact, conformed dimensions.",
         },
         {
-          title: "Star or snowflake for member geography",
+          title: "Star or snowflake for geography",
           prompt:
-            "DIM_MEMBER currently has member_sk, name, city, state, region. A modeller splits city, state, region into DIM_GEO and leaves city_sk on DIM_MEMBER. Draw both and say which is the star. What SQL changes for “value by region”?",
+            "DIM_MEMBER has city, state, region on the same row. A modeller splits DIM_GEO. Which is the star, and what SQL changes for “value by region”?",
           steps: [
-            "Star: FACT_TRADE → DIM_MEMBER, and city, state, region live as columns on DIM_MEMBER. Query: FROM fact JOIN dim_member ON member_sk GROUP BY region.",
-            "Snowflake: FACT_TRADE → DIM_MEMBER → DIM_GEO (city_sk) and DIM_GEO may itself snowflake to DIM_REGION. Query needs an extra join: fact JOIN member JOIN geo GROUP BY geo.region.",
-            "The snowflake is more normalised (Mumbai appears once in DIM_GEO, not once per member). The star duplicates Mumbai on every Mumbai member — cheap, and it survives a geo-table outage in queries that do not need geo.",
-            "For SEBI Grade A, “star schema” means the first picture. Snowflake is the normalised-dimension variant of a dimensional model, still not 3NF of the whole warehouse.",
-            "A galaxy / fact constellation is two facts sharing dimensions, not a snowflake.",
-            "If region is only used in 1% of queries, snowflaking geo is a maintenance choice, not a correctness requirement. Grain of the fact does not change.",
+            {
+              do: "Star: region is a column on DIM_MEMBER. One join: fact JOIN member GROUP BY region.",
+              why: "The sun’s ray already carries the whole address label.",
+            },
+            {
+              do: "Snowflake: extra join to DIM_GEO. Mumbai appears once in GEO, not once per member.",
+              why: "Normalising the hierarchy saves space and enforces city–state consistency. It costs a join.",
+            },
+            {
+              do: "Fact grain is unchanged. A galaxy is two facts sharing dimensions, not a snowflake.",
+              why: "Do not mix those words. SEBI “star schema” means the first picture.",
+            },
           ],
           result:
-            "Star keeps city/state/region on DIM_MEMBER (one join). Snowflake adds DIM_GEO (two joins). Fact grain unchanged.",
+            "Star keeps geo on DIM_MEMBER (one join). Snowflake adds DIM_GEO (two joins). Grain unchanged.",
         },
         {
-          title: "Additive versus semi-additive on a position cube",
+          title: "Do not SUM snapshots across dates",
           prompt:
-            "FACT_POSITION_DAILY rows for M1, ISIN INEA: 1 Apr eod_qty 10, 2 Apr eod_qty 12. FACT_FILL for M1 INEA: 2 Apr two fills +3 and −1. Which sums are legal across date? Across member?",
+            "Position 1 Apr = 10, 2 Apr = 12. Fills on 2 Apr: +3 and −1. Which sums are legal?",
           steps: [
-            "eod_qty is a snapshot. 10 + 12 = 22 is not M1’s position; it double-counts stock. Semi-additive: sum across member or ISIN for a fixed date; do not sum across date. Use last-of-period (12 at 2 Apr) or average if the question asks average inventory.",
-            "fill_qty is additive. +3 + (−1) = +2 net fills on 2 Apr, and you may also sum fills across dates to get a period net.",
-            "Across member, on 2 Apr, SUM(eod_qty) of all members is total shares outstanding in the warehouse’s coverage — legal if every member is present, still a same-date sum.",
-            "A ratio eod_qty / issued_capital is non-additive: sum of ratios ≠ ratio of sums. Store issued_capital as a separate additive (or slowly changing) measure and divide after aggregation.",
-            "COUNT(*) of position rows across dates is a count of snapshots, not a quantity. Do not report it as volume.",
-            "Exam shortcut: money and fill qty usually additive; balances, headcount-on-a-day, inventory semi-additive; percentages non-additive.",
+            {
+              do: "Do not add 10+12 = 22 as “the position”. Take last-of-period (12) or an average if asked.",
+              why: "eod_qty is a photo. Two photos are not two piles of stock. Semi-additive: sum across members on one date, not across dates.",
+            },
+            {
+              do: "Fills +3 + (−1) = +2, and you may SUM fills across dates.",
+              why: "Fill qty is additive, like counting coins.",
+            },
+            {
+              do: "A ratio eod / issued_capital is non-additive: divide after you aggregate the parts.",
+              why: "Sum of ratios ≠ ratio of sums. Exam shortcut: money and fills additive; balances semi; percentages non.",
+            },
           ],
           result:
-            "Do not SUM eod_qty across dates (take last or avg). SUM fill_qty across dates and members. Ratios recompute after aggregation.",
+            "Do not SUM eod_qty across dates. SUM fill_qty freely. Recompute ratios after aggregation.",
         },
         {
-          title: "Degenerate dimension and a junk dimension",
+          title: "Degenerate trade_id sits on the fact",
           prompt:
-            "FACT_FILL has exchange_trade_id (unique per fill), side (B/S), algo_flag (Y/N), and venue. None of these has a big descriptive table. Which are degenerate, which belong in a junk dimension, and which might still deserve a tiny dimension?",
+            "Each fill has exchange_trade_id (high-cardinality, no city/name attributes) and a side flag B/S. Star design: where does each go?",
           steps: [
-            "exchange_trade_id is a degenerate dimension: a high-cardinality identifier stored on the fact, no DIM_TRADE_ID table that would be one row per fact row.",
-            "side and algo_flag are low-cardinality flags. Packing them into one DIM_FILL_JUNK with a row per combination (B-Y, B-N, S-Y, S-N) is a junk dimension. The fact stores junk_sk.",
-            "venue (NSE/BSE/MSE) might stay as a tiny DIM_VENUE because it has a name, timezone, and regulator code that will grow. It can also sit as a degenerate code if it truly never grows attributes.",
-            "Putting exchange_trade_id into a dimension table that only repeats the id is wasted join cost and is not a junk dimension (cardinality equals the fact).",
-            "Grain check: still one fact row per fill. Degenerate and junk choices do not change grain.",
-            "Filter “algo buys on NSE” in a star: JOIN junk WHERE side='B' AND algo_flag='Y' JOIN venue WHERE code='NSE'. In a fully degenerate design those would be WHERE clauses on the fact itself, which also works and is simpler at this size.",
+            {
+              do: "Put exchange_trade_id on FACT_FILL. That is a degenerate dimension — an id with no dimension table.",
+              why: "A dimension table with only the id would be a shadow of the fact. High-cardinality id, no attributes → store on the fact.",
+            },
+            {
+              do: "Do not snowflake a DIM_TRADE_ID with one column. It adds a join and no extra labels.",
+              why: "Snowflake is for a real hierarchy (city → state), not for a lonely ticket number.",
+            },
+            {
+              do: "Side B/S is low-cardinality. Keep it as a fact flag or pack it in a junk dimension with other flags (odd-lot, auction).",
+              why: "Tiny flags should not explode into three mini-dimensions. Junk = a grab-bag of leftover codes.",
+            },
+            {
+              do: "Grain sentence stays “one row per fill”. The degenerate id does not change grain.",
+              why: "Grain is a sentence, not a pile of extra columns.",
+            },
+            {
+              do: "A user still GROUP BYs venue and date; they rarely GROUP BY exchange_trade_id except for drill-to-detail.",
+              why: "Degenerate keys are for trace-back to the exchange, not for a region report.",
+            },
           ],
           result:
-            "exchange_trade_id degenerate on the fact; side+algo_flag junk dimension (or fact flags); venue a small real dimension if it has attributes.",
+            "exchange_trade_id is degenerate on the fact. Side is a fact flag or junk dimension. No DIM_TRADE_ID table.",
+        },
+        {
+          title: "Do not SUM a ratio across members",
+          prompt:
+            "Member MP7 issued 100, held 25 (ratio 0.25). MP8 issued 100, held 5 (ratio 0.05). A report SUMs the two ratios to 0.30. What should it print instead?",
+          steps: [
+            {
+              do: "held/issued is non-additive. 0.25+0.05 = 0.30 is not “the book’s share”.",
+              why: "Sum of ratios ≠ ratio of sums. Exam shortcut: money and fills additive; balances semi; percentages non.",
+            },
+            {
+              do: "Recompute after you add the parts: (25+5)/(100+100) = 30/200 = 0.15.",
+              why: "Store the additive parts (held_qty, issued_qty) on the fact. Divide in the query or cube formula.",
+            },
+            {
+              do: "You may SUM held_qty across members on one date. You may not SUM eod held_qty across dates (semi-additive photo).",
+              why: "Two photos are not two piles. Last-of-period or average if they ask a week.",
+            },
+            {
+              do: "If issued_qty lives on DIM_ISIN, join then divide. Do not hide the ratio as the only stored measure.",
+              why: "A stored-only percentage cannot be rolled up honestly.",
+            },
+            {
+              do: "A star vs snowflake choice does not fix this. Grain and additivity are measure questions.",
+              why: "Do not answer “snowflake it” when the bug is a non-additive SUM.",
+            },
+          ],
+          result:
+            "Print 0.15 from (25+5)/(100+100), not 0.30. Store additive parts; recompute the ratio after aggregation.",
         },
       ],
     },
     {
-      heading: "Data mart versus warehouse, and the cube",
-      body: "A data warehouse is the enterprise conformed store: many subjects, conformed dimensions, one DIM_MEMBER used by surveillance, HR and finance. A data mart is a subject-oriented slice, often departmental (a surveillance mart, a HR mart). Independent marts built directly from sources diverge (“Mumbai” vs “Bombay”) and cannot be drilled across. Dependent marts are filled from the warehouse and stay conformed. Inmon: warehouse first (normalised EDW) then marts. Kimball: dimensional bus of conformed dimensions, marts may be the warehouse.\n\nA cube is a multidimensional array of measures indexed by dimensions. A 3-D cube Product × Region × Quarter holds one cell per combination. OLAP operations reshape what the analyst sees without changing the underlying grain of the fact: slice, dice, roll-up, drill-down, pivot (rotate). MOLAP stores the cube physically; ROLAP queries the star with SQL; HOLAP mixes both.\n\nSEBI questions will hand you a small cube and ask for the result of a slice or a roll-up. Compute. Do not answer “slice means filter” without the number.\n\nA mart that is just a SQL view of the warehouse is still a mart (access layer). A cube built on that mart is an OLAP layer on top. Three layers: staging → warehouse/mart → cube/report.",
+      heading: "Warehouse versus mart, and the cube",
+      body: "A warehouse is the whole school’s shared filing room with one spelling of “Mumbai”. A data mart is one department’s slice (surveillance, HR). Dependent marts are filled from the warehouse and stay consistent. Independent marts built from source systems drift (“Mumbai” vs “Bombay”) and cannot be drilled across.\n\nA cube is a grid of measures indexed by dimensions — Product × Region × Quarter. MOLAP stores the grid; ROLAP is SQL on the star; HOLAP mixes. Slice/dice/roll-up reshape what you see; they do not change the fact grain underneath.",
+      howTo: [
+        "Disagreeing city names across teams → independent marts. Fix: one conformed DIM_MEMBER, dependent marts.",
+        "“Normalised EDW plus departmental stars” → Inmon. “Bus of conformed dimensions” → Kimball.",
+        "Cube without a stored grid can still be a SQL GROUP BY. Drill to fills needs fill grain, not a pre-summed PRQ cube.",
+        "A filtered view of the warehouse is still a (logical) dependent mart. It is not staging and not a cube.",
+      ],
       bullets: [
         "Warehouse: enterprise, conformed. Mart: subject area. Dependent marts inherit conformity.",
-        "Independent marts from source systems cause inconsistent dimensions.",
-        "Cube: measure indexed by dimensions. MOLAP / ROLAP / HOLAP is the storage choice.",
+        "Independent marts from sources cause inconsistent dimensions.",
+        "Cube: measure indexed by dimensions. MOLAP / ROLAP / HOLAP is storage.",
       ],
       examples: [
         {
-          title: "Independent marts disagree on a member city",
+          title: "Independent marts split one member",
           prompt:
-            "Surveillance mart DIM_MEMBER: M1 city Mumbai. Finance mart DIM_MEMBER: M1 city Bombay. Both extracted from different source screens. A board pack joins “alerts by city” to “fees by city”. What breaks, and what architecture fixes it?",
+            "Surveillance DIM_MEMBER: M1 city Mumbai. Finance: M1 city Bombay. A board pack joins alerts-by-city to fees-by-city. What breaks?",
           steps: [
-            "The join on city strings splits M1 into two cities. Alerts sit in Mumbai, fees in Bombay. The drill-across is wrong even though both numbers are “correct” inside their mart.",
-            "Root cause: independent marts, no conformed DIM_MEMBER. This is not an OLAP operator bug.",
-            "Fix: a warehouse (or Kimball bus) with one DIM_MEMBER, city standardised to Mumbai in Transform, both marts loaded from that dimension.",
-            "A dependent surveillance mart and dependent finance mart would both receive member_sk 441 and city Mumbai. Cubes on top would slice the same way.",
-            "A one-off SQL REPLACE('Bombay','Mumbai') in the board pack is not conformity; the next source synonym (“Bom”) breaks it again. Conform in ETL.",
-            "Exam labels: independent mart = from source; dependent mart = from warehouse; conformed dimension = same keys and attributes across facts/marts.",
+            {
+              do: "M1 becomes two cities. Alerts sit in Mumbai, fees in Bombay. Drill-across is wrong.",
+              why: "Each mart is “correct” inside itself. The shared word “city” is not shared meaning.",
+            },
+            {
+              do: "Fix with one warehouse DIM_MEMBER (city standardised in Transform). Both marts load from it.",
+              why: "Dependent marts inherit the same member_sk and the same city spelling.",
+            },
+            {
+              do: "A one-off REPLACE('Bombay','Mumbai') in the board pack is not conformity.",
+              why: "The next synonym (“Bom”) breaks it again. Conform in ETL.",
+            },
           ],
           result:
-            "Drill-across splits M1. Fix with a conformed DIM_MEMBER in a warehouse (dependent marts), not two independent source-fed marts.",
+            "Drill-across splits M1. Conformed DIM_MEMBER in a warehouse (dependent marts), not two source-fed marts.",
         },
         {
-          title: "Inmon versus Kimball in one sentence each, applied",
+          title: "MOLAP versus ROLAP on a tiny cube",
           prompt:
-            "SEBI IT wants (i) a 3NF enterprise model of members, instruments and trades, plus (ii) a star for the surveillance team. Which layer is Inmon’s EDW, which is the mart, and where does ETL land twice?",
+            "50 products × 8 regions × 20 quarters. User asks value by Product only (roll-up the other axes). Where is the work?",
           steps: [
-            "Inmon: ETL from sources into a normalised enterprise data warehouse (EDW) — 3NF members, trades, instruments, many tables, integrity. That is (i).",
-            "Then a second ETL (or views plus a dimensional build) populates a surveillance star: FACT_FILL and DIM_*. That is (ii), a dependent mart.",
-            "Kimball would skip the 3NF EDW, conform DIM_MEMBER once, and let the surveillance star be the warehouse, with a finance star sharing the same dimensions.",
-            "SEBI Grade A typically accepts both vocabularies. If the question says “normalised warehouse plus departmental stars”, it is Inmon. If it says “bus of conformed dimensions”, it is Kimball.",
-            "Staging exists in both: landing is not the EDW and not the mart.",
-            "You do not OLAP-query Inmon’s 3NF EDW directly for a cube; you query the star/cube. The EDW is the integration layer.",
+            {
+              do: "Base cube is 8000 cells. MOLAP can answer Product-only from a stored aggregate. ROLAP GROUP BYs the star (maybe millions of fills).",
+              why: "MOLAP did some sums in advance, like a times-table. ROLAP computes on demand.",
+            },
+            {
+              do: "HOLAP might keep detail relational and store Product-only in MOLAP. This query then hits MOLAP.",
+              why: "Hybrid is “some cheat-sheets, plus the raw notebook”.",
+            },
+            {
+              do: "If the cube grain is already Product-Region-Quarter, you cannot drill to one fill. That is grain, not MOLAP vs ROLAP.",
+              why: "Operators cannot invent detail that was summed away.",
+            },
           ],
           result:
-            "3NF EDW = Inmon warehouse; surveillance star = dependent mart. Kimball would treat the conformed stars as the warehouse.",
+            "MOLAP uses a stored/array aggregate; ROLAP GROUP BYs the star. Drill to fills needs fact grain.",
         },
         {
-          title: "MOLAP versus ROLAP for a 3-D surveillance cube",
+          title: "A view can still be a mart",
           prompt:
-            "Cube SALES is Product × Region × Quarter, 50 products, 8 regions, 20 quarters, one measure value_cr. MOLAP pre-aggregates; ROLAP is SQL on the star. A user asks for value by Product only (roll-up Region and Quarter). Where is the work done?",
+            "CREATE VIEW mart_surv_fill AS SELECT … FROM fact_fill JOIN dim_member WHERE member_type = 'Broker'. Extra tables? Cube? Staging?",
           steps: [
-            "Cell count of the base cube: 50 × 8 × 20 = 8000 base cells, tiny. Either engine is fine; this is a teaching size.",
-            "MOLAP: the roll-up Product-only total is likely already stored as an aggregate cell (or computed from a compact array). Query does not scan FACT_FILL.",
-            "ROLAP: SQL GROUP BY product_sk on the fact, joining DIM_PRODUCT. Work is a scan/aggregate of fact rows (maybe millions) even though the cube is 8000 cells conceptually.",
-            "HOLAP: keep base facts in relational storage, store some aggregations (Product-only, Region-only) in MOLAP. The user’s Product-only query hits the MOLAP aggregate.",
-            "If the next query is a drill-down to individual fill-level rows, MOLAP may not have that grain and the engine goes to relational detail (HOLAP) or fails if the cube grain is already Product-Region-Quarter.",
-            "Cube grain versus fact grain: if the cube is already aggregated to Product-Region-Quarter you cannot drill to a single fill. That is a grain question, not MOLAP versus ROLAP.",
+            {
+              do: "Dependent logical mart: brokers only, keys still conformed, sourced from the warehouse.",
+              why: "Subject slice + from the warehouse = mart, even with no extra physical tables.",
+            },
+            {
+              do: "Not a cube (no stored multidimensional sums). Not staging (rows are already tidy warehouse rows).",
+              why: "The FROM clause is the tell. Staging would still look like the source file.",
+            },
+            {
+              do: "A physical mart would COPY the filtered star for isolation. Access control on the view is a reason to have a logical mart anyway.",
+              why: "Mart is about subject and governance, not only extra disks.",
+            },
           ],
           result:
-            "MOLAP answers Product-only from a stored/array aggregate; ROLAP GROUP BYs the star. Drill to fills needs fact grain, not a PRQ cube.",
+            "Dependent logical mart (broker-filtered view). Not a cube, not staging.",
         },
         {
-          title: "Mart that is only a view — still a mart?",
+          title: "Kimball bus versus Inmon filing room",
           prompt:
-            "Warehouse has FACT_FILL and all dimensions. Surveillance is given CREATE VIEW mart_surv_fill AS SELECT … FROM fact_fill JOIN dim_member WHERE member_type = 'Broker'. No extra tables. Is this a data mart? A cube? Staging?",
+            "Team A: “conformed DIM_MEMBER and DIM_DATE shared by FACT_FILL and FACT_FEE (bus).” Team B: “3NF enterprise tables first, then a surveillance star.” Name the schools. Can both still have dependent marts?",
           steps: [
-            "It is a dependent data mart (logical): subject-oriented (brokers only), sourced from the warehouse, conformed keys preserved.",
-            "It is not a cube: there is no multidimensional aggregation or OLAP operator stored. A cube might be built on top of the view.",
-            "It is not staging: rows are conformed warehouse rows, just filtered.",
-            "Physical mart would COPY the filtered star into another schema for workload isolation. Logical mart shares storage and isolation is at the query layer.",
-            "If the view joined staging tables, it would be a rogue mart and would break conformity. The FROM clause is the tell.",
-            "Access control on the view (only surveillance role) is a reason to have a mart even when no extra ETL exists.",
+            {
+              do: "Team A is Kimball: a bus of conformed dimensions, facts plug in like bus stops.",
+              why: "The exam phrase “bus of conformed dimensions” is Kimball’s poster.",
+            },
+            {
+              do: "Team B is Inmon: a normalised enterprise warehouse (CIF), then departmental stars as marts.",
+              why: "“Normalised EDW plus departmental stars” is Inmon’s poster.",
+            },
+            {
+              do: "Dependent marts exist in both pictures: they are filled from the shared warehouse (or shared conformed dims), not from raw OMS files.",
+              why: "Dependent = inherit spelling. Independent = each team extracts from source and drifts.",
+            },
+            {
+              do: "If surveillance and finance both extract city from two OMS copies, you get Mumbai vs Bombay — independent marts, not either school done well.",
+              why: "The failure mode is source-fed marts, not the Kimball/Inmon slogan.",
+            },
+            {
+              do: "A cube on top is storage (MOLAP/ROLAP). It does not pick Kimball vs Inmon.",
+              why: "Do not mix architecture words with cube storage words.",
+            },
           ],
           result:
-            "Dependent logical mart (broker-filtered view of the warehouse). Not a cube, not staging.",
+            "A = Kimball bus. B = Inmon EDW then stars. Both can have dependent marts; independent source-fed marts still drift.",
+        },
+        {
+          title: "Two dependent marts drill-across on DIM_DATE",
+          prompt:
+            "MART_SURV has alerts by date_sk. MART_FEE has fees by the same date_sk from warehouse DIM_DATE. Board pack: alerts and fees for 2026-08-21. Why does this join work when Bombay/Mumbai did not?",
+          steps: [
+            {
+              do: "Both marts store the same date_sk from one DIM_DATE. 2026-08-21 is one row, one key.",
+              why: "Conformed dimension = shared meaning, shared surrogate. Drill-across is a join on that key.",
+            },
+            {
+              do: "The earlier Mumbai/Bombay split was two independent member dimensions. Here date was not independently rebuilt.",
+              why: "Dependent marts inherit the warehouse calendar. Independent marts invent their own.",
+            },
+            {
+              do: "You still cannot UNION alert rows with fee rows — different grains. You join aggregates on date_sk.",
+              why: "Drill-across is “same dimensions, separate facts”, not “one mixed-grain fact”.",
+            },
+            {
+              do: "If MART_FEE had used load_date instead of business date_sk, 21 Aug fees could sit on 22 Aug and the pack would lie.",
+              why: "Conform the grain of time too: event date, not the ETL postmark, unless the report is about load lag.",
+            },
+            {
+              do: "A filtered view of FACT_FEE for one desk is still a dependent logical mart. Extra disks are optional.",
+              why: "Mart is subject + governance, not only extra tables.",
+            },
+          ],
+          result:
+            "Join both marts on shared date_sk for 2026-08-21. Works because DIM_DATE is conformed, unlike two source-fed city lists.",
         },
       ],
     },
     {
-      heading: "OLAP operators: slice, dice, roll-up, drill-down",
-      body: "Hold one 3-D cube in your head for this whole section. Dimensions: Product ∈ {Equity, Debt, MF}, Region ∈ {East, West}, Quarter ∈ {Q1, Q2}. Measure: turnover in ₹ crore. Twelve cells:\n\nEquity-East-Q1=12, Equity-East-Q2=15, Equity-West-Q1=8, Equity-West-Q2=10, Debt-East-Q1=6, Debt-East-Q2=7, Debt-West-Q1=9, Debt-West-Q2=11, MF-East-Q1=4, MF-East-Q2=5, MF-West-Q1=3, MF-West-Q2=6. Grand total 96.\n\nSlice fixes one dimension to a single value and drops that axis: a 3-D cube becomes 2-D. Dice selects a subcube by restricting two or more dimensions (ranges or lists) and keeps the remaining dimensionality. Roll-up aggregates along a hierarchy (Quarter → Year, Region → Country) or by dropping a dimension (sum over Region). Drill-down is the inverse: Year → Quarter, or add a dimension back. Pivot (rotate) swaps axes; it does not change numbers.\n\nHierarchies must be declared: Quarter rolls to Year, not to Product. You cannot roll Product into Region. If the cube has no Year level stored, roll-up to Year still means SUM of Q1 and Q2 in this two-quarter toy year.",
+      heading: "OLAP: slice, dice, roll-up, drill-down",
+      body: "Hold this toy cube. Product {Equity, Debt, MF} × Region {East, West} × Quarter {Q1, Q2}. Measure = turnover. Cells: Equity-East 12,15; Equity-West 8,10; Debt-East 6,7; Debt-West 9,11; MF-East 4,5; MF-West 3,6. Grand total 96.\n\nSlice fixes one dimension to one value (cut one layer of a cake) and drops that axis. Dice keeps a subcube by restricting two or more dimensions (a smaller box). Roll-up sums up a hierarchy or drops an axis (quarters → year). Drill-down is the inverse. Pivot rotates axes; numbers do not change.",
+      howTo: [
+        "Write the surviving cells, then add. Vocabulary without the number scores poorly.",
+        "One equality on one dimension → slice. Two filters or a list/range → dice.",
+        "Roll-up of an additive measure keeps the grand total. Slice/filter changes it.",
+        "SQL: WHERE is slice/dice; GROUP BY with fewer columns is roll-up.",
+      ],
       bullets: [
-        "Slice: one dimension fixed to one value. Dice: restrict ≥2 dimensions. Both filter; dice keeps a subcube.",
-        "Roll-up: coarser hierarchy or drop an axis (SUM). Drill-down: finer hierarchy or add an axis.",
-        "Pivot changes layout, not cell values. Totals on this page use the 3×2×2 cube summing to 96.",
+        "Slice: one dimension fixed to one value. Dice: restrict ≥2 dimensions.",
+        "Roll-up: coarser hierarchy or drop an axis (SUM). Drill-down: finer.",
+        "Pivot changes layout, not cell values. This page’s cube totals 96.",
       ],
       examples: [
         {
           title: "Slice Product = Equity",
           prompt:
-            "Using the cube in the section body, slice where Product = Equity. Write the remaining 2-D table Region × Quarter and the slice total. Contrast with a dice that also keeps only Equity.",
+            "Slice the 96-cube where Product = Equity. Write Region × Quarter and the slice total.",
           steps: [
-            "Fix Product = Equity. Remaining axes: Region and Quarter. Four cells: East-Q1=12, East-Q2=15, West-Q1=8, West-Q2=10.",
-            "Slice total = 12+15+8+10 = 45. Debt and MF (51) are gone.",
-            "The result is 2-dimensional. That dropped axis is the definition of slice.",
-            "A “dice” that only lists Product = Equity (one restriction) is often casually called a slice. Strict exam usage: one equality on one dimension = slice.",
-            "If the question instead said Product ∈ {Equity, Debt} and Region = West, that is two dimensions restricted → dice, not slice.",
-            "SQL analogue of this slice: WHERE product = 'Equity' then GROUP BY region, quarter. The WHERE is the slice; the GROUP BY is the remaining axes.",
+            {
+              do: "Four cells: East-Q1=12, East-Q2=15, West-Q1=8, West-Q2=10. Total 45.",
+              why: "You fixed Product to one value and dropped that axis — a 2-D layer, like one cake slice.",
+            },
+            {
+              do: "Debt and MF (51) are gone. Grand total is no longer 96.",
+              why: "A slice filters. Roll-up would have kept everyone and only thickened the time axis.",
+            },
+            {
+              do: "SQL analogue: WHERE product = 'Equity' GROUP BY region, quarter.",
+              why: "WHERE is the slice; GROUP BY is the remaining axes.",
+            },
           ],
-          result:
-            "Equity slice is a 2-D Region×Quarter table: 12, 15, 8, 10. Total 45.",
+          result: "Equity slice: 12, 15, 8, 10. Total 45.",
         },
         {
-          title: "Dice Product in {Equity, Debt} and Region = West",
+          title: "Dice Equity+Debt and Region = West",
           prompt:
-            "Dice the same cube to Product ∈ {Equity, Debt} and Region = West, both quarters. List surviving cells and the total. Then say what a slice Region = West alone would have kept.",
+            "Dice to Product ∈ {Equity, Debt} and Region = West, both quarters. List cells and total. What would a West-only slice (keeping MF) have totalled?",
           steps: [
-            "Region = West keeps West cells only. Product list drops MF. Quarters unrestricted, so Q1 and Q2 both stay.",
-            "Surviving cells: Equity-West-Q1=8, Equity-West-Q2=10, Debt-West-Q1=9, Debt-West-Q2=11.",
-            "Dice total = 8+10+9+11 = 38. MF-West 3+6 = 9 was excluded by the product list.",
-            "Dimensionality: Product still has two values, Quarter has two, Region is fixed. Some books still call this a 2-D result (Product × Quarter) because the fixed region was sliced away. Either description is fine if the cells are right.",
-            "Slice Region = West alone would also have kept MF-West Q1=3 and Q2=6, total 38+9 = 47.",
-            "Dice is the “subcube” operator: more than one filter, or a range/list rather than a single equality. Compute the cells; do not argue vocabulary if the numbers are required.",
+            {
+              do: "Cells: Equity-West 8,10 and Debt-West 9,11. Total 38.",
+              why: "Two dimensions restricted → dice. MF-West 3+6 = 9 was excluded by the product list.",
+            },
+            {
+              do: "Slice Region = West alone would keep MF too: 38+9 = 47.",
+              why: "Dice is the smaller box. Slice West is “one layer including MF”.",
+            },
+            {
+              do: "If the paper wants numbers, compute cells first; do not argue slice vs dice vocabulary without the total.",
+              why: "Marks sit on 38, not on the dictionary fight.",
+            },
           ],
-          result:
-            "Cells 8, 10, 9, 11 total 38. Region=West slice without dropping MF would have totalled 47.",
+          result: "Cells 8, 10, 9, 11 total 38. West slice including MF would be 47.",
         },
         {
-          title: "Roll-up Quarter to Year, then drill-down again",
+          title: "Roll-up Quarter to Year, then drop Region",
           prompt:
-            "Roll the cube up from Quarter to Year (this toy year = Q1+Q2). Write Product × Region at Year. Then drill-down Equity-East back to quarters.",
+            "(a) Year = Q1+Q2 for each Product × Region. (b) From the base cube, drop Region (Product × Quarter). Contrast with an East slice.",
           steps: [
-            "For each (Product, Region), Year = Q1 + Q2.",
-            "Equity-East: 12+15 = 27. Equity-West: 8+10 = 18.",
-            "Debt-East: 6+7 = 13. Debt-West: 9+11 = 20.",
-            "MF-East: 4+5 = 9. MF-West: 3+6 = 9. Six cells. Grand total still 96 (roll-up preserves the measure if it is additive).",
-            "Drill-down Equity-East Year 27 → the two children Equity-East-Q1=12 and Equity-East-Q2=15. Other year cells stay aggregated until drilled.",
-            "Roll-up is not a slice: you did not drop Debt. You changed the time hierarchy. SQL: GROUP BY product, region (drop quarter). Drill-down: GROUP BY product, region, quarter again, perhaps filtered to Equity-East.",
+            {
+              do: "Year: Equity East/West 27, 18; Debt 13, 20; MF 9, 9. Total still 96.",
+              why: "Roll-up of an additive measure keeps the grand total. You did not drop Debt; you folded time.",
+            },
+            {
+              do: "Drop Region: Equity-Q1=20, Q2=25; Debt 15, 18; MF 7, 11. Total 96.",
+              why: "East+West for each Product-Quarter. Still a roll-up (axis dropped), not a slice.",
+            },
+            {
+              do: "East slice total is 12+15+6+7+4+5 = 49, because West is discarded, not summed in.",
+              why: "If the grand total left 96, you rolled up or pivoted. If it became 49, you sliced/filtered. Pivot would keep every cell 12, 15, … and still 96.",
+            },
           ],
           result:
-            "Year table: Equity 27/18, Debt 13/20, MF 9/9 (East/West). Equity-East drills to 12 and 15. Total remains 96.",
+            "Year table totals 96. Product×Quarter after dropping Region also 96. East slice is 49, not a roll-up.",
         },
         {
-          title: "Roll-up that drops Region, versus a slice, versus a pivot",
+          title: "Slice Quarter = Q1",
           prompt:
-            "From the base cube, (a) roll-up by dropping Region (Product × Quarter totals), (b) slice Region = East, (c) pivot Product and Quarter on the full cube. Compute (a). Explain why (b) and (c) are different operations even if a GUI looks similar.",
+            "On the 96-cube, slice Quarter = Q1. Write Product × Region and the slice total. Contrast with rolling Q1+Q2 into Year.",
           steps: [
-            "Drop Region: sum East+West for each Product-Quarter.",
-            "Equity-Q1: 12+8 = 20. Equity-Q2: 15+10 = 25. Debt-Q1: 6+9 = 15. Debt-Q2: 7+11 = 18. MF-Q1: 4+3 = 7. MF-Q2: 5+6 = 11. Total 20+25+15+18+7+11 = 96.",
-            "Slice Region = East does not sum West in; it discards West. Equity-East-Q1 stays 12, not 20. Slice total = 12+15+6+7+4+5 = 49, which is East only.",
-            "Pivot rearranges axes (put Quarter on rows, Product on columns) but every cell keeps its number: Equity-East-Q1 is still 12. Pivot total is still 96 and no cell is dropped or summed.",
-            "A user who “hides West” in a UI might think they pivoted; they sliced (or filtered). A user who “shows Product on columns” pivoted. A user who “views India instead of East/West” rolled up.",
-            "Check: if the grand total changed from 96, you sliced or filtered, not rolled-up-additive or pivoted. Roll-up of an additive measure keeps 96; slice to East yields 49.",
+            {
+              do: "Q1 cells: Equity East 12 West 8, Debt East 6 West 9, MF East 4 West 3. Total 12+8+6+9+4+3 = 42.",
+              why: "You fixed Quarter to one value and dropped that axis — a 2-D layer.",
+            },
+            {
+              do: "Q2 (15+10+7+11+5+6 = 54) is gone. Grand total is no longer 96.",
+              why: "A slice filters. The missing layer is discarded, not folded in.",
+            },
+            {
+              do: "Roll-up Quarter → Year would keep both Q1 and Q2 and still total 96.",
+              why: "Roll-up of an additive measure keeps the grand total. Slice does not.",
+            },
+            {
+              do: "SQL analogue: WHERE quarter = 'Q1' GROUP BY product, region.",
+              why: "WHERE is the slice; GROUP BY is the remaining axes.",
+            },
+            {
+              do: "Pivot that Q1 table (swap Product and Region on the page) still lists 12, 8, 6, 9, 4, 3 and still 42.",
+              why: "Pivot changes layout, not cell values.",
+            },
           ],
-          result:
-            "(a) Product×Quarter: 20,25,15,18,7,11 total 96. (b) East slice total 49. (c) Pivot does not change 96 or any cell.",
+          result: "Q1 slice: 12, 8, 6, 9, 4, 3. Total 42. Year roll-up would have stayed 96.",
+        },
+        {
+          title: "Dice MF and Q2 only",
+          prompt:
+            "Dice the 96-cube to Product = MF and Quarter = Q2, both regions. List cells and total. What would a MF-only slice (both quarters) have totalled?",
+          steps: [
+            {
+              do: "Two dimensions restricted → dice. Cells: MF-East-Q2 = 5, MF-West-Q2 = 6. Total 11.",
+              why: "Dice is a smaller box. Equity/Debt and Q1 are outside the box.",
+            },
+            {
+              do: "MF-only slice (both quarters, both regions): East 4+5, West 3+6 = 18.",
+              why: "Slice Product = MF keeps Q1 as well (4 and 3). Dice dropped those.",
+            },
+            {
+              do: "If you instead rolled up Region on this dice, you would get one number 11 (MF-Q2).",
+              why: "After the dice, dropping Region is a roll-up of the remaining additive cells. Total stays 11.",
+            },
+            {
+              do: "SQL analogue: WHERE product = 'MF' AND quarter = 'Q2' GROUP BY region.",
+              why: "Two filters in WHERE are the dice; GROUP BY region keeps the leftover axis.",
+            },
+            {
+              do: "Write 5 and 6 before you argue slice vs dice. Marks sit on 11.",
+              why: "Vocabulary without the number scores poorly.",
+            },
+          ],
+          result: "Dice cells 5 and 6, total 11. MF slice including Q1 would be 18.",
         },
       ],
     },
     {
       heading: "Slowly changing dimensions Type 1 and Type 2",
-      body: "Dimensions change: a broker relocates from Pune to Mumbai, a member is renamed after a merger. Slowly changing dimension (SCD) policy decides what the warehouse does. Type 0: never change (founding date). Type 1: overwrite the attribute in place; history of the attribute is lost; all facts, past and present, now describe the new value. Type 2: insert a new dimension row with a new surrogate key, close the old row (end_date, is_current=N), leave old facts on the old sk so they keep the old city.\n\nType 2 columns typically include effective_from, effective_to, is_current. Natural key (sebi_reg) is stable; surrogate key changes with each version. Facts always store the surrogate that was current at event time, so a 2024 trade of a then-Pune broker stays on the Pune version even after the 2026 move.\n\nType 3 (not asked in depth) keeps a previous_city column on the same row — limited history, one step back. Hybrid Type 1+2: overwrite a misspelling (Type 1) but version a true relocation (Type 2). The exam wants you to pick Type 1 versus Type 2 from a sentence about whether history matters.\n\nDo not Type-2 a fact table. Facts at fill grain already are history. Degenerate ids do not version. Mini-dimensions (a junk of rapidly changing flags) are an alternative when a Type-2 member dimension would explode.",
+      body: "Dimensions change: a broker moves city. Slowly changing dimension (SCD) policy says what the warehouse does. Type 1 overwrites the attribute — history of that label is lost; old facts now wear the new city, like correcting a spelling on a name-tag. Type 2 inserts a new dimension row with a new surrogate key, closes the old row, and leaves old facts on the old key — like issuing a new library card when you move house, and keeping old loans on the old card.\n\nFacts store the surrogate that was current at event time, not the natural key. Lookup is (natural key + business date), never “always the is_current row” for historical fills.",
+      howTo: [
+        "Does history of the attribute matter for the report? Yes → Type 2. Typo / “never was true” → Type 1.",
+        "Type 2: close old row (end_date, is_current=N), insert new sk, same natural key, new city.",
+        "Stamp facts by trade_date between effective_from and effective_to — not by load_date.",
+        "Do not Type-2 a fact table. Fills already are history.",
+      ],
       bullets: [
-        "Type 1: overwrite; history lost; old facts appear under the new attribute.",
-        "Type 2: new row + new surrogate; old facts keep the old version via the old sk.",
-        "Facts point at surrogate keys, never at the natural key, if you want Type-2 history to work.",
+        "Type 1: overwrite; old facts appear under the new label.",
+        "Type 2: new row + new surrogate; old facts keep the old version.",
+        "Facts point at surrogate keys if you want Type-2 history to work.",
       ],
       examples: [
         {
-          title: "Type 1 overwrite of a broker city",
+          title: "Type 1 overwrite of city",
           prompt:
-            "DIM_BROKER before: sk=7, broker_id='BR1', city='Pune'. FACT_TRADE has two rows with broker_sk=7, dates 1 Jan and 1 Jun, qty 10 and 20. On 1 May BR1 moves to Mumbai. Apply Type 1. What does SUM(qty) GROUP BY city show?",
+            "DIM sk=7 BR1 Pune. Two facts on sk 7: 1 Jan qty 10, 1 Jun qty 20. Move to Mumbai on 1 May. Apply Type 1. SUM(qty) GROUP BY city?",
           steps: [
-            "Type 1 UPDATE dim_broker SET city = 'Mumbai' WHERE sk = 7. Still one row, sk still 7.",
-            "Both facts still point at sk 7. They now both display Mumbai, including the 1 Jan trade that happened in Pune.",
-            "GROUP BY city: Mumbai 30, Pune 0. History of the city attribute is gone.",
-            "No new surrogate is allocated. Fact table is untouched (good: facts were not restated, only the label changed).",
-            "Use Type 1 when the old value was an error (“Punr” → “Pune”) or when nobody will ever ask “where was this broker then?”.",
-            "If a report “trades in Pune in January” is a regulatory question, Type 1 just destroyed the answer. That requirement forces Type 2.",
+            {
+              do: "UPDATE city = 'Mumbai' on sk 7. Still one row. Facts untouched.",
+              why: "Type 1 is a sticker change. No new library card.",
+            },
+            {
+              do: "Both trades now display Mumbai. GROUP BY city: Mumbai 30, Pune 0.",
+              why: "January’s Pune history is gone. All facts that pointed at 7 wear the new label.",
+            },
+            {
+              do: "Use Type 1 for “Punr” → “Pune” (never true). Use Type 2 if a regulator will ask “where was this broker in January?”.",
+              why: "The sentence “does history matter?” picks the type.",
+            },
           ],
           result:
-            "One DIM row city=Mumbai. Both trades (30 qty) group under Mumbai. January’s Pune history is lost.",
+            "One DIM row city=Mumbai. Both trades (30 qty) group under Mumbai. January’s Pune is lost.",
         },
         {
           title: "Type 2 versioning of the same move",
           prompt:
-            "Same starting point: sk 7 BR1 Pune, facts 1 Jan qty 10 and 1 Jun qty 20, move on 1 May to Mumbai. Apply Type 2. Assign sk 88 to the new version. Walk fact keys and the GROUP BY city.",
+            "Same start. Assign sk 88 to the Mumbai version. Walk fact keys and GROUP BY city.",
           steps: [
-            "Close old row: sk 7, city Pune, effective_to = 30 Apr, is_current = N.",
-            "Insert sk 88, broker_id BR1 (same natural key), city Mumbai, effective_from = 1 May, is_current = Y.",
-            "1 Jan fact stays on broker_sk = 7 (event time was before the move). 1 Jun fact must use broker_sk = 88. The 1 Jun load (or a late correction) looks up the dimension version current on 1 Jun.",
-            "GROUP BY city: Pune 10, Mumbai 20. History is preserved.",
-            "GROUP BY broker_id (natural key) still totals 30 for BR1. That is why the natural key stays on both versions: you can still roll up “this legal entity” without the city split.",
-            "A lookup that always uses is_current = Y would wrongly attach even the 1 Jan fill to Mumbai if someone “fixes” history. Point-in-time lookup is: natural key + trade_date between effective_from and effective_to.",
+            {
+              do: "Close sk 7 (Pune, end 30 Apr). Insert sk 88 (Mumbai, from 1 May, current).",
+              why: "Two cards, same legal name BR1, different cities and dates.",
+            },
+            {
+              do: "1 Jan fact stays on 7. 1 Jun fact uses 88. GROUP BY city: Pune 10, Mumbai 20. Natural key BR1 still sums to 30.",
+              why: "Event-time geography is preserved. You can still roll up the legal entity on broker_id.",
+            },
+            {
+              do: "A lookup that always uses is_current = Y would wrongly hang January on Mumbai.",
+              why: "Point-in-time lookup is natural key + trade_date in the effective range.",
+            },
           ],
           result:
-            "sk7 Pune closed, sk88 Mumbai current. Jan fact 10 stays Pune; Jun fact 20 is Mumbai. Natural key BR1 still sums to 30.",
+            "sk7 Pune closed, sk88 Mumbai current. Jan 10 stays Pune; Jun 20 is Mumbai. BR1 still totals 30.",
         },
         {
-          title: "ETL lookup: which Type-2 row for a late fill?",
+          title: "Late fill: event date, not load date",
           prompt:
-            "BR1 versions: sk7 Pune from 1 Jan 2025 to 30 Apr 2026, sk88 Mumbai from 1 May 2026 onwards. A fill arrives late with trade_date = 2026-03-15 (Pune era) but load_date = 2026-06-01 (Mumbai era). Which sk does Transform stamp?",
+            "sk7 Pune until 30 Apr 2026, sk88 Mumbai from 1 May. A fill arrives 1 Jun with trade_date 15 Mar. Which sk?",
           steps: [
-            "Type-2 lookup is by event time, not by load time. trade_date 15 Mar 2026 falls in [1 Jan 2025, 30 Apr 2026] → sk 7 Pune.",
-            "Using load_date 1 Jun would stamp sk 88 and rewrite geography of a March trade. That is a Type-1-like corruption implemented by a sloppy lookup.",
-            "Pseudo-code: SELECT sk FROM dim_broker WHERE broker_id = 'BR1' AND '2026-03-15' >= effective_from AND '2026-03-15' < effective_to (or effective_to IS NULL for the open row).",
-            "If two versions overlap on a date, the dimension is broken; Transform should fail the row into reject, not pick arbitrarily.",
-            "If no version covers the date (broker on-boarded in April but a March trade exists), late-arriving dimension stub, then restatement.",
-            "Exam: SCD2 lookup key is (natural key, business date), never (natural key, is_current) for historical facts.",
+            {
+              do: "15 Mar 2026 is in the Pune window → stamp sk 7.",
+              why: "Type-2 lookup is when the trade happened, not when the file showed up. Load date is the postmark, not the exam date.",
+            },
+            {
+              do: "Using load_date 1 Jun would stamp 88 and rewrite March geography — a sloppy Type-1 corruption.",
+              why: "The fact would lie about where the broker was.",
+            },
+            {
+              do: "If two versions overlap on a date, reject the row. If none cover, stub then restate.",
+              why: "Broken effective dates are a dimension bug, not a guess.",
+            },
+          ],
+          result: "Stamp sk 7 (Pune). Event date chooses the Type-2 version, not load date.",
+        },
+        {
+          title: "Type 1 typo versus Type 2 real move",
+          prompt:
+            "DIM sk=21 BR4 city Nashik. Facts on sk 21: 3 Feb qty 5, 9 Aug qty 14. (a) City was always Surat — typo. (b) Broker really moved Surat on 1 Jul. Pick Type 1 or 2 for each, and the GROUP BY city after (b) Type 2 with new sk 90.",
+          steps: [
+            {
+              do: "(a) Typo “never was Nashik” → Type 1 overwrite city = Surat on sk 21. Both facts now display Surat. GROUP BY: Surat 19.",
+              why: "Type 1 is a sticker change for “never true”. History of the wrong label should die.",
+            },
+            {
+              do: "(b) Real move → Type 2: close sk 21 (Nashik until 30 Jun), insert sk 90 (Surat from 1 Jul).",
+              why: "Two library cards, same legal name BR4. Old loans stay on the old card.",
+            },
+            {
+              do: "3 Feb stays on 21 (Nashik 5). 9 Aug uses 90 (Surat 14). GROUP BY city: Nashik 5, Surat 14. Natural key BR4 still sums to 19.",
+              why: "Event-time geography is preserved. You can still roll up the legal entity on broker_id.",
+            },
+            {
+              do: "Do not Type-2 the fact table. The two fills already are history. Only the dimension versions.",
+              why: "Facts point at surrogates. They do not grow SCD rows of their own.",
+            },
+            {
+              do: "If you Type-1’d the real move, August and February would both wear Surat and a regulator asking “where in February?” would hear a lie.",
+              why: "The sentence “does history matter?” picks the type. Here it did.",
+            },
           ],
           result:
-            "Stamp sk 7 (Pune). Event date, not load date, chooses the Type-2 version.",
+            "(a) Type 1: both 19 under Surat. (b) Type 2: sk21 Nashik 5, sk90 Surat 14, BR4 still 19.",
         },
         {
-          title: "Type 1 correction versus Type 2 true change on the same column",
+          title: "is_current lookup hangs March on the new city",
           prompt:
-            "city for BR1 is 'Punr' (typo) from the first load. Facts already use sk 7. Tomorrow the master file says city = 'Pune' (same office, spelling fix). Next year the office actually moves to Mumbai. Which SCD type for each event, and do you allocate a new sk for the typo?",
+            "sk=33 BR8 Jaipur until 28 Feb 2026, sk=41 BR8 Kota from 1 Mar, is_current=Y on 41. A late fill arrives 10 Apr with trade_date 20 Jan. Which sk if you lookup is_current=Y? Which sk is correct?",
           steps: [
-            "Typo Punr → Pune is a correction of a value that was never true. Type 1 overwrite on sk 7. No new surrogate. All facts with sk 7 now show Pune, which is what they should have shown.",
-            "Allocating a Type-2 row for the typo would preserve “Punr” as if it were a real historical city. Analysts would split a fake geography. Do not Type-2 data-quality fixes.",
-            "The later real move Pune → Mumbai is Type 2: close sk 7, insert sk 88 Mumbai, new facts after the move use 88.",
-            "Hybrid policy written in metadata: “city: Type 2 on real relocation; Type 1 on spelling and standardisation to the city reference list.”",
-            "If Punr was loaded yesterday and no facts exist yet, Type 1 and Type 2 look the same operationally (one row). The policy still matters the day the first fact lands.",
-            "Document the rule in business metadata so two ETL developers do not disagree on the next typo.",
+            {
+              do: "is_current = Y always returns sk 41 Kota. Stamping 41 on a 20 Jan fill rewrites January geography.",
+              why: "Current card is today’s address. January’s fill needs January’s card.",
+            },
+            {
+              do: "Correct Type-2 lookup: natural key BR8 + trade_date 20 Jan inside effective_from/to → sk 33 Jaipur.",
+              why: "Point-in-time lookup is natural key + event date in the window, never “always the current row” for historical fills.",
+            },
+            {
+              do: "load_date 10 Apr would also wrongly pick Kota if you used load time. Same bug, different clock.",
+              why: "Load date is the postmark. Event date is the exam date.",
+            },
+            {
+              do: "If two versions overlap on 20 Jan, reject the fill. If none cover, stub then restate.",
+              why: "Broken effective dates are a dimension bug, not a guess.",
+            },
+            {
+              do: "Reports that want “BR8 as they are today” may use is_current on purpose — that is a Type-1-like view, and must be labelled.",
+              why: "As-was versus as-is are different English sentences. Default warehouse facts are as-was.",
+            },
           ],
           result:
-            "Typo: Type 1 on sk 7, no new key. Real move: Type 2 new sk. Do not version spelling mistakes.",
-        },
-      ],
-    },
-    {
-      heading: "Putting the cube and the star together",
-      body: "A cube cell is an aggregation of fact rows that share dimension values. The Equity-East-Q1 cell 12 in the earlier cube is SUM(value_cr) FROM fact JOIN dim_product JOIN dim_region JOIN dim_date WHERE product='Equity' AND region='East' AND quarter='Q1'. If the fact grain is a fill, many fills sit behind that 12. Slice/dice/roll-up are therefore SQL GROUP BY plus WHERE, or precomputed aggregates in MOLAP.\n\nMaterialised aggregations (aggregate fact tables) store some roll-ups physically: FACT_FILL_MONTHLY grain member × ISIN × month. A query at month grain should hit that table, not scan fills. This is still a warehouse object, not staging. Metadata must record that it is derived and how to refresh it after the base fact loads.\n\nWhen an SCD Type 2 city change happens, a cube that groups by city is grouping by the dimension version attached to each fact, not by the member’s current city — if you modelled Type 2 correctly. A Type 1 city change restates every cube cell that used that member. Know which restatement your regulator wanted before you pick SCD type.\n\nExam wrap: ETL fills a star at a declared grain; a cube is an OLAP view of that star; marts are subject slices; metadata and staging keep the pipeline honest. If a number in a cube cannot be traced to fact rows, the grain or the load is wrong.",
-      bullets: [
-        "Cube cell = aggregated facts for a dimension tuple. Operators are WHERE/GROUP BY or MOLAP.",
-        "Aggregate fact tables are stored roll-ups; refresh them after base loads.",
-        "Type 2 city splits cube cells historically; Type 1 restates them.",
-      ],
-      examples: [
-        {
-          title: "Trace cell 12 back to fills",
-          prompt:
-            "FACT_FILL (product, region, date, value_cr): (Equity, East, 2026-01-10, 5), (Equity, East, 2026-02-02, 7), (Equity, East, 2026-04-01, 4), (Debt, East, 2026-01-10, 6). Q1 = Jan–Mar. Which rows form Equity-East-Q1, and what is the cell?",
-          steps: [
-            "Filter Product Equity, Region East, date in Q1 (Jan–Mar 2026).",
-            "Row 5 (10 Jan) qualifies. Row 7 (2 Feb) qualifies. Row 4 (1 Apr) is Q2, out. Debt row is wrong product, out.",
-            "Cell = 5+7 = 12, matching the teaching cube. Two fills, one cell.",
-            "Slice Product=Equity keeps these plus Equity cells of other regions/quarters; it does not by itself sum them.",
-            "Roll-up to Year would add the Q2 4 as well: Equity-East-Year = 12+4 = 16 from these rows (plus any other Equity-East fills not listed).",
-            "If grain were already Product-Region-Quarter, you could not list the two fills; drill-down would stop at 12. Here grain is fill, so drill-down past the cube cell is legal.",
-          ],
-          result:
-            "Equity-East-Q1 = 5+7 = 12 from two fills. The 1 Apr fill is Q2; the Debt fill is another product.",
-        },
-        {
-          title: "Aggregate fact versus query-time roll-up",
-          prompt:
-            "FACT_FILL has 10 million rows. FACT_PRQ is an aggregate at Product × Region × Quarter with 12 rows matching our toy cube. A dashboard asks for grand total 96. Which table, and what must ETL do after a late fill of Equity-East-Q1 worth +1?",
-          steps: [
-            "Grand total can come from SUM(value_cr) of FACT_PRQ (12 cells) or of FACT_FILL (10 million rows). Use FACT_PRQ.",
-            "Late fill +1 to Equity-East-Q1 means base FACT_FILL gains a row, and FACT_PRQ’s Equity-East-Q1 cell must become 13, grand total 97.",
-            "ETL refresh: incremental (+1 to that aggregate cell) or rebuild FACT_PRQ from FACT_FILL for that quarter partition. Stale aggregate is worse than a slow query.",
-            "Metadata: FACT_PRQ.derived_from = FACT_FILL, grain declared, last_refresh timestamp. Dashboards should refuse a cube older than the base fact.",
-            "Slice/dice on FACT_PRQ cannot drill to the late fill’s trade_id: that degenerate dimension was summed away. Drill-through must go to FACT_FILL with the same WHERE.",
-            "Do not leave FACT_PRQ in staging. It is a warehouse aggregate table (performance mart).",
-          ],
-          result:
-            "Read 96 from FACT_PRQ. After a +1 late fill, refresh the Equity-East-Q1 aggregate cell to 13 (total 97) or rebuild the partition.",
-        },
-        {
-          title: "Type 2 restatement of a cube city slice",
-          prompt:
-            "Two fills of BR1, value 10 (Jan, then Pune, sk7) and 20 (Jun, Mumbai, sk88). Cube slices city=Pune versus city=Mumbai. Then someone Type-1 overwrites sk7 to Mumbai by mistake. What do the slices show before and after the mistake?",
-          steps: [
-            "Correct Type 2: Pune slice includes 10, Mumbai slice includes 20. Grand total 30.",
-            "Mistaken Type 1 on sk7: both dimension rows that facts use… wait, sk7’s city becomes Mumbai, sk88 already Mumbai. Both facts now join to Mumbai.",
-            "Pune slice becomes 0. Mumbai slice becomes 30. January’s geography is restated.",
-            "The fact values did not change; the dimension join did. Cube operators were correct; the SCD policy was violated.",
-            "A Type 2-aware report “current city of the broker” would join through is_current = Y (sk88 Mumbai) and attribute both 10 and 20 to Mumbai on purpose. That is a different query, using current attributes, not event-time attributes.",
-            "Know which query the circular asked for: event-time geography (Type 2 join on the fact’s sk) versus current geography (lookup is_current).",
-          ],
-          result:
-            "Before mistake: Pune 10, Mumbai 20. After Type-1 overwrite of sk7: Pune 0, Mumbai 30. Facts unchanged.",
-        },
-        {
-          title: "Dice then roll-up on the teaching cube, one chain",
-          prompt:
-            "Start from the 96-cube. Dice to Product ∈ {Equity, MF} and Quarter = Q2. Then roll-up Region (drop Region). Compute the two remaining Product cells and their total.",
-          steps: [
-            "Dice filters: drop Debt entirely; drop Q1 entirely; keep East and West.",
-            "Remaining cells: Equity-East-Q2=15, Equity-West-Q2=10, MF-East-Q2=5, MF-West-Q2=6. Dice total 36.",
-            "Roll-up drop Region: Equity-Q2 = 15+10 = 25. MF-Q2 = 5+6 = 11.",
-            "Two cells, total 36, same as the dice (additive). Debt-Q2 18 never entered.",
-            "Order matters for thinking, not for the additive result: roll-up first to Product×Quarter then filter Product and Q2 would also yield 25 and 11. For non-additive measures (averages, distinct counts) filter (dice/slice) before averaging, or you average leftovers you intended to drop.",
-            "SQL: WHERE product IN ('Equity','MF') AND quarter = 'Q2' GROUP BY product. The WHERE is the dice; GROUP BY product (no region) is the roll-up.",
-          ],
-          result: "Equity-Q2 = 25, MF-Q2 = 11, total 36. Debt excluded by the dice.",
+            "is_current stamps sk 41 Kota (wrong). Event-time stamps sk 33 Jaipur. Late arrival does not change January.",
         },
       ],
     },
