@@ -83,6 +83,72 @@ export const notesGa: TopicNote = {
           result:
             "(B) Brokers and insider trading are SEBI. Repo, CRR, and G-sec issuance are not.",
         },
+        {
+          title: "1988 start versus 1992 statute",
+          prompt:
+            "True or false, and fix the false line: (i) SEBI existed from 12 April 1988 (ii) it became a statutory board under the Companies Act, 2013 (iii) its own law is the SEBI Act, 1992.",
+          steps: [
+            {
+              do: "Mark (i) true.",
+              why: "SEBI was set up on 12 April 1988, still without its own Act.",
+            },
+            {
+              do: "Mark (ii) false.",
+              why: "The Companies Act is company law under MCA. It did not create SEBI.",
+            },
+            {
+              do: "Mark (iii) true.",
+              why: "1992 is the statute that gave the Board legal powers.",
+            },
+            {
+              do: "Write the fix for (ii): became statutory under the SEBI Act, 1992.",
+              why: "One constitutive Act. Do not swap in SCRA or the RBI Act either.",
+            },
+            {
+              do: "If a follow-up asks HQ, answer Mumbai, not New Delhi.",
+              why: "City and statute are two different facts. Do not mix them in one blank.",
+            },
+            {
+              do: "If a follow-up says ‘created by SCRA, 1956’, reject it.",
+              why: "SCRA recognises stock exchanges. It is not SEBI’s own law.",
+            },
+          ],
+          result:
+            "(i) true (1988). (ii) false — not the Companies Act. (iii) true — SEBI Act, 1992.",
+        },
+        {
+          title: "Three jobs in the SEBI Act, not money-policy tools",
+          prompt:
+            "SEBI’s statutory job is to: (A) set CRR and issue Union G-secs (B) protect investors in securities, develop the securities market, and regulate that market (C) licence banks and run RTGS (D) sit in New Delhi as the central bank.",
+          steps: [
+            {
+              do: "Recall the three-part job: protect, develop, regulate the securities market.",
+              why: "That is the plain-English reading of SEBI’s own Act. Pick (B).",
+            },
+            {
+              do: "Drop (A).",
+              why: "CRR and Union G-secs are RBI / government money-and-debt tools.",
+            },
+            {
+              do: "Drop (C).",
+              why: "Bank licences and RTGS are RBI payment-and-banking work.",
+            },
+            {
+              do: "Drop (D).",
+              why: "SEBI HQ is Mumbai. SEBI is not the central bank. New Delhi is a regional office, not HQ.",
+            },
+            {
+              do: "If an option keeps the three jobs but adds ‘and sets the repo rate’, reject the whole option.",
+              why: "One false regulator word poisons an otherwise official sentence.",
+            },
+            {
+              do: "Write a margin split: securities market → SEBI; banks and rupees → RBI.",
+              why: "That split also answers ‘who registers brokers’ versus ‘who sets SLR’.",
+            },
+          ],
+          result:
+            "(B) Protect, develop, regulate the securities market. Not CRR, not repo, not New Delhi as HQ.",
+        },
       ],
     },
     {
@@ -161,6 +227,72 @@ export const notesGa: TopicNote = {
           ],
           result:
             "RBI (NBFC), SEBI (listing), IFSCA (GIFT IFSC unit). One group, three labels.",
+        },
+        {
+          title: "GIFT City IFSC is IFSCA, not a second SEBI HQ",
+          prompt:
+            "A broker-dealer unit inside GIFT City IFSC is licensed for that IFSC business by: (A) SEBI only, because all brokers are always SEBI (B) IFSCA (C) IRDAI (D) PFRDA.",
+          steps: [
+            {
+              do: "Name the geography: inside an IFSC (GIFT City, Gandhinagar).",
+              why: "Place beats the brand word broker. Inside IFSC → IFSCA.",
+            },
+            {
+              do: "Pick (B) IFSCA.",
+              why: "IFSCA is the unified IFSC regulator under the IFSCA Act, 2019.",
+            },
+            {
+              do: "Drop (A)’s always.",
+              why: "A domestic NSE broker is SEBI. The same group’s IFSC unit is not ‘just SEBI by habit’.",
+            },
+            {
+              do: "Drop IRDAI and PFRDA.",
+              why: "Insurance and pensions / NPS are different trees unless the stem names those products.",
+            },
+            {
+              do: "Do not write ‘RBI regulates every GIFT banking word, so IFSCA is fake’.",
+              why: "IFSC banking units sit under IFSCA as the unified IFSC regulator, not as a domestic RBI branch with another name.",
+            },
+            {
+              do: "If the next line names a domestic NSE cash trade by the parent, label that slice SEBI.",
+              why: "One group can have two labels. Do not force one regulator for the whole brand.",
+            },
+          ],
+          result:
+            "(B) IFSCA for the IFSC unit. Domestic securities still SEBI; do not mix IRDAI or PFRDA.",
+        },
+        {
+          title: "IRDAI, PFRDA, and FDI are not FPI registration",
+          prompt:
+            "Match: (i) insurance company licence (ii) NPS / pension fund regulation (iii) FPI certificate to buy listed Indian securities (iv) FDI policy. Options mix IRDAI, PFRDA, SEBI, and the government.",
+          steps: [
+            {
+              do: "(i) insurance licence → IRDAI.",
+              why: "Insurance is not a SEBI broker licence and not an RBI bank licence.",
+            },
+            {
+              do: "(ii) NPS / pensions → PFRDA.",
+              why: "Pension Fund Regulatory and Development Authority is the pension tree.",
+            },
+            {
+              do: "(iii) FPI certificate → SEBI.",
+              why: "Buying listed securities as a portfolio investor is securities-market conduct. FEMA/RBI still matter for forex, but the FPI registration is SEBI’s.",
+            },
+            {
+              do: "(iv) FDI policy → the government (exam English: government / DPIIT path), not IRDAI.",
+              why: "Foreign direct investment rules are not a stock-broker licence.",
+            },
+            {
+              do: "Reject ‘CCI registers FPIs’ and ‘PFRDA sets repo’.",
+              why: "Competition and pensions are different trees. Repo stays with RBI.",
+            },
+            {
+              do: "Write one line: activity in the stem, not the group’s famous parent.",
+              why: "A bank-promoted fund is still a mutual fund under SEBI if the stem is the scheme.",
+            },
+          ],
+          result:
+            "IRDAI insurance; PFRDA pensions; SEBI FPI certificate; government FDI policy. Repo stays RBI.",
         },
       ],
     },
@@ -246,6 +378,72 @@ export const notesGa: TopicNote = {
           ],
           result: "False. OFS is a sale of existing shares, not a fresh IPO.",
         },
+        {
+          title: "Rights and preferential are primary; later NSE trade is not",
+          prompt:
+            "Classify: (i) a listed company offers new shares to existing holders in a rights issue (ii) it allots new shares to a selected person in a preferential issue (iii) you buy those shares two months later on NSE.",
+          steps: [
+            {
+              do: "(i) rights issue of new shares → primary.",
+              why: "The company issues paper. Fresh capital usually comes in. Existing holders get the offer, but it is still an issue, not an exchange trade.",
+            },
+            {
+              do: "(ii) preferential allotment of new shares → primary.",
+              why: "New paper to a chosen buyer. Same test: is paper being issued?",
+            },
+            {
+              do: "(iii) later NSE purchase → secondary.",
+              why: "The shares already exist. You pay another investor, not the company.",
+            },
+            {
+              do: "Do not call a rights issue an OFS.",
+              why: "OFS sells old shares. Rights create (or issue) new ones.",
+            },
+            {
+              do: "If bonus shares appear in a later option, they are not a cash IPO.",
+              why: "A bonus capitalises reserves. It does not bring in fresh subscription money like an IPO.",
+            },
+            {
+              do: "Repeat the money test: does the company receive this cheque?",
+              why: "Yes for a fresh rights or preferential issue. No for the later NSE trade.",
+            },
+          ],
+          result:
+            "Rights and preferential issues of new shares are primary. The later NSE buy is secondary.",
+        },
+        {
+          title: "FPO is still primary; the unofficial grey market is not a SEBI market",
+          prompt:
+            "True or false: (i) a further public offer of fresh shares is primary (ii) the unofficial IPO grey market is a SEBI-recognised exchange (iii) buying in that grey book is the same as allotment in the IPO.",
+          steps: [
+            {
+              do: "(i) True. An FPO of new shares is a further issue.",
+              why: "The company puts paper out again. That is still the primary market.",
+            },
+            {
+              do: "(ii) False. The unofficial grey market is not a SEBI-recognised stock exchange.",
+              why: "NSE and BSE are recognised markets. A kerb premium book is not.",
+            },
+            {
+              do: "(iii) False. Grey-market chat is not IPO allotment.",
+              why: "Allotment is the primary issue. A side bet on the listing premium does not issue the share.",
+            },
+            {
+              do: "If the stem says selling shareholders in an offer for sale in the IPO document, split the money.",
+              why: "Fresh issue proceeds go to the company. OFS proceeds go to selling holders. Both can sit in one offer document.",
+            },
+            {
+              do: "Keep QIP on the primary side if it appears next.",
+              why: "QIP is a further issue to institutions, not a grey-market trade.",
+            },
+            {
+              do: "Write: recognised secondary market = exchange. Unofficial grey book ≠ that market.",
+              why: "Do not call the grey market ‘SEBI’s primary market’.",
+            },
+          ],
+          result:
+            "(i) true (FPO of fresh shares is primary). (ii) false. (iii) false. Grey market ≠ IPO allotment.",
+        },
       ],
     },
     {
@@ -330,6 +528,72 @@ export const notesGa: TopicNote = {
           result:
             "2020 = T+2; from 27 Jan 2023 = T+1 default; Mar 2024 = optional limited T+0 extra path.",
         },
+        {
+          title: "Friday trade, weekend is not a settlement day",
+          prompt:
+            "An investor buys a T+1 cash-equity stock in the regular session on Friday. Saturday and Sunday are not settlement days. When do shares and money normally finish moving?",
+          steps: [
+            {
+              do: "Set T = Friday.",
+              why: "That is the trade date in the regular session.",
+            },
+            {
+              do: "Ask what the next settlement day is. Skip Saturday and Sunday.",
+              why: "T+1 counts settlement (working) days, not raw calendar nights.",
+            },
+            {
+              do: "Complete on Monday if Monday is a working settlement day.",
+              why: "Friday + next settlement day = Monday in a normal week.",
+            },
+            {
+              do: "Reject ‘settled Friday evening’ and ‘settled Saturday’.",
+              why: "Friday finish would be T+0. Saturday is not a cash-equity settlement day in this picture.",
+            },
+            {
+              do: "Do not call it a Monday trade.",
+              why: "The bargain was struck Friday. Only pay-in slid to the next working day.",
+            },
+            {
+              do: "If Monday is also a settlement holiday, slide again to Tuesday.",
+              why: "Same holiday rule as a Tuesday holiday after a Monday trade.",
+            },
+          ],
+          result:
+            "Monday (if it is a working settlement day). Friday trade → next settlement day under T+1, not Saturday.",
+        },
+        {
+          title: "Optional T+0 is extra; clearing is not abolished",
+          prompt:
+            "True or false: (i) from 28 March 2024, every listed stock must settle the same day (ii) T+1 remains the default cash-equity cycle (iii) T+1 removed the clearing corporation.",
+          steps: [
+            {
+              do: "(i) False. March 2024 began an optional T+0 path for a limited basket.",
+              why: "It was not mandatory for every listed stock and did not replace T+1.",
+            },
+            {
+              do: "(ii) True. T+1 is still the default from 27 January 2023.",
+              why: "Optional T+0 runs beside T+1. Default and extra path are two labels.",
+            },
+            {
+              do: "(iii) False. A clearing corporation still sits in the middle (novation).",
+              why: "Faster settlement did not abolish the CCP. T+1 is a clock, not a new legal counterparty.",
+            },
+            {
+              do: "If the stem says ‘initially 25 stocks’, keep 25. Do not write 250.",
+              why: "The first basket size is a load-bearing number. Inflating it is a GA fault.",
+            },
+            {
+              do: "If the stem is a 2020 paper, do not import T+1 as already universal.",
+              why: "2020 default cash equity was still T+2.",
+            },
+            {
+              do: "Write the year strip: 2020 T+2 · 27 Jan 2023 T+1 default · Mar 2024 optional limited T+0.",
+              why: "Mixing the three clocks is the usual trap.",
+            },
+          ],
+          result:
+            "(i) false (ii) true (iii) false. T+0 extra and limited; T+1 default; CCP still novates.",
+        },
       ],
     },
     {
@@ -409,6 +673,72 @@ export const notesGa: TopicNote = {
           ],
           result:
             "CCP novates and manages settlement risk. Depositories credit/debit demat. Different jobs.",
+        },
+        {
+          title: "Two depositories, 1996 Act, Mumbai",
+          prompt:
+            "Pick the accurate set: (A) One depository in New Delhi under the RBI Act, 1934 (B) NSDL and CDSL, Depositories Act, 1996, both in Mumbai (C) NSDL only, Companies Act, 2013 (D) CDSL sets the repo rate.",
+          steps: [
+            {
+              do: "Count the depositories: two — NSDL and CDSL.",
+              why: "There is not a single national depository as the whole answer. Both names matter.",
+            },
+            {
+              do: "Name the law: Depositories Act, 1996.",
+              why: "Not the RBI Act and not the Companies Act as the constitutive depository statute.",
+            },
+            {
+              do: "Name the city: both depositories are in Mumbai.",
+              why: "Same city trap as SEBI HQ. New Delhi is the wrong default guess.",
+            },
+            {
+              do: "Drop (D). Repo is RBI.",
+              why: "A depository does not set policy rates.",
+            },
+            {
+              do: "Drop (A) and (C) as mixed laws and a missing second depository.",
+              why: "One false statute or one missing name fails the set.",
+            },
+            {
+              do: "Add the access path: you go through a DP, not a walk-in NSDL counter as the normal retail path.",
+              why: "That is the next sentence if the option says ‘no intermediary’.",
+            },
+          ],
+          result:
+            "(B) NSDL and CDSL; Depositories Act, 1996; Mumbai. Not repo, not New Delhi HQ.",
+        },
+        {
+          title: "Beneficial owner versus registered owner",
+          prompt:
+            "In a demat holding, who is the beneficial owner, and who is usually the registered owner on the issuer’s books? (A) investor beneficial; depository registered (B) DP beneficial; RBI registered (C) clearing corporation beneficial; SEBI registered (D) AMC beneficial; AMFI registered.",
+          steps: [
+            {
+              do: "Pick (A).",
+              why: "You own the economic rights (beneficial owner). The depository is the registered owner on the company’s register.",
+            },
+            {
+              do: "Drop (B). A DP is the investor-facing agent, not the beneficial owner of your shares.",
+              why: "The DP opens the account. It does not become you. RBI is not on the share register.",
+            },
+            {
+              do: "Drop (C). The CCP novates trades; it is not your standing share owner.",
+              why: "Wrong layer. Settlement risk ≠ demat title.",
+            },
+            {
+              do: "Drop (D). Mutual-fund bodies are a different product.",
+              why: "AMFI is not a depository. An AMC manages a scheme, not your equity demat title.",
+            },
+            {
+              do: "Add fungible: same-ISIN units are interchangeable balances.",
+              why: "You sell 50 units of that ISIN, not 50 unique paper serials.",
+            },
+            {
+              do: "If asked who moves the shares after a trade, say the depository on instructions, after the CCP has novated.",
+              why: "Two jobs: guarantee versus book-entry.",
+            },
+          ],
+          result:
+            "(A) Investor = beneficial owner; depository = registered owner. DP faces you; CCP is another layer.",
         },
       ],
     },
@@ -490,6 +820,72 @@ export const notesGa: TopicNote = {
           result:
             "Share UPSI only for a real need with safeguards. Closed-window trades can breach PIT without a proven profit.",
         },
+        {
+          title: "Late company disclosure is LODR first, not PIT by itself",
+          prompt:
+            "A listed company sits silent for days after signing a material deal. No employee trade is described. First label? (A) PIT 2015 because all silence is insider trading (B) LODR disclosure duty (C) CRR (D) Depositories Act only.",
+          steps: [
+            {
+              do: "Ask what is missing: a public filing of a material event, not a named insider trade.",
+              why: "Company-to-market speech is listing disclosure (LODR), not PIT first.",
+            },
+            {
+              do: "Pick (B).",
+              why: "LODR is the code that says tell the exchange a material event in time.",
+            },
+            {
+              do: "Drop (A)’s because all silence is insider trading.",
+              why: "PIT needs trading or tipping on UPSI. Silence by the company is a different duty.",
+            },
+            {
+              do: "Drop CRR and the Depositories Act as the main label.",
+              why: "Wrong machines: reserve ratio and demat law.",
+            },
+            {
+              do: "If the next sentence adds ‘the CFO’s spouse bought yesterday’, then add PIT.",
+              why: "Now you have unpublished news plus a connected trade. Two codes can sit together, but the stem here had no trade.",
+            },
+            {
+              do: "Keep PFUTP for fake volume / jumping a client, not for this silence.",
+              why: "Order-book fraud is still a third tree.",
+            },
+          ],
+          result:
+            "(B) LODR first when the company stays silent on a material deal. PIT needs a trade or tip on UPSI.",
+        },
+        {
+          title: "Closed window and a 50-share defence",
+          prompt:
+            "A designated person buys 50 shares in the closed window after quarter-end and says ‘too small to matter, and I did not know the result number’. Defence? (A) Valid, because 50 is below a SEBI rupee floor in the Act (B) Weak — the window is a preventive PIT rule (C) Valid if they use a spouse account (D) Valid because T+1 had not settled.",
+          steps: [
+            {
+              do: "Name the person: designated, so the trading window applies.",
+              why: "The window typically runs from quarter-end until 48 hours after results.",
+            },
+            {
+              do: "Pick (B). Treat the trade as a code problem even without a proven profit.",
+              why: "The paper does not need the exact result number or a huge gain.",
+            },
+            {
+              do: "Drop (A). ‘Only 50 shares’ is not a safe harbour in this exam story.",
+              why: "The notes already kill ‘I own only 50 shares’ as a defence.",
+            },
+            {
+              do: "Drop (C). A spouse / immediate-relative account is usually still in the net.",
+              why: "PIT does not stop at the employee’s own demat.",
+            },
+            {
+              do: "Drop (D). Settlement cycle is not a PIT defence.",
+              why: "T+1 is when shares move. It does not reopen a closed window.",
+            },
+            {
+              do: "If asked about a contra trade six weeks later, remember designated persons also face a contra-trade cooling period (commonly six months in the code).",
+              why: "Window and contra-trade are two preventive PIT tools, not PFUTP.",
+            },
+          ],
+          result:
+            "(B) Closed-window trades can breach PIT without a big profit. Size, spouse, and T+1 are not defences.",
+        },
       ],
     },
     {
@@ -568,6 +964,72 @@ export const notesGa: TopicNote = {
           ],
           result:
             "Open-ended: ongoing NAV flow. Close-ended: typically listed, no daily NAV redeem.",
+        },
+        {
+          title: "Sponsor, trustee, AMC — do not swap the layers",
+          prompt:
+            "Match: (i) promotes the fund house (ii) oversees the AMC in the investors’ interest (iii) manages the money (iv) holds the scheme’s securities. Choose from Sponsor, Trustees, AMC, custodian.",
+          steps: [
+            {
+              do: "(i) Sponsor promotes the fund house.",
+              why: "The sponsor stands behind the AMC. It is not AMFI and not SEBI.",
+            },
+            {
+              do: "(ii) Trustees oversee.",
+              why: "Trustees watch the AMC for unit-holders. They do not pick every stock themselves as the day-to-day manager.",
+            },
+            {
+              do: "(iii) AMC manages the money.",
+              why: "Asset Management Company is the manager. NAV is published for the scheme, not as AMFI’s licence.",
+            },
+            {
+              do: "(iv) Custodian holds the securities.",
+              why: "Custody is safekeeping. An RTA (registrar) processes unit buy/sell paperwork — a fifth layer if the stem asks.",
+            },
+            {
+              do: "Regulator remains SEBI (Mutual Funds Regulations, 1996).",
+              why: "AMFI is the trade body. NSDL may hold units in demat; it does not replace SEBI.",
+            },
+            {
+              do: "If an option says ‘the trustee sets CRR’, reject it.",
+              why: "Wrong regulator family.",
+            },
+          ],
+          result:
+            "Sponsor promotes; trustees oversee; AMC manages; custodian holds securities. SEBI regulates.",
+        },
+        {
+          title: "NAV subtracts liabilities; listed price can differ",
+          prompt:
+            "Assets ₹1,000 crore, liabilities ₹40 crore, units 80 crore. A student writes NAV = 1,000 / 80 = ₹12.50 and says a close-ended unit must trade at that NAV on NSE. Fix both mistakes.",
+          steps: [
+            {
+              do: "Subtract first: net assets = 1,000 − 40 = 960 crore.",
+              why: "Liabilities come off before you divide. The student skipped that step.",
+            },
+            {
+              do: "Divide 960 by 80 = ₹12 per unit.",
+              why: "NAV = (assets − liabilities) / units. ₹12, not ₹12.50.",
+            },
+            {
+              do: "Say what close-ended means: no daily redeem at NAV as the usual path.",
+              why: "Liquidity is often on the exchange.",
+            },
+            {
+              do: "Exchange price can sit above or below NAV.",
+              why: "The listed quote is a market price, not an AMC NAV print by force.",
+            },
+            {
+              do: "Open-ended units are the ones you buy and sell on most days at NAV (cut-off rules apply).",
+              why: "Do not swap the two types.",
+            },
+            {
+              do: "Keep SEBI as regulator; AMFI still is not.",
+              why: "A NAV sum does not change who licences the industry.",
+            },
+          ],
+          result:
+            "NAV = ₹12, not ₹12.50. A close-ended listed price can differ from NAV.",
         },
       ],
     },
@@ -649,6 +1111,72 @@ export const notesGa: TopicNote = {
           result:
             "Circuit breaker = trading halt on a big index move. Novation = CCP substitution. Not the same.",
         },
+        {
+          title: "15% uses a different afternoon clock than 10%",
+          prompt:
+            "Nifty 50 falls 15% from the previous close. What is the halt if the print is (i) 11:00 a.m. (ii) 1:20 p.m. (iii) 2:20 p.m.?",
+          steps: [
+            {
+              do: "Confirm it is MWCB on Nifty versus previous close, not a 5% stock band.",
+              why: "15% is the middle index step (10 / 15 / 20).",
+            },
+            {
+              do: "(i) 11:00 a.m. is before 1:00 p.m. → 1 hour 45 minutes halt.",
+              why: "The morning 15% pause is longer than the morning 10% pause (45 minutes).",
+            },
+            {
+              do: "(ii) 1:20 p.m. is between 1:00 p.m. and 2:00 p.m. → 45 minutes.",
+              why: "For 15%, the short afternoon window ends at 2:00 p.m., not 2:30 p.m.",
+            },
+            {
+              do: "(iii) 2:20 p.m. is after 2:00 p.m. → rest of the day.",
+              why: "A late 15% print closes the session. Do not apply the 10% ‘after 2:30, no halt’ rule here.",
+            },
+            {
+              do: "Write the trap: 10% after 2:30 p.m. does not halt; 15% after 2:00 p.m. does.",
+              why: "Students reuse the 10% timetable and miss the 2:00 p.m. cut.",
+            },
+            {
+              do: "20% at any hour is still rest of the day.",
+              why: "Do not give 20% a 45-minute haircut.",
+            },
+          ],
+          result:
+            "15% at 11:00 → 1h 45m; at 1:20 → 45m; at 2:20 → closed for the day. Not the 10% clock.",
+        },
+        {
+          title: "Either index can trigger; cash and F&O both halt",
+          prompt:
+            "True or false: (i) only Nifty 50 can trigger MWCB, never Sensex (ii) a 10% Sensex move versus previous close can halt the market (iii) the halt is cash only; index futures keep trading.",
+          steps: [
+            {
+              do: "(i) False. Either Nifty 50 or Sensex can trigger.",
+              why: "The notes say Nifty 50 or Sensex versus previous close.",
+            },
+            {
+              do: "(ii) True. A 10/15/20% Sensex shock is enough.",
+              why: "You do not need both indices to print the same number.",
+            },
+            {
+              do: "(iii) False. The market-wide brake covers cash and derivatives together.",
+              why: "It is a whole-market pause, not a single-stock band and not ‘cash only’.",
+            },
+            {
+              do: "Still separate stock-specific bands (2%, 5%, 10%, 20% on one scrip).",
+              why: "Those limit one share. They are not this index halt.",
+            },
+            {
+              do: "Reject ‘the 10% halt is novation’ and ‘the 10% halt is the PIT window’.",
+              why: "Novation is CCP substitution. PIT is insider trading. Different pipes.",
+            },
+            {
+              do: "Read the clock before you quote 45 minutes.",
+              why: "Time of day changes a 10% or 15% halt. 20% does not need the clock.",
+            },
+          ],
+          result:
+            "(i) false (ii) true (iii) false. Either benchmark; cash and F&O; bands are a different tool.",
+        },
       ],
     },
     {
@@ -727,6 +1255,76 @@ export const notesGa: TopicNote = {
           ],
           result:
             "(C) Tuhin Kanta Pandey from 1 March 2025. Buch’s term had already ended.",
+        },
+        {
+          title: "First woman Chairperson is Buch, March 2022",
+          prompt:
+            "SEBI’s first woman Chairperson is: (A) a 2025 fact attached to Pandey (B) Madhabi Puri Buch, who took charge on 1 March 2022 (C) Ajay Tyagi (D) the RBI Governor in 2022.",
+          steps: [
+            {
+              do: "Pick (B). Buch took charge on 1 March 2022.",
+              why: "That is both the first-woman label and the start of her term.",
+            },
+            {
+              do: "Drop (A). Pandey is the 2025 Chair, not the first woman Chair.",
+              why: "Do not move Buch’s first-woman fact onto the next name.",
+            },
+            {
+              do: "Drop (C). Tyagi is the 2017–Feb 2022 Chair, a man, and the 2020-cycle answer.",
+              why: "Right person for 2020, wrong person for this stem.",
+            },
+            {
+              do: "Drop (D). RBI Governor ≠ SEBI Chair.",
+              why: "Shaktikanta Das was RBI Governor in that era, not SEBI Chair.",
+            },
+            {
+              do: "Write her end date: 28 February 2025.",
+              why: "She did not start a second consecutive term on 1 March 2025.",
+            },
+            {
+              do: "For a 2023 or 2024 paper, Buch is still the Chairperson answer.",
+              why: "Pandey must not be back-dated into 2024.",
+            },
+          ],
+          result:
+            "(B) Madhabi Puri Buch from 1 March 2022 (first woman Chair). Pandey is March 2025.",
+        },
+        {
+          title: "Three labels on one timeline",
+          prompt:
+            "Fill: (i) 1 March 2017 – 28 February 2022 (ii) 1 March 2022 – 28 February 2025 (iii) from 1 March 2025. Names: Tyagi, Buch, Pandey. Kill Das if he appears.",
+          steps: [
+            {
+              do: "(i) Ajay Tyagi.",
+              why: "That whole window is Tyagi, including the 2020 Grade A cycle.",
+            },
+            {
+              do: "(ii) Madhabi Puri Buch.",
+              why: "That whole window is Buch, including all of calendar 2024.",
+            },
+            {
+              do: "(iii) Tuhin Kanta Pandey.",
+              why: "He assumed charge on 1 March 2025. That is the 2025-paper label.",
+            },
+            {
+              do: "Draw the hand-off days: 28 Feb / 1 Mar, twice (2022 and 2025).",
+              why: "The exam loves the exact charge dates, not ‘sometime in 2022’.",
+            },
+            {
+              do: "If Shaktikanta Das appears, label him RBI Governor, not SEBI Chair.",
+              why: "Wrong institution.",
+            },
+            {
+              do: "If a stem says ‘throughout 2025’, do not answer Buch.",
+              why: "Buch’s term ended 28 February 2025. Most of calendar 2025 is Pandey.",
+            },
+            {
+              do: "If a stem says ‘February 2022’, still Tyagi until the 28th.",
+              why: "Buch starts only on 1 March 2022. Do not jump early.",
+            },
+          ],
+          result:
+            "Tyagi to 28 Feb 2022; Buch 1 Mar 2022–28 Feb 2025; Pandey from 1 Mar 2025. Das is RBI.",
         },
       ],
     },
@@ -811,6 +1409,72 @@ export const notesGa: TopicNote = {
           ],
           result:
             "False. Repo is RBI → banks against collateral. Brokers are SEBI, but they do not set repo.",
+        },
+        {
+          title: "Reverse repo absorbs; repo injects",
+          prompt:
+            "RBI wants to drain surplus rupees for a day without changing CRR. Which tool fits? (A) repo lending to banks (B) reverse repo (banks park funds with RBI) (C) a SEBI circular to brokers (D) lowering SLR so banks must buy more G-secs from SEBI.",
+          steps: [
+            {
+              do: "Name the need: drain (absorb) short-term liquidity.",
+              why: "Repo lending does the opposite — it injects rupees.",
+            },
+            {
+              do: "Pick (B) reverse repo: banks place funds with RBI, usually against collateral in the old LAF picture.",
+              why: "Money goes to RBI. That is a drain. CRR is not being rewritten.",
+            },
+            {
+              do: "Drop (A). Repo lending injects.",
+              why: "Direction was already a separate item. Do not mix the two names.",
+            },
+            {
+              do: "Drop (C). Brokers and circulars are SEBI.",
+              why: "This is a money-market liquidity problem, not a listing rule.",
+            },
+            {
+              do: "Drop (D). SLR is a stock of eligible liquid assets, and SEBI does not set it.",
+              why: "Even the true idea ‘SLR uses G-secs’ cannot save a wrong setter.",
+            },
+            {
+              do: "If the stem instead says ‘inject overnight’, switch to repo lending against G-sec collateral.",
+              why: "Same family, opposite direction.",
+            },
+          ],
+          result:
+            "(B) Reverse repo absorbs. Repo lending injects. CRR/SLR are ratios; SEBI sets neither.",
+        },
+        {
+          title: "CRR is cash at RBI; SLR is a G-sec-heavy slice",
+          prompt:
+            "Which pair is right? (A) CRR = cash balance with RBI as a share of deposits; SLR = share of deposits in eligible liquid assets, mainly G-secs (B) CRR = SEBI listing fee; SLR = PIT window (C) Both are set by SEBI (D) SLR cash is lent out as personal loans the same day.",
+          steps: [
+            {
+              do: "Pick (A).",
+              why: "CRR is idle cash at the Reserve Bank. SLR is the statutory liquid-asset slice, mostly government securities (and as rules allow, cash and gold).",
+            },
+            {
+              do: "Drop (B). Listing fees and PIT are SEBI market-integrity / listing facts.",
+              why: "Wrong family of tools.",
+            },
+            {
+              do: "Drop (C). RBI sets CRR and SLR.",
+              why: "SEBI does not run monetary-policy ratios.",
+            },
+            {
+              do: "Drop (D). SLR assets are a required holding, not a same-day personal-loan pool.",
+              why: "The point of SLR is a liquid, safe buffer — mainly G-secs.",
+            },
+            {
+              do: "Add direction: a CRR hike drains lendable cash; it is not an overnight reverse-repo trade by another name.",
+              why: "Ratio versus LAF operation.",
+            },
+            {
+              do: "Do not memorise a stale CRR% as if it were printed in the RBI Act.",
+              why: "The instrument stays; the quoted number moves.",
+            },
+          ],
+          result:
+            "(A) CRR = cash at RBI. SLR = eligible liquid assets, mainly G-secs. Both RBI, not SEBI.",
         },
       ],
     },

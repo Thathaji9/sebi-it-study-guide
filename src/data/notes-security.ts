@@ -4,7 +4,7 @@ export const notesSecurity: TopicNote = {
   topic: "security",
   title: "Security — techniques (beginner)",
   blurb:
-    "Security is keeping secrets, spotting tampering, and staying open for honest users. Tag every incident with C, I, or A first. Then pick hashing versus encryption, and know what ransomware actually breaks. Name the control that restores that letter.",
+    "Security is keeping secrets, spotting tampering, and staying open for honest users. Tag every incident with C, I, or A first. Then pick hashing versus encryption, and know what ransomware actually breaks. Name the control that restores that letter. SQL injection is user text glued into a query; parameter binding keeps that text as data.",
   blocks: [
     {
       heading: "CIA triad",
@@ -83,6 +83,48 @@ export const notesSecurity: TopicNote = {
           ],
           result:
             "Public circular+hash: I, not C. Encrypted salary, no backup: C, weak A. Match controls to goals.",
+        },
+        {
+          title: "Authn versus authz versus CIA",
+          prompt:
+            "Login succeeds, then the intern reads /admin/payroll by guessing the URL (IDOR). Which word failed? Which CIA letters?",
+          steps: [
+            {
+              do: "Authentication succeeded (the intern is a known user). Authorisation failed (payroll is not their role). That is IDOR / missing owner check.",
+              why: "‘Who are you?’ is not ‘what may you do?’. MFA would not fix this URL.",
+            },
+            {
+              do: "C of payroll is gone (they read it). I could follow if they can POST. A is fine.",
+              why: "Tag the letter the asset lost, then the control: server-side authz on every object.",
+            },
+            {
+              do: "Empty logs would also hide who did it — accountability, a cousin of I, not a fourth CIA letter in most papers.",
+              why: "Write C/I/A first, then authn/authz if the stem is about identity.",
+            },
+          ],
+          result:
+            "Authn ok, authz failed (IDOR). C of payroll. Fix: server-side permission check, not a secret URL.",
+        },
+        {
+          title: "Ransomware letters versus a DDoS",
+          prompt:
+            "Two incidents: (1) files replaced by .enc, backups offline work. (2) SYN flood, site down, disks untouched. CIA tags and the restore control for each.",
+          steps: [
+            {
+              do: "(1) I (bytes changed) + A (cannot open files). C only if a copy was stolen. Restore A with offline backups; I of live files is gone until restore.",
+              why: "The lock on the diary was replaced by the attacker’s lock. Backups rebuild availability.",
+            },
+            {
+              do: "(2) A only. Disks are intact (I holds) and nobody read secrets (C holds). Restore A with SYN cookies, capacity, anycast — not with backups of the HTML.",
+              why: "The library closed; the books were not rewritten.",
+            },
+            {
+              do: "Do not tick ‘encryption’ as the A control for (1), or ‘backup’ as the A control for (2).",
+              why: "Match the control to what actually broke.",
+            },
+          ],
+          result:
+            "(1) I+A (maybe C): offline restore. (2) A only: flood defence, not backups.",
         },
       ],
     },
@@ -163,6 +205,48 @@ export const notesSecurity: TopicNote = {
           ],
           result:
             "CBC-only is C without I. Use AES-GCM or ChaCha20-Poly1305. TLS 1.3 is AEAD-only.",
+        },
+        {
+          title: "Password storage is a KDF, not AES and not SHA-256",
+          prompt:
+            "Three designs: AES(password) with key in config; SHA-256(password); Argon2id(password, salt). Which is for storing logins, and why are the first two wrong?",
+          steps: [
+            {
+              do: "AES(password) is reversible. Config dump + DB dump = every password in plaintext. Users reuse them. You never need the plaintext to log someone in.",
+              why: "Encryption is a lock you can open. Password storage must not be openable.",
+            },
+            {
+              do: "Raw SHA-256 is one-way but fast and, if unsalted, rainbow-tableable. GPUs try billions of guesses.",
+              why: "A fingerprint of a short secret is still guessable when the fingerprint is cheap.",
+            },
+            {
+              do: "Argon2id (or bcrypt/scrypt/PBKDF2) with a unique salt is slow on purpose. Verify by recomputing, not decrypting.",
+              why: "That is the password-storage primitive. Hash vs encrypt vs KDF are different exam boxes.",
+            },
+          ],
+          result:
+            "Store a slow salted KDF. Not AES(password), not raw SHA-256. Verify by recomputing.",
+        },
+        {
+          title: "MAC versus signature: who can forge the stamp?",
+          prompt:
+            "Bank and partner share HMAC key K. SEBI publishes a PDF with an RSA signature. Who can fake each? Which gives non-repudiation?",
+          steps: [
+            {
+              do: "Either bank or partner can make a valid HMAC. A third party without K cannot. In a dispute, each can claim the other stamped it.",
+              why: "A shared secret is a club stamp, not a courtroom signature.",
+            },
+            {
+              do: "Only SEBI’s private key can sign. Anyone with the public key can verify. SEBI cannot deny the signature if the private key was not stolen.",
+              why: "That is non-repudiation. Public verify, private sign.",
+            },
+            {
+              do: "VPN packets use MAC/AEAD (shared session key). A government circular uses a signature. Do not swap the words.",
+              why: "Audience: two friends vs the whole world.",
+            },
+          ],
+          result:
+            "MAC: any key-holder can forge; no non-repudiation. Signature: only the private key; public verify.",
         },
       ],
     },
@@ -246,6 +330,48 @@ export const notesSecurity: TopicNote = {
           result:
             "The bank performs a state change the victim did not intend. CSRF token (and SameSite) stop cross-origin POSTs. CSRF ≠ XSS.",
         },
+        {
+          title: "Reflected XSS in a search box",
+          prompt:
+            "https://shop.example/search?q=<script>…</script> and the page echoes q into HTML. Stored or reflected? Two fixes?",
+          steps: [
+            {
+              do: "Reflected: the script is in the URL, bounced once in the response, not saved in the database.",
+              why: "Stored would have been a comment that later visitors load. Same sink (HTML), different stay-time.",
+            },
+            {
+              do: "Fix: encode q for the HTML-text context (&lt; not <). CSP without unsafe-inline. Do not ‘strip script tags’ as the only 2-marker.",
+              why: "Encoding matches the sink. A filter that forgets onerror= still loses.",
+            },
+            {
+              do: "Not SQLi unless q is also glued into SQL. Not CSRF unless a forged request is the story.",
+              why: "Name the parser that was confused: browser HTML, not the database, not the cookie jar alone.",
+            },
+          ],
+          result:
+            "Reflected XSS. Encode output + CSP. Different from stored XSS, SQLi, and CSRF.",
+        },
+        {
+          title: "UNION SQLi versus a bound parameter",
+          prompt:
+            "Query is SELECT name, price FROM items WHERE id = '\" + id + \"'. Attacker sends 1 UNION SELECT user, pass FROM users. What changes if id is a bound integer?",
+          steps: [
+            {
+              do: "Concatenation: the database parses UNION as more SQL. Extra columns leak from users. C of the user table.",
+              why: "The attacker wrote grammar, not a value. That is injection.",
+            },
+            {
+              do: "Prepared statement with setInt(1, id): UNION is not parsed as SQL. It cannot even be an integer bind. The query stays one SELECT on items.",
+              why: "Parse first, bind later. Input cannot add keywords.",
+            },
+            {
+              do: "Escaping quotes by hand is a weaker cousin and fails odd encodings. Bound parameters are the named fix. Least-privilege DB user is defence in depth.",
+              why: "The 2-marker is ‘parameterised query / prepared statement’, not ‘sanitize’.",
+            },
+          ],
+          result:
+            "UNION rides concatenated SQL and leaks rows. A bound parameter keeps id as data; UNION never becomes grammar.",
+        },
       ],
     },
     {
@@ -325,6 +451,48 @@ export const notesSecurity: TopicNote = {
           ],
           result:
             "I+A, plus C if exfiltrated. Isolate, rotate, notify, restore from offline backups. Payment is not the A plan.",
+        },
+        {
+          title: "Spear-phishing versus bulk phishing",
+          prompt:
+            "One CFO gets a mail that names yesterday’s invoice number. A thousand staff get ‘your mailbox is full’. Same CIA letter? Extra control for the CFO case?",
+          steps: [
+            {
+              do: "Both steal credentials or drop malware → C of the password (then more). Spear-phishing is targeted; bulk is sprayed.",
+              why: "The trick is still a fake trusted note. The spear just used extra homework.",
+            },
+            {
+              do: "FIDO2 / origin-bound MFA still beats both. Training plus a report button plus DMARC help the bulk wave more than the perfect spear.",
+              why: "Humans fail on a well-aimed mail. Bind the authenticator to the real site name.",
+            },
+            {
+              do: "A look-alike domain with a valid padlock is still phishing, not ‘TLS failed’.",
+              why: "TLS authenticated the wrong name the user did not check.",
+            },
+          ],
+          result:
+            "Both are C of secrets (then payload). Spear is targeted. FIDO2 resists both; SMS OTP does not.",
+        },
+        {
+          title: "ARP spoof MITM on a LAN",
+          prompt:
+            "Attacker on the same switch poisons ARP: ‘I am the gateway’. HTTP intranet vs HTTPS with HSTS to the real name. What can they do?",
+          steps: [
+            {
+              do: "They sit on the path (MITM). HTTP: read and change pages (C and I fail). They can also drop packets (A).",
+              why: "ARP lies about the van envelope. The postcard HTTP has no seal.",
+            },
+            {
+              do: "HTTPS to the real name with a checked cert: they can delay or drop, not read the body. Forging the page breaks the AEAD tag unless the user clicks through a warning.",
+              why: "TLS with validation turns the MITM into a delay box.",
+            },
+            {
+              do: "Defence: HTTPS+HSTS, inspect ARP/DHCP, 802.1X. Do not ‘accept this certificate’ on the intranet either.",
+              why: "Clicking through volunteers to talk to the spoofer.",
+            },
+          ],
+          result:
+            "ARP spoof = on-path MITM. HTTP is readable. HTTPS+valid cert+HSTS is C+I of the body; AP can still drop.",
         },
       ],
     },
@@ -408,6 +576,52 @@ export const notesSecurity: TopicNote = {
           result:
             "Java throws (local A, no smash). C overwrites neighbours (I). Memory safety ≠ absence of SQLi.",
         },
+        {
+          title: "strcpy into a 8-byte buffer",
+          prompt:
+            "char buf[8]; strcpy(buf, argv[1]); argv[1] is 20 bytes. Contrast fgets/snprintf. CIA?",
+          language: "cpp",
+          code: `char buf[8];
+strcpy(buf, argv[1]);  /* unbounded if src is long */
+/* snprintf(buf, sizeof buf, "%s", argv[1]); */`,
+          steps: [
+            {
+              do: "strcpy copies until a NUL. 20 bytes plus NUL walk past buf[8] onto neighbours (saved frame, maybe return address). I of stack data.",
+              why: "Same cup-overflow picture as gets(). The length lives only in the destination array, which strcpy ignores.",
+            },
+            {
+              do: "Crash if the return address is junk (A). Hijack if it is crafted. C if the process then reads secrets.",
+              why: "Integrity first, then maybe A and C.",
+            },
+            {
+              do: "Fix: copy with a bound — snprintf(buf, sizeof buf, \"%s\", argv[1]) or memcpy with min(len, 7) and a NUL. Canary/NX/ASLR still help.",
+              why: "The code fix is a bounded copy. Flags are extra belts.",
+            },
+          ],
+          result:
+            "Unbounded strcpy smashes adjacent stack (I). Use snprintf/fgets with sizeof. gets/strcpy on untrusted input is the trigger.",
+        },
+        {
+          title: "Off-by-one is still an overflow",
+          prompt:
+            "char buf[8]; for (i = 0; i <= 8; i++) buf[i] = x[i]; One extra write. Why does the exam still call it a buffer overflow?",
+          steps: [
+            {
+              do: "Valid indexes are 0..7. i==8 writes buf[8], one past the end. Adjacent memory (often a saved flag or canary) changes.",
+              why: "Overflow is ‘past the rim’, not only ‘a megabyte past the rim’.",
+            },
+            {
+              do: "Loop should be i < 8 or i < sizeof buf. Off-by-one is a famous C class: the extra equals.",
+              why: "The cup still spilled, just a drop.",
+            },
+            {
+              do: "Java would throw on a[8] if length is 8. C does not. Same moral as the 16-byte gets example, smaller spill.",
+              why: "Memory unsafety is the missing check, not the size of the smash.",
+            },
+          ],
+          result:
+            "i <= 8 writes one past buf[8]. Still I of adjacent state. Bound is i < length.",
+        },
       ],
     },
     {
@@ -490,6 +704,52 @@ export const notesSecurity: TopicNote = {
           result:
             "Salt in the row (public, unique). Pepper in KMS (secret). Argon2id beats AES(password) because verification must not be reversible.",
         },
+        {
+          title: "Same password, two salts, two hashes",
+          prompt:
+            "Alice and Bob both chose Welcome@123. Unsalted SHA-256 dump versus per-user 16-byte salt. What does an attacker see?",
+          steps: [
+            {
+              do: "Unsalted: identical hashes. The dump shows they share a password. One rainbow-table hit cracks both.",
+              why: "One recipe for the whole school. Duplicates leak.",
+            },
+            {
+              do: "Salted: two random salts, two different KDF outputs. The dump no longer clusters them. Each guess must be stretched twice.",
+              why: "Salt’s job is uniqueness, not secrecy. It lives next to the hash.",
+            },
+            {
+              do: "Still rotate Welcome@123 via a password policy and MFA. Salt does not make a bad password strong; it makes bulk precomputation fail.",
+              why: "Online guessing is lockout/MFA. Offline guessing is salt+stretch.",
+            },
+          ],
+          result:
+            "Unsalted identical hashes reveal duplicates. Per-user salt makes each row a different lock.",
+        },
+        {
+          title: "Verify a login without storing the password",
+          prompt:
+            "Row holds salt and digest. User types a password. What does the server compute? When is it a match? Why not decrypt?",
+          language: "python",
+          code: `import secrets
+digest = kdf(password.encode(), salt, cost)
+ok = secrets.compare_digest(digest, stored)`,
+          steps: [
+            {
+              do: "Load salt and stored digest. Run the same KDF on the typed password and that salt. Compare in constant time.",
+              why: "You never need the old plaintext. Match means ‘same password’, not ‘open the box’.",
+            },
+            {
+              do: "Wrong password → different digest → reject. There is no decrypt() to try.",
+              why: "A one-way KDF has no undo key. That is the point versus AES(password).",
+            },
+            {
+              do: "TLS still wraps the login POST so the password is not sniffed. The KDF protects the file at rest.",
+              why: "Wire C and dump C are different controls.",
+            },
+          ],
+          result:
+            "Recompute KDF(password, salt) and compare. Never decrypt. TLS for the wire; KDF for the dump.",
+        },
       ],
     },
     {
@@ -569,6 +829,205 @@ export const notesSecurity: TopicNote = {
           ],
           result:
             "TLS = C+I of the path + server auth for that name. It does not fix injection, XSS, CSRF, look-alike phishing, or ransomware.",
+        },
+        {
+          title: "Certificate name mismatch",
+          prompt:
+            "User visits bank.example. The cert is for evil.example, signed by a public CA. Padlock in some browsers after a click-through. Is TLS ‘working’? CIA?",
+          steps: [
+            {
+              do: "The crypto may lock the bytes to whoever holds evil.example’s key — often the MITM. If the client does not check the name, C is toward the attacker.",
+              why: "TLS authenticity is ‘this key matches this name’. The name must be the one in the URL.",
+            },
+            {
+              do: "A normal browser shows a warning. Clicking through undoes the model. HSTS on bank.example would refuse the bad name.",
+              why: "Validation is part of TLS, not an optional extra.",
+            },
+            {
+              do: "A valid cert for bank.example from a trusted CA, with matching name, is the pass condition. Then AEAD gives C+I of HTTP.",
+              why: "Three checks: chain, time, name.",
+            },
+          ],
+          result:
+            "Wrong name ⇒ you may be encrypting to the MITM. Check name, expiry, chain. Padlock ≠ the right site.",
+        },
+        {
+          title: "Write one finding like an auditor",
+          prompt:
+            "nmap shows 5432 open to 0.0.0.0/0 on the finance VPC. Turn this into condition, CIA, owner, remediation — not the word ‘insecure’.",
+          steps: [
+            {
+              do: "Condition: PostgreSQL 5432 reachable from the Internet (evidence: nmap, SG dump). Impact: C of the database (and I if writes are allowed), A if it is then flooded.",
+              why: "Findings are facts plus a letter, not adjectives.",
+            },
+            {
+              do: "Owner: network/cloud firewall (path). Extra: systems/DBA must still use a strong role password and patches.",
+              why: "Network finding first; host config is the second layer.",
+            },
+            {
+              do: "Remediation: restrict SG to the app subnet; no 0.0.0.0/0. Retest with nmap from the Internet. Do not ‘install TLS’ as the only line — that does not close the port.",
+              why: "The broken control is the path. TLS would protect the wire if the path stayed open, but the stem was exposure.",
+            },
+          ],
+          result:
+            "5432 world-open: C (and maybe I/A). Network owner: restrict the ACL. Retest. ‘Insecure’ is not a finding.",
+        },
+      ],
+    },
+    {
+      heading: "SQL injection versus parameter binding",
+      body: "SQL injection happens when user text is glued into a SQL sentence with + or format strings. The database then parses the attacker’s words as grammar — extra OR, UNION, or a comment that cuts off the real AND password = … Think of a paper form: if the visitor can rewrite the printed instructions, not just fill a blank, they run the office.\n\nParameter binding (prepared statements) sends the SQL with placeholders ? first. The database parses that shape once. Then you bind values. Quotes inside a name cannot close a string that is already parsed. Input stays data. Escape-by-hand is weaker. Least-privilege DB accounts and denying stacked queries are extra belts, not a substitute for binding.",
+      howTo: [
+        "If the code concatenates request text into SQL, tick SQLi. Rewrite with placeholders and bind every value.",
+        "Do not build column/table names from raw user strings either — whitelist those, still bind values.",
+        "Login example: parse SELECT … WHERE name=? AND pass=? first, then setString. A tautology in the name field stays a name.",
+        "Defence in depth: KDF for passwords, least-privilege DB user, no stacked queries. The named 2-marker is still bound parameters.",
+      ],
+      bullets: [
+        "SQLi: concat SQL + input; attacker changes grammar (OR, UNION, comment).",
+        "Fix: prepared statement / bound parameters — parse first, bind later.",
+        "Escaping quotes by hand is weaker. Binding is the technique. Least privilege is extra.",
+      ],
+      examples: [
+        {
+          title: "Tautology in a glued login",
+          prompt:
+            "SQL is SELECT * FROM users WHERE name = '\" + name + \"' AND pass = '\" + pass + \"'. Name field is admin' OR '1'='1' -- . What SQL runs? Why does login succeed?",
+          language: "sql",
+          code: `-- glued, name = admin' OR '1'='1' --
+SELECT * FROM users WHERE name = 'admin' OR '1'='1' --' AND pass = '...';`,
+          steps: [
+            {
+              do: "The quote in admin' closes the string. OR '1'='1 is parsed as SQL. -- comments out the rest, so AND pass is never checked.",
+              why: "The parser cannot see a boundary between the programmer’s sentence and the user’s words.",
+            },
+            {
+              do: "A matching row (often the first user, or admin) comes back. Authn is skipped. C of the account, then the app.",
+              why: "The deputy (database) obeyed the attacker’s grammar.",
+            },
+            {
+              do: "Classic follow-ups: UNION SELECT to leak other tables, or a tautology without -- that still depends on AND/OR precedence.",
+              why: "Once grammar is open, many payloads exist. Exams want the idea, not a weapon.",
+            },
+            {
+              do: "Fix is not ‘strip quotes’. Fix is a placeholder so the whole admin' OR '1'='1 is one value for name.",
+              why: "Data cannot add OR when OR was not in the parsed shape.",
+            },
+          ],
+          result:
+            "Glued quotes let OR '1'='1 change WHERE. Login succeeds without the password. Bind name and pass.",
+        },
+        {
+          title: "Prepared statement: same input stays data",
+          prompt:
+            "Same login, but ? placeholders and setString. What does the database store for name when the field is admin' OR '1'='1?",
+          language: "java",
+          code: `PreparedStatement ps = conn.prepareStatement(
+    "SELECT * FROM users WHERE name = ? AND pass = ?");
+ps.setString(1, name);
+ps.setString(2, pass);`,
+          steps: [
+            {
+              do: "The SQL text with two ? is parsed first. Shape is fixed: compare name to parameter 1 and pass to parameter 2.",
+              why: "Parse-then-bind is the whole technique. Grammar is frozen.",
+            },
+            {
+              do: "setString sends admin' OR '1'='1 as bytes for parameter 1. The quote is part of a value, like a name with an apostrophe (O'Brien).",
+              why: "The extra OR never becomes a keyword. It is a weird username that simply does not match.",
+            },
+            {
+              do: "Login fails unless a user really has that name and the bound password hash matches. No tautology.",
+              why: "Input stayed data. That is parameter binding.",
+            },
+            {
+              do: "Also store a KDF of the password, not pass in cleartext, and use a DB account that cannot DROP TABLE.",
+              why: "Binding is primary. The rest is defence in depth.",
+            },
+          ],
+          result:
+            "name is bound as the literal admin' OR '1'='1. No extra SQL. Login fails. Parse first, bind later.",
+        },
+        {
+          title: "UNION after a SELECT list",
+          prompt:
+            "SELECT name, price FROM items WHERE id = '\" + id + \"'. id = 1 UNION SELECT user, pass FROM users. Columns? Bound integer instead?",
+          language: "sql",
+          code: `-- glued, id has no quotes
+SELECT name, price FROM items WHERE id = 1 UNION SELECT user, pass FROM users`,
+          steps: [
+            {
+              do: "If quotes are placed so UNION is outside the string (id = 1 UNION SELECT … with no quotes, or a closed quote), the database runs two SELECTs and stacks rows. user, pass leak as if they were name, price.",
+              why: "UNION needs the same column count/types. The attacker matches the list (two columns here).",
+            },
+            {
+              do: "C of the users table. The items query was never meant to read passwords.",
+              why: "Confused deputy: the app’s DB rights are reused for a second sentence.",
+            },
+            {
+              do: "ps.setInt(1, id) cannot bind the letters UNION. Even setString would bind the whole token as id’s value, not as a second statement (and id would not match).",
+              why: "A parameter is one value in the already-parsed statement, not a second statement.",
+            },
+            {
+              do: "Stacked queries (id=1; DROP TABLE …) need a driver that allows multiple statements — turn that off, still bind.",
+              why: "Belts: bind, no multi-query, least privilege. Binding is the named fix.",
+            },
+          ],
+          result:
+            "UNION appends attacker columns to a glued query. A bound id cannot add a second SELECT.",
+        },
+        {
+          title: "Why ‘escape quotes’ is a weaker fix",
+          prompt:
+            "A developer replaces ' with '' in the name, then still concatenates. Give two reasons binding is safer. What about numeric id with no quotes?",
+          language: "python",
+          code: `# still concat after replace — easy to miss a path
+# numeric: "WHERE id = " + id   # no quotes to escape
+# id = "1 OR 1=1" still injects`,
+          steps: [
+            {
+              do: "Numeric fields are often concatenated without quotes: WHERE id = 1 OR 1=1. Escaping quotes never runs. Binding still sends one integer (or rejects the string).",
+              why: "Injection is not only a quote problem. It is a parse-boundary problem.",
+            },
+            {
+              do: "Encodings, trailing backslashes, and a second SQL dialect can beat a homemade escaper. One missed code path (logs, reports, search) is enough.",
+              why: "A filter you wrote is not the database’s binder.",
+            },
+            {
+              do: "Prepared statements use the driver’s binder for every type. Whitelist if you must interpolate a column name (ORDER BY) — still never concat raw user SQL.",
+              why: "Identifiers cannot use ? in some engines. Then allow-list first, last, name — not free text.",
+            },
+            {
+              do: "Exam 2-marker: prepared statements / bound parameters. ‘Sanitize input’ is too vague.",
+              why: "Name the technique.",
+            },
+          ],
+          result:
+            "Quote-escaping misses numeric concat and homemade bugs. Bind every value. Whitelist identifiers.",
+        },
+        {
+          title: "Least privilege still matters after binding",
+          prompt:
+            "The app uses prepared statements everywhere, but the DB user is root and can DROP TABLE. What does binding not stop? What should the account be able to do?",
+          steps: [
+            {
+              do: "Binding stops extra grammar in values. It does not stop a stolen app password from running the statements the app was allowed — including DROP if the role can DROP.",
+              why: "SQLi is one bug. Over-privilege is another. Defence in depth.",
+            },
+            {
+              do: "Give the app SELECT/INSERT/UPDATE only on the tables it needs. No DROP, no GRANT, no FILE. A second role for migrations.",
+              why: "Even a future missed concat then cannot destroy the schema as easily.",
+            },
+            {
+              do: "Passwords in that database should still be KDFs. Binding does not encrypt rows.",
+              why: "Different controls: grammar (bind), rights (role), secrets at rest (KDF/TLS).",
+            },
+            {
+              do: "If the stem shows concat, the first fix to write is still parameter binding, then the tighter role.",
+              why: "Primary bug first. Belts second.",
+            },
+          ],
+          result:
+            "Binding ≠ least privilege. App role: only needed DML. Binding is still the SQLi fix; the role limits blast radius.",
         },
       ],
     },

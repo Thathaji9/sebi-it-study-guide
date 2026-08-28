@@ -4,7 +4,7 @@ export const notesNetworking: TopicNote = {
   topic: "networking",
   title: "Networking — techniques (beginner)",
   blurb:
-    "A network is people posting letters through layers of wrapping. Memorise OSI layers, TCP versus UDP, and well-known ports. On every “which layer?” question, name the address type: port, IP, MAC, or bits.",
+    "A network is people posting letters through layers of wrapping. Memorise OSI layers, TCP versus UDP, and well-known ports. On every “which layer?” question, name the address type: port, IP, MAC, or bits. A firewall is a policy on those addresses; NAT rewrites private IPs so many hosts share one public number.",
   blocks: [
     {
       heading: "OSI seven layers",
@@ -83,6 +83,48 @@ export const notesNetworking: TopicNote = {
           ],
           result:
             "UDP L4 = datagram. A switch forwards frames, not IP packets. TCP/IP Application collapses OSI 5–7.",
+        },
+        {
+          title: "Device to layer in one line",
+          prompt:
+            "Hub, switch, router, HTTP browser, TLS record, TCP port. Name the OSI floor for each.",
+          steps: [
+            {
+              do: "Hub = 1 Physical (bits to every port). Switch = 2 Data Link (MAC). Router = 3 Network (IP).",
+              why: "Each box speaks one address type: bits, MAC, or IP.",
+            },
+            {
+              do: "HTTP browser = 7 Application. TLS as a format/lock on the bytes = 6 Presentation (exam mapping). TCP port = 4 Transport.",
+              why: "The user protocol, the encoding/lock, and the port are three different wrappers.",
+            },
+            {
+              do: "If the paper uses TCP/IP not OSI: HTTP+TLS sit in Application, TCP in Transport, IP in Internet, Ethernet in Link.",
+              why: "Do not invent a Presentation layer when the stem said TCP/IP.",
+            },
+          ],
+          result:
+            "Hub 1, switch 2, router 3, HTTP 7, TLS/format 6, TCP port 4. Address type picks the floor.",
+        },
+        {
+          title: "Same hop, five wrappers",
+          prompt:
+            "You send https://example.com from a laptop. List the five names the packet carries, bottom to top, on the first hop to the home gateway.",
+          steps: [
+            {
+              do: "L1 bits on Wi-Fi or Ethernet. L2 dest MAC = gateway. L3 dest IP = example.com’s address. L4 dest port 443. L7 HTTP inside TLS.",
+              why: "The van envelope is local (MAC). The street address is the server IP. The apartment number is 443.",
+            },
+            {
+              do: "Source port is ephemeral (e.g. 49152). Source IP is the laptop’s private address until NAT.",
+              why: "Return traffic needs a ticket back to this browser tab.",
+            },
+            {
+              do: "At the gateway NAT may rewrite the source IP/port. Dest IP and dest port 443 stay (until a proxy).",
+              why: "Only the local or edge envelope changes. The server still sees port 443.",
+            },
+          ],
+          result:
+            "Bits → gateway MAC → server IP → TCP/443 → HTTP/TLS. First-hop dest MAC is the gateway, not the server.",
         },
       ],
     },
@@ -164,6 +206,48 @@ export const notesNetworking: TopicNote = {
           result:
             "window=0 → flow (receiver). cwnd halving → congestion (network). UDP has neither built in.",
         },
+        {
+          title: "Header size and what is missing in UDP",
+          prompt:
+            "TCP header ≥ 20 bytes, UDP 8 bytes. Which TCP fields are absent in UDP? Why can a 40-byte DNS query still prefer UDP?",
+          steps: [
+            {
+              do: "UDP has source port, dest port, length, checksum — 8 bytes. No seq, no ack, no flags, no window.",
+              why: "A postcard does not number pages or book a conversation.",
+            },
+            {
+              do: "TCP’s extra 20+ bytes plus a handshake are worth it when every byte must arrive in order (HTTP, SSH).",
+              why: "Reliability is a feature you pay for. DNS queries are tiny and can retry at the app.",
+            },
+            {
+              do: "A lost UDP DNS packet is not resent by the network stack. The resolver times out and asks again.",
+              why: "‘UDP is faster’ means less overhead, not ‘it magically arrives’.",
+            },
+          ],
+          result:
+            "UDP: 4 fields, 8 bytes, no seq/ack/window. Tiny DNS stays UDP; bulk reliable bytes stay TCP.",
+        },
+        {
+          title: "Connection words: handshake versus a datagram",
+          prompt:
+            "Stem says ‘connection-oriented, ordered, retransmission’. Other stem says ‘one request, one reply, no setup’. Protocols and an example each?",
+          steps: [
+            {
+              do: "First stem is TCP: three-way handshake, byte stream, retries. Example HTTP/1.1 or SSH.",
+              why: "Registered post: agree, number every byte, resend losses.",
+            },
+            {
+              do: "Second stem is UDP: no handshake. Example DNS query or DHCP discover.",
+              why: "Postcard: send and hope. The app may add its own retry.",
+            },
+            {
+              do: "Both still write port numbers. ‘Connection’ does not mean ‘encrypted’. TLS can ride on TCP (or QUIC on UDP).",
+              why: "Reliability and encryption are different jobs.",
+            },
+          ],
+          result:
+            "Connection/order/retry → TCP (HTTP, SSH). No setup, one Q/R → UDP (DNS, DHCP). Ports on both.",
+        },
       ],
     },
     {
@@ -242,6 +326,48 @@ export const notesNetworking: TopicNote = {
           ],
           result:
             "DNS (name→IP), then route (IP→next-hop IP), then ARP (next-hop IP→MAC). Packet dest IP stays the server.",
+        },
+        {
+          title: "TTL expires: traceroute’s trick",
+          prompt:
+            "A packet is sent with TTL=1, then TTL=2, toward 8.8.8.8. What comes back, from whom, and at which layer is ICMP?",
+          steps: [
+            {
+              do: "First hop (home gateway) decrements TTL 1→0, drops the packet, sends ICMP Time Exceeded to you. That names hop 1.",
+              why: "TTL is a hop budget, not a timer in seconds. Traceroute repeats with a bigger budget to list the path.",
+            },
+            {
+              do: "TTL=2 dies at the next router. Eventually a hop delivers to 8.8.8.8 (or you see ICMP Echo Reply if it was ping).",
+              why: "Each probe is a new packet. Routers on the path are not ‘remembering traceroute’.",
+            },
+            {
+              do: "ICMP is network-layer signalling (L3), not an application like HTTP. Ping is ICMP, not TCP.",
+              why: "Favourite trap: ‘ping is layer 7’.",
+            },
+          ],
+          result:
+            "TTL=1 → ICMP Time Exceeded from hop 1. ICMP is L3. Traceroute maps the path by growing TTL.",
+        },
+        {
+          title: "ARP is not DNS and not routing",
+          prompt:
+            "Host wants 192.168.1.20 on its own /24. Empty ARP cache. Which lookup happens? Which two lookups do not?",
+          steps: [
+            {
+              do: "Dest is on-link, so no default gateway and no DNS (you already have the IP). ARP broadcast: who has 192.168.1.20? Reply is that host’s MAC.",
+              why: "ARP answers ‘what local envelope for this neighbour IP?’",
+            },
+            {
+              do: "DNS would run if you had a name, not an IP. Routing/longest-prefix would run if the dest were off-subnet.",
+              why: "Three different questions. Do not mix the tables.",
+            },
+            {
+              do: "The IP packet’s dest IP stays 192.168.1.20. Only the Ethernet dest MAC is filled from ARP.",
+              why: "ARP never rewrites IPs. NAT is the box that rewrites IPs.",
+            },
+          ],
+          result:
+            "On-link: ARP only. Not DNS, not the default route. Dest IP unchanged; dest MAC from ARP.",
         },
       ],
     },
@@ -323,6 +449,48 @@ export const notesNetworking: TopicNote = {
           result:
             "Allow TCP 10/8 → *:443 out plus stateful established back. UDP/443 is separate. Last rule deny-all.",
         },
+        {
+          title: "Collision domain versus broadcast domain",
+          prompt:
+            "Five PCs on one hub. Then those PCs each on a switch port. Then a router between two switches. Who shares collisions? Who shares broadcasts?",
+          steps: [
+            {
+              do: "Hub: one collision domain (all five share the shout) and one broadcast domain.",
+              why: "A hub is a loudspeaker. Everyone hears bits and broadcasts.",
+            },
+            {
+              do: "Switch: five collision domains (one per port) but still one broadcast domain (ARP ff:ff:ff:ff:ff:ff is flooded).",
+              why: "A switch splits collisions, not broadcasts, unless you VLAN.",
+            },
+            {
+              do: "Router: two broadcast domains. A broadcast on LAN A does not cross to LAN B. Each LAN keeps its own ARP world.",
+              why: "Broadcasts die at L3. That is a reason we subnet.",
+            },
+          ],
+          result:
+            "Hub: 1 collision + 1 broadcast. Switch: per-port collisions, 1 broadcast. Router: splits broadcasts.",
+        },
+        {
+          title: "Firewall is policy, router is forwarding",
+          prompt:
+            "A box has an IP table and also drops TCP/23. Is it a router, a firewall, or both? What does ‘stateful’ add?",
+          steps: [
+            {
+              do: "Forwarding by dest IP (TTL−1, new MAC) is the router job. Dropping Telnet 23 is a firewall job. Home gateways do both.",
+              why: "One appliance, two functions. Tick the function the stem asked.",
+            },
+            {
+              do: "Stateless: each packet is judged alone (5-tuple). Stateful: after an inside TCP handshake, replies are allowed as ‘established’ without a second guess.",
+              why: "State remembers the conversation, like a receptionist who already signed you in.",
+            },
+            {
+              do: "A filter is not NAT. NAT rewrites addresses. A transparent firewall may leave IPs unchanged.",
+              why: "Policy ≠ rewrite. Need both sentences when the stem mixes them.",
+            },
+          ],
+          result:
+            "IP hop = router. Port drop = firewall. Stateful allows established replies. NAT is a third job.",
+        },
       ],
     },
     {
@@ -402,6 +570,48 @@ export const notesNetworking: TopicNote = {
           ],
           result:
             "Broadcast frame, flooded in the VLAN. Data Link. EtherType 0x0806 = ARP. Routers do not pass it between subnets.",
+        },
+        {
+          title: "Binary exponential backoff after two collisions",
+          prompt:
+            "A and B collide, r=1. They collide again, r=2. What is the backoff window in slot times? Why random?",
+          steps: [
+            {
+              do: "After the first collision r=1, pick k in 0..1 (2¹−1). After the second, r=2, pick k in 0..3 (2²−1) slot times.",
+              why: "The window doubles so two stubborn stations are less likely to pick the same k again.",
+            },
+            {
+              do: "Random matters: if both always waited 1 slot they would collide forever.",
+              why: "Backoff without randomness is just a scheduled crash.",
+            },
+            {
+              do: "Give up after a cap (classic 16 tries). Switched full-duplex never runs this loop.",
+              why: "CSMA/CD is the shared-medium algorithm, not modern full-duplex Ethernet’s daily life.",
+            },
+          ],
+          result:
+            "r=1 → k in 0..1. r=2 → k in 0..3. Window 2^r−1. Random so retries spread.",
+        },
+        {
+          title: "Why CSMA/CD sleeps on a full-duplex switch port",
+          prompt:
+            "Laptop — switch, both ends full-duplex, no hub. Two frames at once, opposite directions. Collision? Jam?",
+          steps: [
+            {
+              do: "No shared coaxial tap. Send and receive use separate lanes (or the switch queues). There is nothing to ‘hear as a mess’.",
+              why: "Collision detection needs a shared shout. Full-duplex removed the shout.",
+            },
+            {
+              do: "The switch may buffer. That is queuing, not a CD jam. No exponential backoff on the wire.",
+              why: "Do not draw jam/backoff on a modern switched exam topology unless they put a hub back in.",
+            },
+            {
+              do: "If autoneg falls back to a hub or half-duplex, CSMA/CD returns. The algorithm follows the medium.",
+              why: "Device class (hub vs switch) picks the story.",
+            },
+          ],
+          result:
+            "Full-duplex switch port: no CD, no jam. Buffering ≠ collision. Hub/half-duplex brings CD back.",
         },
       ],
     },
@@ -483,6 +693,48 @@ export const notesNetworking: TopicNote = {
           result:
             "Active FTP data dies on NAT. Passive is client-outbound. SFTP on 22 avoids a second channel. FTP 21/20 ≠ SFTP 22.",
         },
+        {
+          title: "Well-known versus ephemeral ports",
+          prompt:
+            "Client 192.168.1.10:51732 talks to 93.184.216.34:443. Which side is the server? Who chose 51732? After close, can another app reuse 443?",
+          steps: [
+            {
+              do: "443 is well-known HTTPS — the bound service, the server. 51732 is ephemeral — the client’s temporary source port.",
+              why: "Well-known ports (0–1023, plus familiar 1433/3306/…) name the application. High ports are tickets for one conversation.",
+            },
+            {
+              do: "The OS picked 51732 from a pool so two browser tabs do not share the same 5-tuple.",
+              why: "A connection is protocol + two IPs + two ports. The extra number multiplexes clients.",
+            },
+            {
+              do: "Port 443 on the server stays bound. Many clients share dest 443 with different source ports. After a client close, 51732 goes back to the pool (after TIME-WAIT on TCP).",
+              why: "The service port does not move just because one client left.",
+            },
+          ],
+          result:
+            "Server = :443. Client chose ephemeral 51732. 443 stays the service; the high port is per-connection.",
+        },
+        {
+          title: "DNS 53, mail 25/143/110, remote 22/23 — pick four",
+          prompt:
+            "(i) SSH (ii) Telnet (iii) IMAP folders (iv) SMTP between servers. Why is 22 encrypted and 23 not, by syllabus default?",
+          steps: [
+            {
+              do: "22 SSH, 23 Telnet, 143 IMAP, 25 SMTP.",
+              why: "Remote shell pair and mail pair are high-yield. Do not swap IMAP 143 with POP 110.",
+            },
+            {
+              do: "SSH encrypts the session (and can carry SFTP on the same 22). Telnet 23 is cleartext — passwords on the wire.",
+              why: "That is why Telnet is a museum piece and a finding in audits.",
+            },
+            {
+              do: "SMTP 25 is server-to-server. User submission is often 587/465. Same family, different door.",
+              why: "Read ‘between MTAs’ versus ‘phone sends mail’.",
+            },
+          ],
+          result:
+            "SSH 22, Telnet 23, IMAP 143, SMTP 25. SSH is encrypted; Telnet is not. SFTP is 22, not FTP 21.",
+        },
       ],
     },
     {
@@ -563,6 +815,48 @@ export const notesNetworking: TopicNote = {
           result:
             "UDP DNS = two datagrams, no handshake. TCP for truncation, AXFR, DoT — not for a normal tiny query.",
         },
+        {
+          title: "Four-way close versus RST",
+          prompt:
+            "Each side still has data it might send. Why can close take four segments? When is RST the right word?",
+          steps: [
+            {
+              do: "TCP is two one-way streams. FIN says ‘I will send no more’. The peer may still send. So: FIN, ACK of that FIN, later FIN the other way, ACK. Four segments.",
+              why: "Hanging up one phone while the other person is still talking. Each direction closes itself.",
+            },
+            {
+              do: "If the peer’s FIN is piggy-backed with its ACK you may see three packets; the exam still wants the four-step idea.",
+              why: "Same flags, maybe combined.",
+            },
+            {
+              do: "RST aborts: no orderly FIN, discard state. Used on a closed port or a smashed session. Not a graceful close.",
+              why: "Reset is ‘slam the door’, not ‘goodbye’.",
+            },
+          ],
+          result:
+            "Close: FIN/ACK each way (four segments). RST aborts. Handshake is three; close is four.",
+        },
+        {
+          title: "ISN is not ‘packet 1’",
+          prompt:
+            "Client ISN=4000, no payload on SYN. After the handshake, client sends 3 bytes ‘GET’. Sequence numbers of SYN, third ACK, and the data?",
+          steps: [
+            {
+              do: "SYN seq=4000 (consumes 1). Third ACK seq=4001. Data seq=4001, bytes 4001..4003.",
+              why: "SYN ate the imaginary byte 4000. First real payload starts at ISN+1.",
+            },
+            {
+              do: "Server ack after those 3 bytes is 4004 (next expected).",
+              why: "TCP counts bytes, not packets. Three letters move the number by 3.",
+            },
+            {
+              do: "Do not write ‘seq=1 for the first packet’. ISNs are random (or cookie-encoded) on purpose.",
+              why: "Predictable ISNs were an old attack. Exams still use small numbers for traces.",
+            },
+          ],
+          result:
+            "SYN 4000; ACK seq=4001; data seq=4001 length 3; next ack=4004. Byte counts, not packet counts.",
+        },
       ],
     },
     {
@@ -642,6 +936,190 @@ export const notesNetworking: TopicNote = {
           ],
           result:
             "NAT hides addresses and conserves IPv4. It does not encrypt, does not stop outbound malware, and is not a complete firewall. Still use TLS and a real filter.",
+        },
+        {
+          title: "Two inside hosts, one public IP",
+          prompt:
+            "10.0.0.8:51000 and 10.0.0.9:51000 both fetch the same HTTPS site. Public 198.51.100.2. How does NAT tell the replies apart?",
+          steps: [
+            {
+              do: "Both cannot keep WAN source 198.51.100.2:51000 toward the same dest. NAT remaps at least one to a free WAN port (e.g. 40000 and 40001).",
+              why: "The 5-tuple on the WAN must be unique. Ports are the multiplex tickets.",
+            },
+            {
+              do: "Reply to :40000 reverse-maps to .8:51000. Reply to :40001 reverse-maps to .9:51000.",
+              why: "The table row is the whole trick. The server never sees 10.0.0.0/8.",
+            },
+            {
+              do: "If the two insides talk to different dest IPs, some NATs could keep 51000 on both — still unique 5-tuples. Exam default: show two WAN ports.",
+              why: "Uniqueness is on the full tuple, but drawing two ports is the safe story.",
+            },
+          ],
+          result:
+            "PAT assigns distinct WAN ports. Replies demux by dest port on the public IP. Same inside port is fine.",
+        },
+        {
+          title: "NAT layer: why a switch cannot PAT",
+          prompt:
+            "PAT rewrites IPv4 source and a TCP port. Which layers? Why must checksums change? Why will an L2-only switch fail this?",
+          steps: [
+            {
+              do: "IPv4 header is L3; TCP/UDP ports are L4. PAT is L3+L4. Ethernet MACs are rewritten by the router hop anyway, not as the NAT idea.",
+              why: "Apartment number (port) plus street address (IP) both change at the front desk.",
+            },
+            {
+              do: "IPv4 header checksum covers the IP header. TCP/UDP checksums cover a pseudo-header that includes IPs and the ports. Both must be recomputed.",
+              why: "Stale checksums make the next hop drop the packet as corrupt.",
+            },
+            {
+              do: "A pure L2 switch has no IP table and no port rewrite. It only matches MACs. NAT lives on a router/firewall edge.",
+              why: "Wrong box, wrong layer.",
+            },
+          ],
+          result:
+            "PAT = L3 IPs + L4 ports. Refresh IPv4 and TCP/UDP checksums. A switch cannot NAT.",
+        },
+      ],
+    },
+    {
+      heading: "Firewall rules and NAT together",
+      body: "A firewall is a bouncer with a list: allow or drop using protocol, IPs, and ports (the 5-tuple). Default deny means ‘if no line matches, drop’. Stateful inspection remembers TCP that already shook hands, so replies do not need a matching inbound allow for every high port.\n\nNAT is a different job on the same edge box: rewrite private IPs (and ports) to a public IP. Order to remember: the inside host starts a flow → firewall must allow it out → NAT creates a mapping → replies come back to the public IP/port → NAT reverse-maps → firewall sees established state and lets them in. Unsolicited inbound still dies unless you port-forward and allow that dest port. A firewall is not TLS. NAT is not a full firewall.",
+      howTo: [
+        "Write the 5-tuple: proto, src IP, src port, dest IP, dest port. Last rule deny-all.",
+        "Stateful: allow outbound new, then allow established/related back. Do not open every high port inbound.",
+        "NAT mapping is born from outbound (or from DNAT). No mapping + no DNAT ⇒ drop inbound SYN.",
+        "Port-forward (DNAT) still needs an allow to that WAN port. Rewrite without allow still drops.",
+      ],
+      bullets: [
+        "Firewall: policy on 5-tuple, default deny, stateful established.",
+        "NAT: rewrite addresses/ports. Outbound mapping; inbound needs DNAT.",
+        "Both can sit on one box. NAT ≠ encryption ≠ ‘the firewall is done’.",
+      ],
+      examples: [
+        {
+          title: "Default deny and one HTTPS allow",
+          prompt:
+            "Inside 10.0.0.0/8 may browse HTTPS. Write three rules (out, established back, deny). Why not allow inbound :443 to the LAN?",
+          steps: [
+            {
+              do: "1) allow TCP 10.0.0.0/8:* → 0.0.0.0/0:443 new outbound. 2) allow established,related. 3) deny all.",
+              why: "Browsers start inside. Replies use dest = the client’s high port, which state already knows.",
+            },
+            {
+              do: "An inbound allow to LAN:443 would make every PC a public web server. That is the opposite of ‘browse out’.",
+              why: "Direction and who starts the conversation matter.",
+            },
+            {
+              do: "UDP/443 is not covered. Add a separate line only if you mean HTTP/3.",
+              why: "Protocol is part of the 5-tuple. TCP ≠ UDP.",
+            },
+            {
+              do: "Without deny-all on a default-allow box, the allow line teaches nothing.",
+              why: "Policy is the last matching action, plus the default.",
+            },
+          ],
+          result:
+            "Allow TCP 10/8 → *:443 out, allow established back, deny-all. Do not publish LAN:443.",
+        },
+        {
+          title: "Stateful vs stateless on the return path",
+          prompt:
+            "Client 10.0.0.8:51999 → 93.184.216.34:443. Stateless firewall has only the outbound allow. Does the SYN-ACK from :443 survive? How does stateful fix it?",
+          steps: [
+            {
+              do: "Return packet is src 93.184.216.34:443 dest 10.0.0.8:51999. It does not match ‘dest port 443 outbound’. Stateless drops it unless you also allowed inbound from :443 to high ports.",
+              why: "Each packet is a stranger. Opening all high ports inbound is a wide hole.",
+            },
+            {
+              do: "Stateful: the outbound SYN created a flow record. The SYN-ACK matches that record (established) and is allowed. High ports stay closed to random SYNs.",
+              why: "The receptionist remembers who went out.",
+            },
+            {
+              do: "A forged inbound SYN to 10.0.0.8:51999 still dies — no matching state, and deny-all.",
+              why: "State is not ‘any packet to a high port’.",
+            },
+            {
+              do: "UDP is harder to track (no SYN). Timeouts and ‘related’ (FTP ALG) are extra stories; exams still want TCP established.",
+              why: "TCP flags make state easy. UDP is guesswork plus timers.",
+            },
+          ],
+          result:
+            "Stateless drops the SYN-ACK unless you punch high ports. Stateful allows established replies only.",
+        },
+        {
+          title: "Port-forward needs DNAT and an allow",
+          prompt:
+            "Public 198.51.100.2:80 should reach inside web 10.0.0.8:80. NAT table plus firewall. What if you DNAT but default-deny with no allow?",
+          steps: [
+            {
+              do: "DNAT: wan dest 198.51.100.2:80 → 10.0.0.8:80. That rewrite picks the apartment. SNAT on the way out still hides 10.0.0.8.",
+              why: "Forward is ‘ticket 80 to apartment 8’. Without it, PAT has no inbound row.",
+            },
+            {
+              do: "Firewall must allow TCP any → 198.51.100.2:80 (or to 10.0.0.8:80, depending when filter runs). Then established back to the client.",
+              why: "NAT without allow is a rewrite into a closed door.",
+            },
+            {
+              do: "DNAT but deny-all and no allow: packet is dropped. Allow but no DNAT: NAT still cannot choose a host, drop.",
+              why: "Need both jobs. Filter and rewrite are not substitutes.",
+            },
+            {
+              do: "This still is not TLS. HTTP/80 is clear on the WAN unless you terminate TLS on 443.",
+              why: "Publishing a port is reachability, not confidentiality.",
+            },
+          ],
+          result:
+            "DNAT 80→10.0.0.8:80 plus an allow on TCP/80. Either piece alone still drops. Not encryption.",
+        },
+        {
+          title: "Outbound malware and why NAT is not the bouncer",
+          prompt:
+            "PC 10.0.0.8 is infected and connects TCP to 203.0.113.50:445. PAT is on. Default firewall allows inside outbound any. What happens? Which control would stop it?",
+          steps: [
+            {
+              do: "PAT happily maps the outbound flow. The malware phones home. NAT hid 10.0.0.8 but helped the flow leave.",
+              why: "NAT is a translator, not a policy that understands ‘this is malware’.",
+            },
+            {
+              do: "A firewall egress policy (allow 80/443, deny 445 SMB out) would drop it. So would DNS/IP intel at L7.",
+              why: "The bouncer’s list is the firewall. Tighten outbound, do not ‘trust NAT’.",
+            },
+            {
+              do: "Inbound default deny still holds — attackers cannot SYN in. That does not stop the inside traitor.",
+              why: "CIA: inbound filter helps C of servers; egress filter helps C of data leaving.",
+            },
+            {
+              do: "Exam line: NAT conserves IPv4 and hides numbers. A firewall enforces allow/deny. Use both, plus TLS.",
+              why: "Three tools, three jobs.",
+            },
+          ],
+          result:
+            "PAT lets the malware out. Egress firewall (deny 445) would stop that flow. NAT is not the bouncer.",
+        },
+        {
+          title: "Order of operations on a home gateway",
+          prompt:
+            "Laptop 10.0.0.8:51000 → 1.1.1.1:443. Name firewall then NAT on the way out, and the reverse on the way back.",
+          steps: [
+            {
+              do: "Out: firewall checks ‘may 10.0.0.8 start TCP to 1.1.1.1:443?’ If yes, NAT SNAT source to the public IP:port and stores a row.",
+              why: "Policy on the real inside 5-tuple, then rewrite for the WAN.",
+            },
+            {
+              do: "WAN packet: src public:40000 dst 1.1.1.1:443. Return: dst public:40000.",
+              why: "The server only knows the public ticket.",
+            },
+            {
+              do: "In: NAT reverse-maps dest to 10.0.0.8:51000. Stateful firewall sees established and allows. Laptop receives the SYN-ACK.",
+              why: "Undo the rewrite, then the flow record matches. Unsolicited inbound would fail both steps.",
+            },
+            {
+              do: "Vendors may filter pre-NAT or post-NAT. For the exam, say: allow the conversation, map the addresses, established back.",
+              why: "Do not invent vendor-specific zone names unless given.",
+            },
+          ],
+          result:
+            "Out: firewall allow, then SNAT. In: reverse NAT, then established allow. No mapping ⇒ inbound drop.",
         },
       ],
     },

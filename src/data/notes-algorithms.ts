@@ -4,7 +4,7 @@ export const notesAlgorithms: TopicNote = {
   topic: "algorithms",
   title: "Algorithms — techniques (beginner)",
   blurb:
-    "BFS uses a queue and walks level by level. DFS uses a stack (or recursion) and walks deep first. Merge sort always takes n log n. Dijkstra needs non-negative weights; Bellman-Ford allows negatives and can spot a negative cycle. Greedy takes a local best; DP fills a table when greedy lies. KMP uses a prefix table so the text pointer never walks backwards.",
+    "BFS uses a queue and walks level by level. DFS uses a stack (or recursion) and walks deep first. Merge sort always takes n log n. Dijkstra needs non-negative weights; Bellman-Ford allows negatives and can spot a negative cycle. Greedy takes a local best; DP fills a table when greedy lies. KMP uses a prefix table so the text pointer never walks backwards. Binary search halves a sorted array at mid until left and right cross.",
   blocks: [
     {
       heading: "BFS — queue, level by level",
@@ -134,6 +134,81 @@ print(dist)`,
           ],
           result: "Queue after B is dequeued: [C, D].",
         },
+        {
+          title: "Mark visited when you enqueue, not when you dequeue",
+          prompt:
+            "Undirected A—B, A—C, B—C. Neighbours alphabetical. Start at A. If you mark visited only when you dequeue, how many times can C sit in the queue?",
+          language: "python",
+          code: `from collections import deque
+g = {"A": ["B", "C"], "B": ["A", "C"], "C": ["A", "B"]}
+# buggy: mark on dequeue
+q = deque(["A"])
+seen = set()
+while q:
+    u = q.popleft()
+    if u in seen:
+        continue
+    seen.add(u)
+    for v in g[u]:
+        q.append(v)
+# C is enqueued from A and again from B`,
+          steps: [
+            {
+              do: "Start queue [A]. Dequeue A, mark A, enqueue B and C. Queue is B, C.",
+              why: "A’s neighbours are still unseen because we have not dequeued them yet.",
+            },
+            {
+              do: "Dequeue B, mark B. Neighbours A (already in seen) and C. Enqueue C again. Queue is C, C.",
+              why: "C was not marked yet. Mark-on-dequeue lets a vertex wait twice.",
+            },
+            {
+              do: "Correct BFS marks C when it is first enqueued from A, so B does not enqueue C again. Queue after B would be [C].",
+              why: "Visited-on-enqueue means each vertex enters the queue once.",
+            },
+            {
+              do: "Exam flag: if the question shows C twice in the queue, the trace forgot to mark on enqueue.",
+              why: "The invariant is ‘each vertex is queued at most once’.",
+            },
+          ],
+          result: "Buggy mark-on-dequeue can put C in the queue twice. Mark when you enqueue.",
+        },
+        {
+          title: "Directed BFS: edges go one way",
+          prompt:
+            "Directed lists (sorted): A:[B,C] B:[D] C:[D] D:[E] E:[]. Start BFS at A. Visit order? Distances? What if we start at E?",
+          language: "python",
+          code: `from collections import deque
+g = {"A":["B","C"],"B":["D"],"C":["D"],"D":["E"],"E":[]}
+dist, q = {"A": 0}, deque(["A"])
+order = []
+while q:
+    u = q.popleft()
+    order.append(u)
+    for v in g[u]:
+        if v not in dist:
+            dist[v] = dist[u] + 1
+            q.append(v)
+print(order, dist)`,
+          steps: [
+            {
+              do: "Dequeue A, enqueue B then C. Visit so far A. Queue B, C. Dist B=1, C=1.",
+              why: "Directed edges out of A are the only ones BFS may follow from A.",
+            },
+            {
+              do: "Dequeue B, enqueue D (dist 2). Queue C, D. Dequeue C: D is already seen, skip. Dequeue D, enqueue E (dist 3). Then E.",
+              why: "First time we reach D is from B, so dist[D]=2. C→D is a later edge on the same level.",
+            },
+            {
+              do: "Visit order A, B, C, D, E. Distances 0,1,1,2,3.",
+              why: "Still level by level. Direction only limits which neighbours exist.",
+            },
+            {
+              do: "BFS from E: E has no outgoing edge. Only E is visited. A is not reachable backwards.",
+              why: "On a directed graph, ‘connected’ depends on the start vertex.",
+            },
+          ],
+          result: "From A: A, B, C, D, E with dist 0,1,1,2,3. From E: only E.",
+        },
       ],
     },
     {
@@ -248,6 +323,83 @@ print(st)  # B on top`,
             },
           ],
           result: "DFS may record dist(T)=3. BFS records 1. Use BFS for unweighted shortest paths.",
+        },
+        {
+          title: "Grey ancestor = directed cycle",
+          prompt:
+            "Directed A→B, B→C, C→A. Recursive DFS from A. When we look at C→A, A is still on the call stack. Cycle?",
+          language: "python",
+          code: `g = {"A": ["B"], "B": ["C"], "C": ["A"]}
+WHITE, GREY, BLACK = 0, 1, 2
+color = {v: WHITE for v in g}
+cycle = False
+def dfs(u):
+    global cycle
+    color[u] = GREY
+    for v in g[u]:
+        if color[v] == GREY:
+            cycle = True
+        elif color[v] == WHITE:
+            dfs(v)
+    color[u] = BLACK
+dfs("A")
+print(cycle)`,
+          steps: [
+            {
+              do: "dfs(A) paints A grey. Recurse B (grey), then C (grey). Stack of live calls: A → B → C.",
+              why: "Grey means ‘started, not finished’ — still on the recursion stack.",
+            },
+            {
+              do: "From C the edge C→A hits grey A. That is a back-edge to an ancestor. Set cycle = True.",
+              why: "A path down the stack plus this edge is a directed cycle A-B-C-A.",
+            },
+            {
+              do: "Then C, B, A finish and turn black. A black neighbour is a finished branch, not a new cycle alarm.",
+              why: "Only grey (not white, not black) proves a cycle in directed DFS.",
+            },
+            {
+              do: "On an undirected graph, ignore the single parent edge or you will call every two-way edge a cycle.",
+              why: "Undirected A—B always looks like a back-edge unless you skip the parent.",
+            },
+          ],
+          result: "Yes, a directed cycle. C→A is a back-edge to grey A.",
+        },
+        {
+          title: "Discovery order versus finish (post) order",
+          prompt:
+            "DAG: A→C, A→B, B→D, C→D. Neighbours alphabetical. Recursive DFS from A. Discovery list? Finish list?",
+          language: "python",
+          code: `g = {"A": ["B", "C"], "B": ["D"], "C": ["D"], "D": []}
+seen, disc, fin = set(), [], []
+def dfs(u):
+    seen.add(u)
+    disc.append(u)
+    for v in g[u]:
+        if v not in seen:
+            dfs(v)
+    fin.append(u)
+dfs("A")
+print("discover", disc)
+print("finish", fin)`,
+          steps: [
+            {
+              do: "dfs(A) discovers A. First neighbour B. dfs(B) discovers B, then D. D has no child, so D finishes first.",
+              why: "Finish (post) order records a vertex when its whole subtree is done.",
+            },
+            {
+              do: "B finishes after D. Back in A, C is next. C’s neighbour D is already seen, so C finishes at once. A finishes last.",
+              why: "Discovery A, B, D, C. Finish D, B, C, A.",
+            },
+            {
+              do: "Reverse of finish order is A, C, B, D — one valid topological order of this DAG.",
+              why: "A vertex finishes only after every vertex it can reach. That is the topology trick.",
+            },
+            {
+              do: "Do not use discovery order as a topological sort. Discovery was A, B, D, C, which still has C after D even though C→D.",
+              why: "Finish (or reverse finish) is the DAG listing. Discovery is ‘when I first marked’.",
+            },
+          ],
+          result: "Discover A, B, D, C. Finish D, B, C, A. Reverse finish A, C, B, D is a topo order.",
         },
       ],
     },
@@ -368,6 +520,72 @@ print(merge_sort([38, 27, 43, 3]))`,
             },
           ],
           result: "[2a, 2b, 3, 4]. Left equal key stays first. Merge sort is stable.",
+        },
+        {
+          title: "Merge leftover: one run empties first",
+          prompt:
+            "Merge L=[1, 4, 9] with R=[2, 3]. Show each take. What happens after R is empty?",
+          language: "python",
+          code: `L, R = [1, 4, 9], [2, 3]
+i = j = 0
+out = []
+while i < len(L) and j < len(R):
+    if L[i] <= R[j]:
+        out.append(L[i]); i += 1
+    else:
+        out.append(R[j]); j += 1
+out += L[i:] + R[j:]
+print(out)`,
+          steps: [
+            {
+              do: "Heads 1 vs 2: take 1. Heads 4 vs 2: take 2. Heads 4 vs 3: take 3. After that take, R is empty. Output so far 1, 2, 3.",
+              why: "Each step compares the two current heads and advances only that run.",
+            },
+            {
+              do: "The while loop stops because j==len(R). Append leftover L[i:] = [4, 9].",
+              why: "No more compares. The rest of the non-empty run is already sorted, so copy it.",
+            },
+            {
+              do: "Result [1, 2, 3, 4, 9]. Total takes: 3 compares + 2 copies = 5 = n.",
+              why: "A merge of n items does Θ(n) work, never Θ(n²).",
+            },
+            {
+              do: "If L had emptied first, we would have copied leftover R the same way.",
+              why: "The code `out + L[i:] + R[j:]` covers both leftovers; one of them is empty.",
+            },
+          ],
+          result: "[1, 2, 3, 4, 9]. After R empties, copy leftover 4, 9. Merge is linear in the two run lengths.",
+        },
+        {
+          title: "Reversed array: merge sort still n log n",
+          prompt:
+            "[4, 3, 2, 1]. Insertion sort does 6 swaps (n(n−1)/2). Merge sort: how many split levels? Why is that not n²?",
+          language: "python",
+          code: `# insertion: 4,3,2,1 -> 6 adjacent inversions, Theta(n^2)
+# merge sort: mid splits
+# [4,3] | [2,1]
+# [4]|[3]  [2]|[1]
+# merge [3,4] and [1,2], then [1,2,3,4]
+# 2 levels of n copies = 8 = n log2 n`,
+          steps: [
+            {
+              do: "Insertion sort walks left and swaps past every inversion. Reversed n=4 has 6 inversions. That grows like n².",
+              why: "Each pair is out of order. Insertion pays per pair.",
+            },
+            {
+              do: "Merge sort still splits twice to singletons, then merges. Two levels × 4 copies ≈ n log n.",
+              why: "The split tree does not grow extra levels just because the keys are reversed.",
+            },
+            {
+              do: "Merges: [3,4], [1,2], then [1,2,3,4]. Same shape as a random array of length 4.",
+              why: "Input order changes which head you take, not how many levels you pay.",
+            },
+            {
+              do: "Exam pick: worst-case Θ(n log n) sorter that is stable → merge sort, not insertion, not naive quick sort.",
+              why: "Quick sort’s worst case on sorted/reversed input is n² unless you pick a better pivot.",
+            },
+          ],
+          result: "2 split levels, Θ(n) per level, still Θ(n log n). Insertion sort on the same input is Θ(n²).",
         },
       ],
     },
@@ -491,6 +709,71 @@ print(dist)
           ],
           result: "A=0, B=4, C=1, D=5. No negative cycle. Bellman-Ford is the safe choice because of B→C.",
         },
+        {
+          title: "Extra Bellman-Ford round catches a negative cycle",
+          prompt:
+            "Directed: A→B 1, B→C 1, C→B −3. Source A, |V|=3 so 2 rounds then a test round. What happens?",
+          language: "python",
+          code: `edges = [("A","B",1),("B","C",1),("C","B",-3)]
+dist = {"A":0,"B":10**9,"C":10**9}
+for _ in range(2):
+    for u, v, w in edges:
+        if dist[u] + w < dist[v]:
+            dist[v] = dist[u] + w
+changed = False
+for u, v, w in edges:
+    if dist[u] + w < dist[v]:
+        changed = True
+print(dist, "neg_cycle" if changed else "ok")`,
+          steps: [
+            {
+              do: "Round 1: B←1, C←2, then C→B: 2+(−3)=−1 so B←−1. Distances keep dropping around B-C.",
+              why: "Each loop B→C→B subtracts 2. There is no shortest path once a reachable negative cycle exists.",
+            },
+            {
+              do: "After |V|-1=2 rounds the table is still not ‘final’. The extra 3rd round still relaxes B or C.",
+              why: "A still-improving extra pass is the negative-cycle alarm.",
+            },
+            {
+              do: "Report: negative cycle reachable from A. Do not print B=… as a shortest path.",
+              why: "Shortest paths are undefined when you can loop cheaper forever.",
+            },
+            {
+              do: "Dijkstra is illegal here (negative edge) and would also miss the cycle test.",
+              why: "Bellman-Ford’s extra round is the named exam tool for ‘is there a negative cycle?’.",
+            },
+          ],
+          result: "Extra round still relaxes. Negative cycle B-C-B. No finite shortest path to B or C.",
+        },
+        {
+          title: "Pick BFS, Dijkstra, or Bellman-Ford",
+          prompt:
+            "(i) unweighted city map (ii) road times, all ≥ 0 (iii) one toll of −5, no cycle (iv) need to know if a negative cycle exists.",
+          language: "java",
+          code: `// (i) BFS
+// (ii) Dijkstra
+// (iii) Bellman-Ford (negatives, no cycle needed for correctness)
+// (iv) Bellman-Ford extra round`,
+          steps: [
+            {
+              do: "(i) Unweighted / every edge cost 1 → BFS. Distance = hop count.",
+              why: "A heap is wasted when every edge is the same.",
+            },
+            {
+              do: "(ii) Non-negative weights → Dijkstra. Settle the smallest tentative.",
+              why: "Greedy settle is safe only when remaining edges are ≥ 0.",
+            },
+            {
+              do: "(iii) Any negative edge → Bellman-Ford even if you believe there is no cycle.",
+              why: "Dijkstra’s proof is already broken by one negative toll.",
+            },
+            {
+              do: "(iv) Run |V|-1 rounds then one extra. If anything still relaxes, tick negative cycle.",
+              why: "That extra pass is the cycle test. Floyd-Warshall also flags a negative on the diagonal for all-pairs.",
+            },
+          ],
+          result: "BFS (unweighted), Dijkstra (weights ≥ 0), Bellman-Ford (negatives or cycle test).",
+        },
       ],
     },
     {
@@ -605,6 +888,72 @@ print(chosen)
             },
           ],
           result: "Activities: {(1,4),(5,7),(8,11)} size 3. Coins: greedy 3, DP 2 (3+3).",
+        },
+        {
+          title: "Same bag: fractional 240 versus 0/1 220",
+          prompt:
+            "Items (w,v)=(10,60),(20,100),(30,120), W=50. Fractions allowed vs whole items only. Two numbers to write.",
+          language: "python",
+          code: `# fractional greedy v/w: 60 + 100 + 80 = 240
+# 0/1 candidates:
+# 10+20=30 -> 160
+# 20+30=50 -> 220
+# 10+30=40 -> 180
+# best 0/1 is 220 (items 2 and 3)`,
+          steps: [
+            {
+              do: "Fractional: densities 6, 5, 4. Take all of 1 and 2, then 20/30 of 3. Value 240.",
+              why: "Cutting item 3 is legal only in the fractional problem.",
+            },
+            {
+              do: "0/1: you may not cut. Items 2+3 weigh 50 and value 220. Items 1+2=160. Items 1+3=180. Best 220.",
+              why: "The whole-item constraint changes the feasible set. Greedy density would have taken item 1 first and stopped at 160.",
+            },
+            {
+              do: "So greedy density is optimal for fractional (240) and wrong as a 0/1 policy if you take item 1 first.",
+              why: "0/1 needs the DP skip-or-take table (or an exhaustive check on tiny n).",
+            },
+            {
+              do: "Exam words: ‘you may take a fraction’ → 240 greedy. ‘whole item’ → DP, here 220.",
+              why: "Same numbers, two problems. Read the constraint.",
+            },
+          ],
+          result: "Fractional optimum 240. 0/1 optimum 220 (items 2+3). Greedy-by-density for 0/1 that keeps item 1 scores only 160.",
+        },
+        {
+          title: "Tiny LCS table is DP, not greedy",
+          prompt:
+            "X=ABCB, Y=BDCB. Fill dp[i][j] = LCS of prefixes. What is dp[4][4]? Why is ‘take first common letter’ greedy unsafe?",
+          language: "python",
+          code: `X, Y = "ABCB", "BDCB"
+n, m = len(X), len(Y)
+dp = [[0]*(m+1) for _ in range(n+1)]
+for i in range(1, n+1):
+    for j in range(1, m+1):
+        if X[i-1] == Y[j-1]:
+            dp[i][j] = dp[i-1][j-1] + 1
+        else:
+            dp[i][j] = max(dp[i-1][j], dp[i][j-1])
+print(dp[4][4])`,
+          steps: [
+            {
+              do: "When letters match, dp = diagonal+1. Else dp = max(skip X letter, skip Y letter).",
+              why: "LCS subproblems overlap. The table stores each prefix pair once.",
+            },
+            {
+              do: "Match path: B, C, B of X with B, C, B of Y. Length 3. dp[4][4]=3.",
+              why: "One LCS is BCB. The whole strings are length 4, so 3 is possible.",
+            },
+            {
+              do: "Greedy ‘first common letter A vs B — take B of Y with first B of X’ can still be repaired, but ‘always take the leftmost match and never skip’ can miss a longer later chain.",
+              why: "There is no safe local rule for LCS. Fill the table.",
+            },
+            {
+              do: "Exam: subsequence (may skip) vs substring (must be contiguous). LCS is DP. Longest common substring is a different table (reset on mismatch).",
+              why: "Name the state. Do not stamp greedy on a matching problem.",
+            },
+          ],
+          result: "dp[4][4]=3 (e.g. BCB). LCS is DP. Greedy leftmost match is not a theorem.",
         },
       ],
     },
@@ -725,6 +1074,273 @@ print(lps[matched - 1])  # next j`,
             },
           ],
           result: "KMP O(n+m). Naive worst O(nm). Extra memory O(m) for LPS.",
+        },
+        {
+          title: "Search AABA inside AACAABA",
+          prompt:
+            "Pattern AABA, LPS [0,1,0,1], text AACAABA. Walk i and j. Where does the match start? Does i ever decrease?",
+          language: "python",
+          code: `t, p = "AACAABA", "AABA"
+lps = [0, 1, 0, 1]
+i = j = 0
+hits = []
+while i < len(t):
+    if t[i] == p[j]:
+        i += 1
+        j += 1
+        if j == len(p):
+            hits.append(i - j)
+            j = lps[j - 1]
+    elif j:
+        j = lps[j - 1]
+    else:
+        i += 1
+print(hits)`,
+          steps: [
+            {
+              do: "Match AA, then text C vs pattern B. Mismatch at j=2. Set j=lps[1]=1. i stays on C.",
+              why: "The prefix table reuses the overlapping A. Text pointer i does not walk back.",
+            },
+            {
+              do: "C vs P[1]=A: still mismatch, j=lps[0] path → j=0, then i steps to the next letter A.",
+              why: "When j is already 0, the only move left is i += 1.",
+            },
+            {
+              do: "From index 3 the four letters AABA match. Hit at start index 3. j resets to lps[3]=1.",
+              why: "A full match still uses LPS so overlapping hits are not missed.",
+            },
+            {
+              do: "i only stayed or went forward. That is why search is O(n+m), not O(n m).",
+              why: "Never rewind the text. Naive search would have slid back.",
+            },
+          ],
+          result: "Match starts at index 3. i never decreases. Hits = [3].",
+        },
+        {
+          title: "LPS of AAAA",
+          prompt:
+            "Pattern AAAA. Fill four LPS entries. Why is LPS[3]=3, not 4?",
+          language: "python",
+          code: `def lps(p):
+    pi = [0] * len(p)
+    length = 0
+    i = 1
+    while i < len(p):
+        if p[i] == p[length]:
+            length += 1
+            pi[i] = length
+            i += 1
+        elif length:
+            length = pi[length - 1]
+        else:
+            i += 1
+    return pi
+print(lps("AAAA"))`,
+          steps: [
+            {
+              do: "pi[0]=0. i=1, A==A → pi[1]=1. i=2, A==A → pi[2]=2. i=3, A==A → pi[3]=3.",
+              why: "Each longer prefix of AAAA has a longer proper prefix-suffix of all A’s.",
+            },
+            {
+              do: "LPS = [0, 1, 2, 3].",
+              why: "Proper means ‘not the whole string’. The whole AAAA cannot count as its own prefix-suffix.",
+            },
+            {
+              do: "So LPS[3]=3, not 4. The proper prefix AAA equals the suffix AAA.",
+              why: "That overlap of 3 is what KMP jumps on after a full match of AAAA in a run of A’s.",
+            },
+            {
+              do: "Contrast AABA whose LPS ended [0,1,0,1]. Repeating letters grow LPS; a break resets toward 0.",
+              why: "LPS is about self-overlap of the pattern, not of the text.",
+            },
+          ],
+          result: "[0, 1, 2, 3]. LPS[3]=3 because a proper prefix-suffix cannot be the whole pattern.",
+        },
+      ],
+    },
+    {
+      heading: "Binary search — sorted array, mid, left/right",
+      body: "Binary search finds a key in a sorted array by looking at the middle. If the mid value is the key, stop. If the key is smaller, throw away the right half (new right = mid−1). If the key is larger, throw away the left half (new left = mid+1). Each step halves the search window.\n\nThe array must be sorted in the same order you compare. Unsorted input makes the discarded half a lie. Time Θ(log n) comparisons. Extra memory Θ(1) for the loop. Write left, mid, right after every step. When left passes right, the key is missing.",
+      howTo: [
+        "Check the array is sorted. Set left=0, right=n−1.",
+        "While left ≤ right: mid = floor((left+right)/2). Compare a[mid] with the key.",
+        "Equal → found. Key < a[mid] → right = mid−1. Key > a[mid] → left = mid+1.",
+        "If left > right, the key is not there. Count the steps: about log₂ n.",
+      ],
+      bullets: [
+        "Needs a sorted array. Mid index, then shrink left or right.",
+        "Θ(log n) time, Θ(1) extra memory for the iterative loop.",
+        "When left > right the search missed. Unsorted input is undefined.",
+      ],
+      examples: [
+        {
+          title: "Find 7 in [1, 3, 5, 7, 9]",
+          prompt:
+            "Iterative binary search for 7. Show left, mid, right after each compare.",
+          language: "python",
+          code: `a = [1, 3, 5, 7, 9]
+key = 7
+left, right = 0, len(a) - 1
+while left <= right:
+    mid = (left + right) // 2
+    if a[mid] == key:
+        print("found", mid)
+        break
+    if key < a[mid]:
+        right = mid - 1
+    else:
+        left = mid + 1`,
+          steps: [
+            {
+              do: "n=5, left=0, right=4. mid=2, a[2]=5. 7>5 so left ← 3. After this step left=3, right=4.",
+              why: "Everything at mid and left of mid is ≤ 5, so 7 cannot live there.",
+            },
+            {
+              do: "mid=(3+4)//2=3, a[3]=7. Equal. Found at index 3.",
+              why: "The next middle of the remaining window is the key.",
+            },
+            {
+              do: "Two compares. log₂ 5 is a bit more than 2, so this is the expected ballpark.",
+              why: "Each compare throws away about half of the array.",
+            },
+            {
+              do: "Do not scan 1,3,5,7 from the left. That would be linear search.",
+              why: "Binary search jumps to mid. Linear search walks one by one.",
+            },
+          ],
+          result: "Found 7 at index 3. Windows: [0..4] mid 5 → [3..4] mid 7.",
+        },
+        {
+          title: "Miss: left walks past right",
+          prompt:
+            "Same array. Search 6. Show the last window and why the answer is ‘not found’.",
+          language: "python",
+          code: `a = [1, 3, 5, 7, 9]
+key = 6
+left, right = 0, 4
+while left <= right:
+    mid = (left + right) // 2
+    if a[mid] == key:
+        break
+    if key < a[mid]:
+        right = mid - 1
+    else:
+        left = mid + 1
+print(left, right)  # left > right`,
+          steps: [
+            {
+              do: "left=0, right=4, mid=2, a[2]=5. 6>5 so left=3.",
+              why: "6 would have to sit among the values ≥ 7 if it existed.",
+            },
+            {
+              do: "mid=(3+4)//2=3, a[3]=7. 6<7 so right=2. Now left=3 and right=2.",
+              why: "The window collapsed. There is no index between 3 and 2.",
+            },
+            {
+              do: "left > right, loop ends. 6 is not in the array.",
+              why: "The sorted array jumped from 5 to 7. Binary search proved the gap is empty.",
+            },
+            {
+              do: "A linear scan would also miss, but would look at every cell. Binary search looked at 5 then 7 only.",
+              why: "Logarithmic compares even on a miss.",
+            },
+          ],
+          result: "Not found. After comparing 5 then 7, left=3 > right=2.",
+        },
+        {
+          title: "First occurrence of a duplicate",
+          prompt:
+            "[1, 2, 2, 2, 5], key=2. Ordinary binary search may land on any 2. How do you force the leftmost 2?",
+          language: "python",
+          code: `a = [1, 2, 2, 2, 5]
+key = 2
+left, right, ans = 0, 4, -1
+while left <= right:
+    mid = (left + right) // 2
+    if a[mid] >= key:
+        if a[mid] == key:
+            ans = mid
+        right = mid - 1
+    else:
+        left = mid + 1
+print(ans)`,
+          steps: [
+            {
+              do: "Ordinary ‘return on equal’ might hit index 2 or 3 depending on mid. All are correct 2’s, not the first.",
+              why: "The basic algorithm only promises some index of the key.",
+            },
+            {
+              do: "To get the first: when a[mid]==2, record ans=mid and still set right=mid−1. Keep searching the left half.",
+              why: "A still-smaller index might also hold 2. Shrink toward the left.",
+            },
+            {
+              do: "Trace: mid=2 is 2, ans=2, right=1. Next mid=0 is 1, left=1. Next mid=1 is 2, ans=1, right=0. Then left>right. ans=1.",
+              why: "Index 1 is the first 2. We did not stop at the first hit.",
+            },
+            {
+              do: "Last occurrence is the mirror: on equal, record and set left=mid+1.",
+              why: "Same idea, shrink toward the right end of the run.",
+            },
+          ],
+          result: "Leftmost 2 is index 1. On a hit, keep searching the left half.",
+        },
+        {
+          title: "Unsorted array: binary search lies",
+          prompt:
+            "Array [9, 1, 7, 3, 5], search 3 with the same mid logic. What can happen? What must you do first?",
+          language: "java",
+          code: `// not sorted
+// left=0, right=4, mid=2, a[2]=7
+// 3<7 so discard the right half [3,5]  -- but 3 lives there
+// then search [9,1,7] and miss`,
+          steps: [
+            {
+              do: "First mid is index 2, value 7. The code thinks ‘3<7 so throw away indexes 3 and 4’.",
+              why: "That discard is only legal if everything to the right of mid is ≥ 7.",
+            },
+            {
+              do: "Here index 3 holds 3 — the key you just threw away. Later the loop misses.",
+              why: "The invariant ‘left half ≤ mid ≤ right half’ is false on an unsorted array.",
+            },
+            {
+              do: "Fix: sort first (n log n) then binary search (log n), or just scan in O(n) if you search once.",
+              why: "Sorting to search once is usually slower than a linear scan.",
+            },
+            {
+              do: "Exam: if they did not say the array is sorted, do not tick binary search.",
+              why: "Sorted is part of the pre-condition, not a detail.",
+            },
+          ],
+          result: "May miss 3 after discarding the half that held it. Sort first, or use linear search.",
+        },
+        {
+          title: "How many compares: n=16",
+          prompt:
+            "n=16, worst-case binary search. About how many mid checks until left>right? Contrast linear search.",
+          language: "python",
+          code: `# n=16, each step halves
+# 16 -> 8 -> 4 -> 2 -> 1 -> empty
+# about log2(16)+1 = 5 compares worst case
+# linear worst case = 16`,
+          steps: [
+            {
+              do: "A window of 16 becomes at most 8, then 4, then 2, then 1, then empty. That is 5 mid checks in the worst miss.",
+              why: "Halving 16 down to 1 is log₂ 16 = 4 steps, plus the last compare on the singleton.",
+            },
+            {
+              do: "Linear search worst case looks at all 16 cells (key absent or at the end).",
+              why: "No discard. Every cell is a candidate until you see it.",
+            },
+            {
+              do: "n=10⁹ still about 30 binary compares. Linear would be a billion.",
+              why: "Log grows slowly. That is the point of the technique.",
+            },
+            {
+              do: "Write Θ(log n) time, Θ(1) extra space for the loop (recursion would use Θ(log n) stack).",
+              why: "The exam wants the bound and the sorted pre-condition.",
+            },
+          ],
+          result: "About 5 compares for n=16 worst case. Linear is 16. Binary search is Θ(log n) on a sorted array.",
         },
       ],
     },

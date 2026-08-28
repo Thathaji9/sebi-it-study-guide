@@ -117,6 +117,79 @@ export const notesProgramming: TopicNote = {
           ],
           result: "7 8",
         },
+        {
+          title: "for-update i++ and ++i run the body the same times",
+          prompt: "What is printed?",
+          language: "java",
+          code: `class Main {
+  public static void main(String[] args) {
+    int a = 0, b = 0;
+    for (int i = 0; i < 3; i++) a++;
+    for (int j = 0; j < 3; ++j) b++;
+    System.out.print(a + " " + b);
+  }
+}`,
+          steps: [
+            {
+              do: "A for-loop does: init once, test, body, update, test, body, update… until the test is false.",
+              why: "The update is a lone statement. It is not used as a value.",
+            },
+            {
+              do: "First loop: i is 0, 1, 2. Each time the body does a++. After three bodies a is 3. Then i becomes 3 and i < 3 fails.",
+              why: "i++ in the update still adds 1 after the body. The old value is thrown away.",
+            },
+            {
+              do: "Second loop: j is 0, 1, 2. Each time the body does b++. After three bodies b is 3. Then ++j makes j=3 and the test fails.",
+              why: "++j in the update also just adds 1. There is nobody reading the expression value.",
+            },
+            {
+              do: "Both loops ran the body 3 times. print 3 3.",
+              why: "i++ vs ++i only differs when you save or print the expression. A lone update does not.",
+            },
+            {
+              do: "Do not rewrite this as ‘++j starts at 1 so the body runs twice’. Init is still j = 0.",
+              why: "The ++ sits in the update slot, not in the init slot.",
+            },
+          ],
+          result: "3 3",
+        },
+        {
+          title: "i++ as an array store index",
+          prompt: "What is printed?",
+          language: "java",
+          code: `class Main {
+  public static void main(String[] args) {
+    int i = 0;
+    int[] a = { 0, 0, 0 };
+    a[i++] = 5;
+    a[i++] = 7;
+    System.out.print(a[0] + " " + a[1] + " " + a[2] + " " + i);
+  }
+}`,
+          steps: [
+            {
+              do: "Start table: i = 0. Array is [0, 0, 0].",
+              why: "Write i before each store. The index used is the value of i++, not the later i.",
+            },
+            {
+              do: "a[i++] = 5. Index used is 0, so a[0] = 5. Then i becomes 1. Array is [5, 0, 0].",
+              why: "i++ means use the old i as the index, then add 1.",
+            },
+            {
+              do: "a[i++] = 7. Index used is 1, so a[1] = 7. Then i becomes 2. Array is [5, 7, 0].",
+              why: "Same rule on the next line. We did not skip a slot.",
+            },
+            {
+              do: "a[2] was never written, so it stays 0. Final i is 2.",
+              why: "Two stores used indexes 0 and 1. i was bumped twice.",
+            },
+            {
+              do: "print 5 7 0 2.",
+              why: "Read the table. Do not mix this with ++i, which would have started at index 1.",
+            },
+          ],
+          result: "5 7 0 2",
+        },
       ],
     },
     {
@@ -235,6 +308,87 @@ int main() {
             },
           ],
           result: "8 2",
+        },
+        {
+          title: "Java object: field write is shared, new is not",
+          prompt: "What is printed?",
+          language: "java",
+          code: `class Box { int n; }
+class Main {
+  static void bump(Box b) {
+    b.n = 9;
+    b = new Box();
+    b.n = 1;
+  }
+  public static void main(String[] args) {
+    Box x = new Box();
+    x.n = 3;
+    bump(x);
+    System.out.print(x.n);
+  }
+}`,
+          steps: [
+            {
+              do: "main: x → heap Box with n=3.",
+              why: "x holds an arrow. The number 3 lives in the Box, not in x itself.",
+            },
+            {
+              do: "bump copies the arrow. b and x point at the same Box. b.n = 9 writes that Box. n is 9.",
+              why: "A copy of a reference still points at the same object, so field writes are shared.",
+            },
+            {
+              do: "b = new Box() makes a second Box and moves only b. Then b.n = 1 writes the second Box.",
+              why: "Rebinding the parameter never moves the caller’s arrow x.",
+            },
+            {
+              do: "bump returns. x still points at the first Box, whose n is 9.",
+              why: "The 1 was written on an object nobody in main can see.",
+            },
+            {
+              do: "print 9.",
+              why: "Ask two questions: did we write a field of the shared object, or did we move the copy?",
+            },
+          ],
+          result: "9",
+        },
+        {
+          title: "C++ pointer: *p writes, p = moves the copy",
+          prompt: "What is printed?",
+          language: "cpp",
+          code: `#include <iostream>
+void f(int* p) {
+  *p = 8;
+  int y = 1;
+  p = &y;
+}
+int main() {
+  int x = 3;
+  f(&x);
+  std::cout << x;
+}`,
+          steps: [
+            {
+              do: "main: x = 3. f(&x) copies the address of x into p.",
+              why: "int* is a copied address, not an alias of the pointer variable itself.",
+            },
+            {
+              do: "*p = 8 writes through the address. x becomes 8.",
+              why: "*p means ‘the int sitting at that address’. That int is the caller’s x.",
+            },
+            {
+              do: "p = &y moves only the copy p so it points at local y. x is still 8.",
+              why: "Assigning p never changes main’s idea of ‘where x lives’.",
+            },
+            {
+              do: "y dies when f returns. Nobody needed y. x is still 8.",
+              why: "The write that mattered was *p, not the later p =.",
+            },
+            {
+              do: "print 8. To swap two caller ints you need int& or you swap *p and *q, not p and q.",
+              why: "Same Java lesson: write through the arrow, or the copy only moves.",
+            },
+          ],
+          result: "8",
         },
       ],
     },
@@ -366,6 +520,89 @@ int main() {
           ],
           result: "DfBg",
         },
+        {
+          title: "static does not override — Java",
+          prompt: "What is printed?",
+          language: "java",
+          code: `class P {
+  static String s() { return "P"; }
+  String t() { return "Pt"; }
+}
+class C extends P {
+  static String s() { return "C"; }
+  @Override String t() { return "Ct"; }
+}
+class Main {
+  public static void main(String[] args) {
+    P p = new C();
+    System.out.print(p.s() + " " + p.t());
+  }
+}`,
+          steps: [
+            {
+              do: "p’s variable type is P. The object is C.",
+              why: "Write both labels before you pick a method.",
+            },
+            {
+              do: "s() is static in both classes. p.s() is chosen from the variable type P → P.",
+              why: "static is not virtual. Java even warns that p.s() should be written P.s().",
+            },
+            {
+              do: "C.s() is hiding, not overriding. The object C is ignored for s.",
+              why: "Same name and empty parameters is still not override when the method is static.",
+            },
+            {
+              do: "t() is an instance method. C overrides t. p.t() → Ct.",
+              why: "Instance override waits for the real object.",
+            },
+            {
+              do: "print P Ct.",
+              why: "One print mixes a compile-time static with a run-time instance method.",
+            },
+          ],
+          result: "P Ct",
+        },
+        {
+          title: "private is not override — Java",
+          prompt: "What is printed?",
+          language: "java",
+          code: `class P {
+  private String h() { return "P"; }
+  String go() { return h(); }
+}
+class C extends P {
+  String h() { return "C"; }
+}
+class Main {
+  public static void main(String[] args) {
+    P p = new C();
+    System.out.print(p.go());
+  }
+}`,
+          steps: [
+            {
+              do: "p’s variable type is P. The object is C. go() is inherited from P.",
+              why: "C does not override go, so go’s body is still P’s body.",
+            },
+            {
+              do: "Inside P.go() the call is h(). P.h() is private.",
+              why: "A private method is invisible outside P, including in a child.",
+            },
+            {
+              do: "C.h() looks like an override, but it is a new method. It does not replace P.h().",
+              why: "private methods do not override. There is no virtual call here.",
+            },
+            {
+              do: "go() therefore runs P.h() → P, even though the object is C.",
+              why: "The call is wired to P at compile time.",
+            },
+            {
+              do: "print P. If h() had been public (or protected) in both classes, the print would have been C.",
+              why: "The specifier decides whether the child rewrite is a real override.",
+            },
+          ],
+          result: "P",
+        },
       ],
     },
     {
@@ -496,6 +733,81 @@ int main() {
           ],
           result: "DB",
         },
+        {
+          title: "Missing super(int) is a compile error",
+          prompt: "Does this compile?",
+          language: "java",
+          code: `class Base {
+  Base(int n) { System.out.print("B" + n); }
+}
+class Child extends Base {
+  Child() { System.out.print("C"); }
+}`,
+          steps: [
+            {
+              do: "Child() does not write this(…) or super(…). Java therefore inserts super().",
+              why: "If you write neither, the first hidden line is always super() with no arguments.",
+            },
+            {
+              do: "Base has only Base(int). There is no Base() constructor.",
+              why: "Once you write any constructor, Java stops giving you a free no-arg constructor.",
+            },
+            {
+              do: "The inserted super() has no matching constructor. javac rejects Child().",
+              why: "The parent must be built first. Java will not guess super(0) for you.",
+            },
+            {
+              do: "Fix: Child() { super(1); … } or add Base() { } in the parent.",
+              why: "Either give the parent a no-arg constructor, or call the one that exists.",
+            },
+            {
+              do: "Result is compile error. There is no runtime print of C.",
+              why: "Constructors that cannot start the parent never run.",
+            },
+          ],
+          result: "compile error",
+        },
+        {
+          title: "Java field init runs after super, before the child body",
+          prompt: "What is printed?",
+          language: "java",
+          code: `class Base {
+  Base() { System.out.print("B"); }
+}
+class Child extends Base {
+  int x = printX();
+  static int printX() { System.out.print("X"); return 1; }
+  Child() { System.out.print("C"); }
+}
+class Main {
+  public static void main(String[] args) {
+    new Child();
+  }
+}`,
+          steps: [
+            {
+              do: "new Child() starts Child(). There is no this() or super(…), so Java inserts super().",
+              why: "The parent constructor always runs before this class finishes building.",
+            },
+            {
+              do: "Base() prints B. Buffer is B.",
+              why: "Parent body is first.",
+            },
+            {
+              do: "Back in Child, instance fields are set. x = printX() prints X. Buffer is BX.",
+              why: "Field initialisers run after super returns and before the rest of the child constructor.",
+            },
+            {
+              do: "Then the Child() body prints C. Buffer is BXC.",
+              why: "Constructor body is last for this class.",
+            },
+            {
+              do: "print BXC. Remember the order: parent constructor, child fields, child body.",
+              why: "A field initialiser is not ‘before everything’. It is after the parent is built.",
+            },
+          ],
+          result: "BXC",
+        },
       ],
     },
     {
@@ -621,6 +933,92 @@ class Test {
           ],
           result: "compile error",
         },
+        {
+          title: "finally assignment does not replace a saved return",
+          prompt: "What is printed?",
+          language: "java",
+          code: `class Main {
+  static int x;
+  static int f() {
+    try {
+      return 1;
+    } finally {
+      x = 2;
+    }
+  }
+  public static void main(String[] args) {
+    System.out.print(f() + " " + x);
+  }
+}`,
+          steps: [
+            {
+              do: "try hits return 1 and saves pending result 1.",
+              why: "The method does not leave until finally finishes.",
+            },
+            {
+              do: "finally runs x = 2. Field x becomes 2. There is no return in finally.",
+              why: "An assignment is not a return. The saved 1 stays the method result.",
+            },
+            {
+              do: "f returns 1. After the call, x is 2.",
+              why: "Side effects in finally still happen. They just do not replace the saved return.",
+            },
+            {
+              do: "print 1 2.",
+              why: "Contrast with finally { return 2; }, which would have printed 2.",
+            },
+            {
+              do: "Exam trap: ‘finally always wins the return’. Only a return in finally wins.",
+              why: "Read the finally body. Assignment vs return are different.",
+            },
+          ],
+          result: "1 2",
+        },
+        {
+          title: "finally still runs when the exception is not caught here",
+          prompt: "What is printed?",
+          language: "java",
+          code: `class Main {
+  static void f() {
+    try {
+      System.out.print("T");
+      throw new RuntimeException();
+    } finally {
+      System.out.print("F");
+    }
+  }
+  public static void main(String[] args) {
+    try {
+      f();
+    } catch (RuntimeException e) {
+      System.out.print("C");
+    }
+  }
+}`,
+          steps: [
+            {
+              do: "f’s try prints T. Buffer is T. Then it throws RuntimeException.",
+              why: "There is no catch inside f. The throw is not handled here.",
+            },
+            {
+              do: "f still runs finally and prints F. Buffer is TF. Then the exception leaves f.",
+              why: "finally runs on the way out, even when the throw will keep going.",
+            },
+            {
+              do: "main’s catch matches RuntimeException and prints C. Buffer is TFC.",
+              why: "The handler lives in the caller, after f’s finally has already run.",
+            },
+            {
+              do: "Output TFC, not TC then F, and not TF with a crash and no C.",
+              why: "Order is: try of f, finally of f, then the caller’s catch.",
+            },
+            {
+              do: "If finally had thrown a new exception, that new one would have hidden the RuntimeException.",
+              why: "A throw (or return) in finally replaces the pending throw from try.",
+            },
+          ],
+          result: "TFC",
+        },
       ],
     },
     {
@@ -734,6 +1132,288 @@ class Test {
             },
           ],
           result: "false true",
+        },
+        {
+          title: "Discarded toUpperCase and replace leave s alone",
+          prompt: "What is printed?",
+          language: "java",
+          code: `class Main {
+  public static void main(String[] args) {
+    String s = "ab";
+    s.toUpperCase();
+    s.replace('a', 'x');
+    System.out.print(s);
+  }
+}`,
+          steps: [
+            {
+              do: "s points at \"ab\".",
+              why: "A String object cannot change its letters.",
+            },
+            {
+              do: "s.toUpperCase() builds \"AB\" and throws it away. s still points at \"ab\".",
+              why: "Ignoring a String method result does not write s.",
+            },
+            {
+              do: "s.replace('a', 'x') builds \"xb\" and throws it away. s is still \"ab\".",
+              why: "replace also returns a new String. The old object is untouched.",
+            },
+            {
+              do: "print ab.",
+              why: "Both calls were wasted because nobody stored the result.",
+            },
+            {
+              do: "The fix is s = s.toUpperCase() or String t = s.replace(...).",
+              why: "You must assign if you want the new letters.",
+            },
+          ],
+          result: "ab",
+        },
+        {
+          title: "Assigned + and concat: equals true, == usually false",
+          prompt: "What is printed?",
+          language: "java",
+          code: `class Main {
+  public static void main(String[] args) {
+    String s = "a";
+    s = s + "b";
+    String t = "a".concat("b");
+    System.out.print(s.equals(t) + " " + (s == t));
+  }
+}`,
+          steps: [
+            {
+              do: "s starts as the literal \"a\". Then s = s + \"b\" builds a new \"ab\" at run time and points s at it.",
+              why: "s is not final, so + is not folded into the interned literal \"ab\".",
+            },
+            {
+              do: "t = \"a\".concat(\"b\") also builds a new \"ab\" object.",
+              why: "concat always returns a new String when the argument is not empty.",
+            },
+            {
+              do: "s.equals(t) compares letters a,b → true.",
+              why: "equals is content. Both objects hold a then b.",
+            },
+            {
+              do: "s == t compares arrows. Two new objects → false.",
+              why: "== on String is identity, not letters.",
+            },
+            {
+              do: "print true false.",
+              why: "Assigned concat worked. Identity still failed. Use equals in exam answers about content.",
+            },
+          ],
+          result: "true false",
+        },
+      ],
+    },
+    {
+      heading: "Recursion vs a loop (factorial / fib trace)",
+      body: "A recursive method solves a smaller copy of the same problem, then comes back. Every call needs a base case that returns without calling itself. Trace factorial by writing a stack of frames: fact(4) waits for fact(3), which waits for fact(2), until fact(1) returns 1.\n\nA loop keeps one frame and updates a box. fact(4) in a loop is f=1; multiply by 2, 3, 4. Same answer, no stack of waiting calls.\n\nFibonacci is the usual trap. fib(n) = fib(n-1)+fib(n-2) recomputes the same smaller n many times. A loop (or a memo table) computes each n once. Missing the base case in recursion grows the stack until the program dies. A loop with a bad test can run forever, but it does not grow a call stack.",
+      howTo: [
+        "Find the base case. If n is already small, write the return value and stop.",
+        "For recursion, draw one stack frame per call. Write what that frame is waiting for.",
+        "Walk back out: each frame uses the value that returned from below.",
+        "For a loop, keep one row: the running answer and the loop index. Update the row each trip.",
+        "If the same n is asked twice (fib), count the extra calls. A loop would do that n once.",
+      ],
+      bullets: [
+        "Base case first. No base case → stack overflow, not a number.",
+        "factorial(n) = n * factorial(n-1). A loop multiplies 1..n in one frame.",
+        "Naive fib is correct but slow: the same fib(k) is drawn many times in the tree.",
+        "A loop of n steps is enough for fib if you keep the last two numbers.",
+      ],
+      examples: [
+        {
+          title: "Recursive factorial — stack of waiting multiplies",
+          prompt: "What does fact(4) return? Show the stack.",
+          language: "java",
+          code: `class Main {
+  static int fact(int n) {
+    if (n <= 1) return 1;
+    return n * fact(n - 1);
+  }
+  public static void main(String[] args) {
+    System.out.print(fact(4));
+  }
+}`,
+          steps: [
+            {
+              do: "fact(4): n is 4, not ≤ 1, so it must compute 4 * fact(3). Frame 4 waits.",
+              why: "The multiply cannot finish until the smaller call returns.",
+            },
+            {
+              do: "fact(3) waits for 3 * fact(2). fact(2) waits for 2 * fact(1). Stack is 4, 3, 2, 1.",
+              why: "Each call is a new frame with its own n. Draw them as a pile.",
+            },
+            {
+              do: "fact(1): n ≤ 1, return 1. This is the base case. No further call.",
+              why: "The pile stops growing only when a frame returns a number with no recursive call.",
+            },
+            {
+              do: "Walk back: fact(2) = 2*1 = 2. fact(3) = 3*2 = 6. fact(4) = 4*6 = 24.",
+              why: "Each waiting multiply uses the value that returned from below.",
+            },
+            {
+              do: "print 24. Peak stack was four frames (4 down to 1).",
+              why: "The extra cost of recursion here is the pile of frames, not a wrong answer.",
+            },
+          ],
+          result: "24",
+        },
+        {
+          title: "Loop factorial — one frame, same 24",
+          prompt: "What is printed? How many frames?",
+          language: "java",
+          code: `class Main {
+  static int fact(int n) {
+    int f = 1;
+    for (int i = 2; i <= n; i++) f = f * i;
+    return f;
+  }
+  public static void main(String[] args) {
+    System.out.print(fact(4));
+  }
+}`,
+          steps: [
+            {
+              do: "One call fact(4). Table: f=1, i will run 2, 3, 4.",
+              why: "A loop reuses the same method frame. There is no fact(3) call.",
+            },
+            {
+              do: "i=2: f = 1*2 = 2. i=3: f = 2*3 = 6. i=4: f = 6*4 = 24. Then i=5 fails i<=4.",
+              why: "Each trip multiplies the next integer into the running box f.",
+            },
+            {
+              do: "return 24. print 24.",
+              why: "Same answer as the recursive trace. The homework is the table, not a stack.",
+            },
+            {
+              do: "Peak extra stack is one frame. Recursion needed four frames for n=4.",
+              why: "That is the exam contrast: same product, different memory shape.",
+            },
+            {
+              do: "fact(1) or fact(0): the loop body never runs, f stays 1. That matches 0! = 1 and 1! = 1.",
+              why: "The loop’s ‘base’ is the starting f=1, not a recursive return.",
+            },
+          ],
+          result: "24",
+        },
+        {
+          title: "Recursive fib(5) — the tree repeats work",
+          prompt: "What does fib(5) return, and why is it slower than a loop?",
+          language: "java",
+          code: `class Main {
+  static int fib(int n) {
+    if (n <= 1) return n;
+    return fib(n - 1) + fib(n - 2);
+  }
+  public static void main(String[] args) {
+    System.out.print(fib(5));
+  }
+}`,
+          steps: [
+            {
+              do: "Base: fib(0)=0, fib(1)=1. fib(5) = fib(4)+fib(3).",
+              why: "Write the two children before you expand them.",
+            },
+            {
+              do: "fib(4)=fib(3)+fib(2). Now fib(3) appears under fib(5) and again under fib(4).",
+              why: "The naive tree does not remember answers. The same n is asked more than once.",
+            },
+            {
+              do: "Expand until bases: fib(2)=fib(1)+fib(0)=1+0=1. fib(3)=2, fib(4)=3, fib(5)=5.",
+              why: "The values are the usual 0,1,1,2,3,5. The tree is still correct.",
+            },
+            {
+              do: "Count calls: fib(5) does two calls, fib(4) two more, and fib(3) is fully drawn twice. Many frames for a tiny n.",
+              why: "Time grows like the Fibonacci numbers themselves, not like n.",
+            },
+            {
+              do: "print 5. The exam point is not the 5. It is that fib(3) was paid for twice.",
+              why: "A loop (next example) pays for each k once.",
+            },
+          ],
+          result: "5  (fib(3) is computed more than once in the tree)",
+        },
+        {
+          title: "Loop fib — keep the last two numbers",
+          prompt: "What is printed for n = 5?",
+          language: "java",
+          code: `class Main {
+  static int fib(int n) {
+    if (n <= 1) return n;
+    int a = 0, b = 1;
+    for (int i = 2; i <= n; i++) {
+      int c = a + b;
+      a = b;
+      b = c;
+    }
+    return b;
+  }
+  public static void main(String[] args) {
+    System.out.print(fib(5));
+  }
+}`,
+          steps: [
+            {
+              do: "n=5, not a base. Start a=0 (fib 0), b=1 (fib 1). One frame only.",
+              why: "We store the last two answers instead of calling fib again.",
+            },
+            {
+              do: "i=2: c=0+1=1, then a=1, b=1. Table is fib2=1.",
+              why: "c is the next Fibonacci number. Then slide the window forward.",
+            },
+            {
+              do: "i=3: c=1+1=2 → a=1, b=2. i=4: c=1+2=3 → a=2, b=3. i=5: c=2+3=5 → a=3, b=5.",
+              why: "Five is reached in three more multiplies-worth of additions: n−1 steps after the bases.",
+            },
+            {
+              do: "return b which is 5. print 5.",
+              why: "Same answer as recursive fib(5), but each i was done once.",
+            },
+            {
+              do: "This loop is the usual exam ‘better fib’. Recursion with a memo table is also linear; bare recursion is not.",
+              why: "The bug in naive fib is repeated work, not a wrong formula.",
+            },
+          ],
+          result: "5",
+        },
+        {
+          title: "Missing base case blows the stack; a bad loop runs forever",
+          prompt: "What happens? (two snippets)",
+          language: "java",
+          code: `static int badFact(int n) {
+  return n * badFact(n - 1); // no if
+}
+static int badLoop(int n) {
+  int f = 1, i = 2;
+  while (i <= n) f = f * i; // forgot i++
+  return f;
+}`,
+          steps: [
+            {
+              do: "badFact(4) calls badFact(3), then 2, 1, 0, −1, … There is no if that returns a number.",
+              why: "Without a base case the pile of frames never stops growing.",
+            },
+            {
+              do: "The JVM throws StackOverflowError. You never get a product.",
+              why: "Each call uses stack space. The machine runs out.",
+            },
+            {
+              do: "badLoop(4): i stays 2 forever, so i <= n stays true. f is multiplied by 2 again and again.",
+              why: "A forgotten i++ is an infinite loop in one frame. The stack does not grow.",
+            },
+            {
+              do: "The program hangs (or wraps the int) but it is not StackOverflowError.",
+              why: "Same missing ‘stop’, different memory. Recursion needs a base return; a loop needs the index to move.",
+            },
+            {
+              do: "Exam pick: missing base case → stack overflow. Missing i++ → infinite loop.",
+              why: "Name the failure from the shape: pile of calls vs one spinning frame.",
+            },
+          ],
+          result: "badFact → StackOverflowError. badLoop → infinite loop (no growing stack).",
         },
       ],
     },

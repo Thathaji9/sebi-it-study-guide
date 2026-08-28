@@ -88,6 +88,68 @@ export const notesDatabase: TopicNote = {
           result:
             "Three tables. ACK’s primary key is (circ_id, firm_id). That row holds ack_date.",
         },
+        {
+          title: "One PAN, one investor (1:1)",
+          prompt:
+            "Each investor has exactly one PAN. Each PAN belongs to exactly one investor. pan_issue_date is a fact about the card. How many tables, and where does pan_issue_date live?",
+          code: "INVESTOR(inv_id, name, pan_no NOT NULL UNIQUE)\nPAN_CARD(pan_no, pan_issue_date)",
+          language: "sql",
+          steps: [
+            {
+              do: "Say the shape: one investor ↔ one PAN, both sides total (exactly one).",
+              why: "1:1 is “pair of lockers that always match”, not “maybe later”.",
+            },
+            {
+              do: "You may keep two tables and put pan_no as a UNIQUE NOT NULL foreign key on INVESTOR.",
+              why: "A 1:1 foreign key can sit on either side. UNIQUE stops two investors sharing a PAN.",
+            },
+            {
+              do: "Put pan_issue_date on PAN_CARD (or on INVESTOR if you merge). It is not a key.",
+              why: "Issue date describes the card, the way a print date describes a pass, not the person.",
+            },
+            {
+              do: "Merging into one table INVESTOR(inv_id, name, pan_no UNIQUE, pan_issue_date) is also legal for total 1:1.",
+              why: "When both sides must exist, two boxes can become one row. Optional 1:1 should stay two tables so a missing PAN is a NULL, not a missing person.",
+            },
+            {
+              do: "Do not make a third link table. That is the M:N picture.",
+              why: "A sign-up sheet is for many-to-many. Here each person has one card.",
+            },
+          ],
+          result:
+            "Two tables (or one merged table). pan_issue_date lives with the card. pan_no is UNIQUE NOT NULL on the investor side.",
+        },
+        {
+          title: "Nominee is weak under a holder",
+          prompt:
+            "HOLDER has pan. A nominee has only a local name (nom_name) and share_pct. Two holders may both name “Ria”. What is NOMINEE’s primary key?",
+          code: "HOLDER(pan, holder_name)\nNOMINEE(pan, nom_name, share_pct)",
+          language: "sql",
+          steps: [
+            {
+              do: "Mark HOLDER as strong: pan already names the person.",
+              why: "A strong entity is a student with a roll number.",
+            },
+            {
+              do: "Mark NOMINEE as weak. nom_name is unique only inside one holder.",
+              why: "Two families can both have a child named Ria. The local name is a partial key.",
+            },
+            {
+              do: "Copy the owner key pan into NOMINEE. Full key = (pan, nom_name).",
+              why: "A weak child’s ID is “parent’s ID + the small local name”, like “School A / Locker 12”.",
+            },
+            {
+              do: "share_pct stays off the key — it is a number on that nominee line.",
+              why: "Percents can repeat. They do not pick out a row.",
+            },
+            {
+              do: "Draw a double box for NOMINEE and an identifying link to HOLDER.",
+              why: "The exam picture of a weak entity is a double rectangle plus a double diamond.",
+            },
+          ],
+          result:
+            "NOMINEE primary key is (pan, nom_name). share_pct is a non-key number. Two holders may both have a nominee Ria.",
+        },
       ],
     },
     {
@@ -170,6 +232,66 @@ export const notesDatabase: TopicNote = {
           result:
             "member_id never NULL. sebi_reg may be NULL in SQL. UNIQUE + NULL is not a candidate key.",
         },
+        {
+          title: "Two-column candidate, count superkeys",
+          prompt:
+            "LOT(wh_id, lot_no, grade, kg) with only wh_id lot_no → grade kg. How many superkeys? List them and the candidate key.",
+          steps: [
+            {
+              do: "Close {wh_id, lot_no}: you get grade and kg — the whole heading. So that pair is a candidate key.",
+              why: "Warehouse plus lot number already names the sack. Drop either piece and two sacks can clash.",
+            },
+            {
+              do: "grade or kg alone is not a key. Two lots can share a grade or a weight.",
+              why: "Measured columns are almost never IDs.",
+            },
+            {
+              do: "n = 4 columns, k = 2 in the candidate, so 2^{n−k} = 2^2 = 4 superkeys.",
+              why: "A superkey is “the candidate plus any spare bag of leftover columns”.",
+            },
+            {
+              do: "List them: {wh_id, lot_no}, {wh_id, lot_no, grade}, {wh_id, lot_no, kg}, and all four columns.",
+              why: "Every superkey still contains the candidate. There is no extra candidate here.",
+            },
+            {
+              do: "Do not count {wh_id, grade} — that set does not determine lot_no.",
+              why: "One warehouse can have two lots of the same grade. Superkey means unique row, not “looks important”.",
+            },
+          ],
+          result:
+            "Four superkeys, all containing {wh_id, lot_no}. The only candidate key is {wh_id, lot_no}.",
+        },
+        {
+          title: "Optional foreign key may be NULL",
+          prompt:
+            "DEAL(deal_id PRIMARY KEY, desk_id REFERENCES desk(desk_id), notes). Some deals have no desk yet. May desk_id be NULL? May deal_id? What if desk_id = 'ZZ' and DESK has no ZZ?",
+          code: "CREATE TABLE deal (\n  deal_id CHAR(10) PRIMARY KEY,\n  desk_id CHAR(6) REFERENCES desk(desk_id),\n  notes VARCHAR(80)\n);",
+          language: "sql",
+          steps: [
+            {
+              do: "deal_id cannot be NULL — entity integrity for the primary key.",
+              why: "A blank roll number cannot pick out a deal.",
+            },
+            {
+              do: "desk_id may be NULL because the foreign key is optional (no NOT NULL).",
+              why: "A foreign key that is empty means “no parent yet”, like a form with the class box left blank.",
+            },
+            {
+              do: "If desk_id is 'ZZ' and DESK has no such row, the INSERT fails — referential integrity.",
+              why: "A non-empty foreign key must match a live parent. NULL is the only escape.",
+            },
+            {
+              do: "Two deals may both have desk_id NULL. That does not break the foreign key.",
+              why: "NULL is “unknown parent”, not “the same parent twice”.",
+            },
+            {
+              do: "PRIMARY KEY is UNIQUE + NOT NULL. A plain REFERENCES is not a candidate key of DEAL.",
+              why: "Many deals can share one desk. The copy of someone else’s key is not your roll number.",
+            },
+          ],
+          result:
+            "deal_id never NULL. desk_id may be NULL. A non-NULL desk_id must exist in DESK. ZZ with no parent is rejected.",
+        },
       ],
     },
     {
@@ -251,6 +373,63 @@ export const notesDatabase: TopicNote = {
           result:
             "Not 2NF. Partial FDs isin → isin_name and order_id → trader. qty may stay with the full key.",
         },
+        {
+          title: "Close W+ when a gate still needs Y",
+          prompt:
+            "F = {W → X, XY → Z, Z → Y, V → W}. Compute W+, WX+, and VY+.",
+          steps: [
+            {
+              do: "Start W+ = {W}. Fire W → X. Stop at {W, X}. XY → Z never fires because Y is missing.",
+              why: "You only add a right-hand side when you already hold the whole left-hand side. One letter short and the gate stays shut.",
+            },
+            {
+              do: "WX+ starts {W, X}. Same story: still no Y, still no Z. WX+ = {W, X}.",
+              why: "Adding a letter you already determine does not unlock a new FD. You needed Y, not a second copy of X.",
+            },
+            {
+              do: "VY+ starts {V, Y}. Fire V → W, then W → X. Now you hold X and Y, so XY → Z fires, then Z → Y (already have Y).",
+              why: "Y was the missing key for the XY gate. Once it is on the table, Z walks in.",
+            },
+            {
+              do: "VY+ = {V, W, X, Y, Z} — the whole set of letters.",
+              why: "A closure is a flood-fill. Write every letter you can reach, then stop.",
+            },
+            {
+              do: "So W alone is not a key of a table with attributes VWXYZ. VY is a key (it closes everything).",
+              why: "Exam: a candidate key is a set whose closure is the whole heading.",
+            },
+          ],
+          result: "W+ = WX. WX+ = WX. VY+ = VWXYZ. W never unlocks Z because Y is missing.",
+        },
+        {
+          title: "Scheme name hangs off part of the key",
+          prompt:
+            "SIP(pan, scheme_id, scheme_name, sip_amt) with pan scheme_id → sip_amt and scheme_id → scheme_name. Test 2NF.",
+          steps: [
+            {
+              do: "Close (pan, scheme_id): whole table. Neither piece alone is a key. Candidate key = {pan, scheme_id}.",
+              why: "You need “which person” and “which scheme” to name one SIP line.",
+            },
+            {
+              do: "scheme_id → scheme_name is an extra that follows only a piece of the key.",
+              why: "The scheme’s nickname belongs on a scheme card, not copied onto every SIP. That is a partial dependency.",
+            },
+            {
+              do: "sip_amt follows the full key, so it may stay.",
+              why: "The amount is a fact about the pair, like “this person, this scheme, this rupee figure”.",
+            },
+            {
+              do: "Split: SCHEME(scheme_id, scheme_name) and SIP(pan, scheme_id, sip_amt).",
+              why: "2NF puts “facts about a part of the key” in their own table.",
+            },
+            {
+              do: "After the split, each table has a key → rest shape, so 2NF holds.",
+              why: "Fixing the partial FD is the whole 2NF repair.",
+            },
+          ],
+          result:
+            "Not 2NF. Partial FD scheme_id → scheme_name. sip_amt stays with the full key (pan, scheme_id).",
+        },
       ],
     },
     {
@@ -329,6 +508,63 @@ export const notesDatabase: TopicNote = {
           ],
           result:
             "TRADE is in BCNF. Only candidate key {trade_id}; every real FD has that superkey on the left.",
+        },
+        {
+          title: "City hangs off warehouse (transitive extra)",
+          prompt:
+            "BIN(bin_id, warehouse, city) with bin_id → warehouse city and warehouse → city. Highest normal form?",
+          steps: [
+            {
+              do: "bin_id+ is the whole table. Only candidate key is {bin_id}. Non-primes: warehouse, city.",
+              why: "One bin number already names the row, like one locker ID.",
+            },
+            {
+              do: "Singleton key ⇒ 2NF holds. There is no composite key to hang a partial extra on.",
+              why: "2NF only complains about pieces of a multi-column key.",
+            },
+            {
+              do: "warehouse → city: warehouse is not a superkey, city is not prime. 3NF fails.",
+              why: "city follows warehouse, and warehouse follows bin_id — a transitive extra. That is a 3NF issue.",
+            },
+            {
+              do: "BCNF also fails (same FD, left is not a superkey). Highest form is 2NF.",
+              why: "Walk 1NF → 2NF → 3NF → BCNF and stop at the first fail if they ask “highest”.",
+            },
+            {
+              do: "Split: WH(warehouse, city) and BIN(bin_id, warehouse).",
+              why: "Put the city with the warehouse card. The bin only stores which warehouse it sits in.",
+            },
+          ],
+          result: "CK = {bin_id}. Highest form is 2NF (warehouse → city breaks 3NF and BCNF).",
+        },
+        {
+          title: "Lossless BCNF split of a zip rule",
+          prompt:
+            "POST(street, city, zip) with street city → zip and zip → city. Write a lossless BCNF decomposition.",
+          steps: [
+            {
+              do: "Close (street, city) and (street, zip): both give the whole table. Keys: those two pairs. Every column is prime.",
+              why: "Overlapping keys, like the officer/window/shift picture, but with postal columns.",
+            },
+            {
+              do: "zip → city: left is not a superkey, but city is prime, so 3NF allows it. BCNF forbids it.",
+              why: "BCNF has no “right-hand side is prime” escape hatch.",
+            },
+            {
+              do: "Split on the bad FD: R1(zip, city) and R2(street, zip).",
+              why: "The repair is “XY in one table, rest plus X in the other” for a violating X → Y.",
+            },
+            {
+              do: "R1 has key {zip} (zip → city). R2 has key {street, zip}. Both sides are BCNF.",
+              why: "Each leftover FD has a superkey on the left inside its own table.",
+            },
+            {
+              do: "The join of R1 and R2 on zip is lossless and recovers POST.",
+              why: "X (zip) is a key of one piece, so the chase/join does not invent extra rows.",
+            },
+          ],
+          result:
+            "R1(zip, city) and R2(street, zip). Original was 3NF not BCNF; the split is BCNF and lossless.",
         },
       ],
     },
@@ -409,6 +645,64 @@ export const notesDatabase: TopicNote = {
           ],
           result: "TRADE ÷ WATCH = {M1, M3}. M2 is out for missing INEB.",
         },
+        {
+          title: "Filter HOLDER first, then join",
+          prompt:
+            "HOLD(pan, isin, qty), HOLDER(pan, city). “ISINs held by Pune pans, each ISIN once.” Write algebra two ways.",
+          steps: [
+            {
+              do: "City is not in HOLD, so you must join HOLD with HOLDER on pan, keep city = Pune, then π_isin.",
+              why: "You cannot filter a column that is not on the table — like asking a holdings sheet for “home city” without the holder card.",
+            },
+            {
+              do: "Cheaper tree: π_isin(HOLD ⋈ σ_{city='Pune'}(HOLDER)).",
+              why: "Filter the small HOLDER table first. Same answer, fewer join rows.",
+            },
+            {
+              do: "Worse tree: σ_{city='Pune'}(HOLD ⋈ HOLDER) then π_isin — same result, more work.",
+              why: "Pushing σ down onto the table that holds the column is the exam rewrite.",
+            },
+            {
+              do: "π drops duplicate ISINs, so two Pune pans holding INEZ still print INEZ once.",
+              why: "Exam algebra is set-based unless they say bag/multiset.",
+            },
+            {
+              do: "Do not write σ_{city='Pune'}(HOLD). That column does not exist there.",
+              why: "A select that names a missing attribute is illegal, not “empty”.",
+            },
+          ],
+          result:
+            "π_isin(HOLD ⋈ σ_{city='Pune'}(HOLDER)). You cannot σ on city inside HOLD alone.",
+        },
+        {
+          title: "Unsafe calculus “not in HOLD”",
+          prompt:
+            "HOLD(pan, isin). Why is { t | ¬(t ∈ HOLD) } unsafe? Write a safe “pans in HOLDER that hold nothing”.",
+          steps: [
+            {
+              do: "The wish list { t | t is not a HOLD row } would include every made-up tuple in the universe — infinite junk names.",
+              why: "Safe calculus answers must be built from values already in the database, not from an infinite sea.",
+            },
+            {
+              do: "That query is the classic unsafe example. The exam stem often shows exactly ¬(t ∈ r).",
+              why: "Memorise the shape: “everything not in r” with no universe table.",
+            },
+            {
+              do: "Safe version needs a universe: pans that exist in HOLDER. Algebra: π_pan(HOLDER) − π_pan(HOLD).",
+              why: "Minus is “in the first list but not the second”, and both lists are finite projections.",
+            },
+            {
+              do: "Calculus spelling: { h.pan | h ∈ HOLDER ∧ ¬∃x (x ∈ HOLD ∧ x.pan = h.pan) }.",
+              why: "The outer tuple is pinned to HOLDER, so the answer cannot wander off into fake pans.",
+            },
+            {
+              do: "Do not skip the universe and just write { t.pan | ¬∃x (x ∈ HOLD ∧ x.pan = t.pan) } — t is still free to be anything.",
+              why: "A free tuple with only a negative test is the same unsafety in disguise.",
+            },
+          ],
+          result:
+            "{ t | ¬(t ∈ HOLD) } is unsafe. Safe: π_pan(HOLDER) − π_pan(HOLD), with HOLDER as the universe.",
+        },
       ],
     },
     {
@@ -487,6 +781,63 @@ export const notesDatabase: TopicNote = {
           ],
           result:
             "Non-root internal: minimum 1 key (2 children). Leaf with max 3 keys: minimum 2 keys.",
+        },
+        {
+          title: "8000 fills, 40 per block",
+          prompt:
+            "8000 sorted fills, 40 records per data block so 200 data blocks, unique fill_id. Index packs 80 entries per index block. Dense vs sparse: how many entries and index blocks (one level)?",
+          steps: [
+            {
+              do: "Dense: one index line per fill → 8000 entries. ceil(8000/80) = 100 index blocks.",
+              why: "Dense is a contents line for every record, even when the key is unique.",
+            },
+            {
+              do: "Sparse: one line per data block → 200 entries. ceil(200/80) = 3 index blocks.",
+              why: "Sparse only stores “first key of this page”, like a thumb index.",
+            },
+            {
+              do: "Uniqueness does not shrink the dense count from 8000 to 200.",
+              why: "Dense is per record, not per distinct key. Sparse is per block, not per key either.",
+            },
+            {
+              do: "The data file must already be sorted for the sparse count to be legal.",
+              why: "Sparse search assumes each block owns a clean key range.",
+            },
+            {
+              do: "If they add a second index level, you would pack those 100 (or 3) blocks again — that is a different question.",
+              why: "This stem asked one level. Do not invent a root unless they say so.",
+            },
+          ],
+          result: "Dense 8000 entries (100 blocks). Sparse 200 entries (3 blocks).",
+        },
+        {
+          title: "Hash cannot walk 7200 to 7299",
+          prompt:
+            "You need every allot_id from 7200 to 7299. The file is hashed on allot_id. Why is a B+ leaf chain better than the hash buckets?",
+          steps: [
+            {
+              do: "Hash sends each key to a bucket with a mix function. Neighbours 7200 and 7201 usually land in different buckets.",
+              why: "A hash is a locker number, not a sorted shelf. “From 7200 to 7299” is a range, not one equality.",
+            },
+            {
+              do: "To answer the range you would scan every bucket (or 100 separate point lookups). That is a full file read in disguise.",
+              why: "Hash is great for “exactly this key”, bad for “keys from A to B”.",
+            },
+            {
+              do: "A B+ tree stores the real ids in order on linked leaves. Find 7200, then walk the leaf chain until 7299.",
+              why: "The dictionary picture: words at the back, in order, with arrows to the next page.",
+            },
+            {
+              do: "Internal B+ nodes are only guide words. Data pointers live at the leaves.",
+              why: "That is why the range walk does not bounce around the middle pages.",
+            },
+            {
+              do: "Pick hash for “allot_id = 7241”. Pick B+ for “7200 ≤ allot_id ≤ 7299”.",
+              why: "Match the operator: equality → hash; range → B+ leaf chain.",
+            },
+          ],
+          result:
+            "Hash scatters neighbours. B+ finds 7200 then walks linked leaves to 7299. Hash for equality; B+ for ranges.",
         },
       ],
     },
@@ -567,6 +918,64 @@ export const notesDatabase: TopicNote = {
           result:
             "Lost update: 7 instead of 12. Strict 2PL would serialise the writes. Prefer qty = qty + :delta.",
         },
+        {
+          title: "Same cash row, two committed values",
+          prompt:
+            "cash starts 250. T1 reads 250. T2 writes 180 and commits. T1 reads cash again and sees 180. Name the bug and the weakest ANSI level that forbids it.",
+          steps: [
+            {
+              do: "T1 saw two committed values on the same row. Call it a non-repeatable read.",
+              why: "Same locker, two different finished numbers. T2 did commit 180, so the ink was real.",
+            },
+            {
+              do: "Not a dirty read — T2 had committed before the second read.",
+              why: "Dirty means you copied a draft that was later torn up.",
+            },
+            {
+              do: "Not a phantom — no new row appeared in a count. Not a lost update — T1 did not write.",
+              why: "Match the definition, not the vibes.",
+            },
+            {
+              do: "READ COMMITTED still allows this (each read sees the latest commit). Weakest fix: REPEATABLE READ.",
+              why: "That level keeps the first snapshot of the row. SERIALIZABLE also works, but the exam asks for the weakest.",
+            },
+            {
+              do: "A second COUNT of “cash rows where cash > 200” that grows because a new row was inserted would be a phantom instead.",
+              why: "Same-row two values ≠ extra row in a filter.",
+            },
+          ],
+          result:
+            "Non-repeatable read. Weakest ANSI level that forbids it: REPEATABLE READ.",
+        },
+        {
+          title: "Power cut after COMMIT (durability)",
+          prompt:
+            "T1 UPDATE qty = 70, then COMMIT. The plug is pulled before the dirty buffer is flushed to the data file. The redo log has the change. What is qty after recovery, and which ACID letter is that?",
+          steps: [
+            {
+              do: "COMMIT succeeded, so the transaction is done. Recovery must restore qty = 70.",
+              why: "Durability: after commit, a power cut must not eat the write.",
+            },
+            {
+              do: "Redo the logged change onto the data file. That is the redo log’s job.",
+              why: "The log is the durable notebook. The buffer was only a whiteboard.",
+            },
+            {
+              do: "This is not atomicity. Atomicity would UNDO T1 if it had aborted or never committed.",
+              why: "Undo is “all or nothing for an unfinished unit”. Redo is “keep the stamp of commit”. Do not swap the letters.",
+            },
+            {
+              do: "If T1 had written 70 but not yet committed, recovery would undo back to the old qty.",
+              why: "Uncommitted ink is a draft. Atomicity rubs it out.",
+            },
+            {
+              do: "Isolation and consistency are about other people and rules, not about the crash after commit.",
+              why: "Name D for this stem. The crash-after-commit picture is the durability poster.",
+            },
+          ],
+          result:
+            "qty is 70 after redo. Durability (D). Atomicity would undo only if T1 had not committed.",
+        },
       ],
     },
     {
@@ -644,6 +1053,62 @@ export const notesDatabase: TopicNote = {
           ],
           result:
             "T2 fails validation (overlap on M1) and aborts. T1’s 12 stands.",
+        },
+        {
+          title: "A chain, not a cycle, is CSR",
+          prompt: "S: r1(X); w1(X); r2(X); w2(X); c1; c2. CSR or not? Equivalent serial order?",
+          steps: [
+            {
+              do: "Conflicts on X: r1 with w2, w1 with r2, w1 with w2. In each pair T1 happens first, so arrows T1 → T2.",
+              why: "Read-write and write-write on the same cell count. Same-transaction pairs (r1 with w1) do not.",
+            },
+            {
+              do: "No arrow T2 → T1. The graph is a chain, not a cycle.",
+              why: "A cycle would mean “T1 before T2 and T2 before T1”. Here every conflict agrees: T1 first.",
+            },
+            {
+              do: "S is conflict serialisable. Equivalent serial order is T1 then T2.",
+              why: "Any topological order of an acyclic conflict graph is an equivalent one-at-a-time story.",
+            },
+            {
+              do: "Commits at the end do not add conflict arrows.",
+              why: "CSR is about the order of reads and writes, not about who said “done” last.",
+            },
+            {
+              do: "If you swapped in an extra w2(X) before w1(X), you would grow a back-edge and lose CSR.",
+              why: "One reversed write-write is enough to make a two-cycle.",
+            },
+          ],
+          result: "Acyclic: only T1 → T2. S is CSR. Equivalent serial order T1 then T2.",
+        },
+        {
+          title: "Grow, write, commit, then unlock",
+          prompt:
+            "T1: lock-X(P); lock-X(Q); w(P); w(Q); commit; unlock(P); unlock(Q). Is this 2PL? Strict 2PL? Does it guarantee CSR?",
+          steps: [
+            {
+              do: "All locks come first; all unlocks come after the last lock. That is two-phase.",
+              why: "2PL is “put every padlock on, then (later) take them off”. No lock after the first unlock.",
+            },
+            {
+              do: "Write-locks stay until commit, then drop. That is strict 2PL.",
+              why: "Strict means nobody can copy P or Q until T1 has stamped commit, so there is no cascade abort on those writes.",
+            },
+            {
+              do: "2PL ⇒ conflict serialisable, so this schedule’s conflict graph cannot cycle if every transaction follows 2PL.",
+              why: "The exam slogan is “2PL ⇒ CSR”. Strict is extra (no cascade), not extra serialisability.",
+            },
+            {
+              do: "If T1 unlocked P before commit (but after both locks), it would still be 2PL, but not strict.",
+              why: "That early unlock is the dirty-read window for T2.",
+            },
+            {
+              do: "If T1 unlocked P and then locked Q, it would not be 2PL at all.",
+              why: "A lock after an unlock is a second growing phase — the classic fail.",
+            },
+          ],
+          result:
+            "This is strict 2PL (hence 2PL, hence CSR). Unlocks wait until after commit.",
         },
       ],
     },

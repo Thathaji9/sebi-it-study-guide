@@ -112,6 +112,83 @@ int main() {
           ],
           result: "EB EBI BI X",
         },
+        {
+          title: "Java substring throws on a wild end; Python would clip",
+          prompt: "What is the result?",
+          language: "java",
+          code: `class Main {
+  public static void main(String[] args) {
+    String s = "SEBI";
+    try {
+      System.out.print(s.substring(1, 9));
+    } catch (StringIndexOutOfBoundsException e) {
+      System.out.print("X");
+    }
+    try {
+      System.out.print(s.substring(3, 1));
+    } catch (StringIndexOutOfBoundsException e) {
+      System.out.print("Y");
+    }
+  }
+}`,
+          steps: [
+            {
+              do: "s = SEBI, length 4. substring(1, 9): end 9 is past length.",
+              why: "Java requires 0 ≤ start ≤ end ≤ length.",
+            },
+            {
+              do: "Java throws StringIndexOutOfBoundsException. First catch prints X.",
+              why: "Wild substring bounds are errors, not clipped letters.",
+            },
+            {
+              do: "substring(3, 1): start 3 > end 1. That also throws. Second catch prints Y.",
+              why: "Java does not swap the two indexes. i > j is illegal.",
+            },
+            {
+              do: "Python s[1:9] would have clipped to BI. Python s[3:1] would have been empty.",
+              why: "Same fences, kinder language. Do not mix the two on the exam.",
+            },
+            {
+              do: "print XY. There is no EBI and no empty string in this Java run.",
+              why: "If the question is Java, pick the exception, not the Python clip.",
+            },
+          ],
+          result: "XY",
+        },
+        {
+          title: "Translate Java substring(i, j) into C++ substr",
+          prompt: "On \"SEBI\", Java substring(1, 3) is \"EB\". What C++ call matches it? What does C++ substr(1, 3) give?",
+          language: "cpp",
+          code: `#include <iostream>
+#include <string>
+int main() {
+  std::string s = "SEBI";
+  std::cout << s.substr(1, 3 - 1) << " " << s.substr(1, 3);
+}`,
+          steps: [
+            {
+              do: "Java/Python second number is an exclusive index. Length of the piece is j − i.",
+              why: "substring(1, 3) takes 3−1 = 2 letters, so EB.",
+            },
+            {
+              do: "C++ second number is a count. Matching call is substr(1, 2), which is substr(1, 3-1).",
+              why: "Translate: C++ count = Java end − Java start.",
+            },
+            {
+              do: "s.substr(1, 3) takes three letters from E → EBI. That is Java substring(1, 4), not (1, 3).",
+              why: "Copying the two numbers across languages is the trap.",
+            },
+            {
+              do: "print EB EBI.",
+              why: "First call is the translation. Second call is the wrong copy-paste.",
+            },
+            {
+              do: "Exam recipe: Java/Python [i, j) ↔ C++ substr(i, j−i).",
+              why: "Write the formula once, then fill the numbers.",
+            },
+          ],
+          result: "EB EBI",
+        },
       ],
     },
     {
@@ -171,6 +248,77 @@ System.out.print(s.charAt(s.length() - 1));`,
             { do: "print M.", why: "The last-letter recipe is always charAt(length - 1)." },
           ],
           result: "M",
+        },
+        {
+          title: "Empty string: length 0, no valid index",
+          prompt: "s = \"\". What is s.length()? What happens for charAt(0)?",
+          language: "java",
+          code: `String s = "";
+System.out.print(s.length());
+// s.charAt(0)  → StringIndexOutOfBoundsException
+// s.substring(0, 0) is ""  (legal)`,
+          steps: [
+            {
+              do: "Count letters: there are none. length is 0.",
+              why: "Length is a count of boxes. Zero boxes is a legal string.",
+            },
+            {
+              do: "Last index would be length − 1 = −1. There is no letter there.",
+              why: "The last-index formula assumes n ≥ 1.",
+            },
+            {
+              do: "charAt(0) asks for a box that does not exist → throws.",
+              why: "Index 0 is only valid when length is at least 1.",
+            },
+            {
+              do: "substring(0, 0) is the empty string, and that is legal.",
+              why: "Equal start and end is an empty piece, not a character read.",
+            },
+            {
+              do: "print 0 for length. charAt(0) is the error path.",
+              why: "Empty is a real exam case. Do not invent a space or null.",
+            },
+          ],
+          result: "length 0; charAt(0) throws; substring(0, 0) is empty.",
+        },
+        {
+          title: "C++ s[n] vs at(n) at the end fence",
+          prompt: "s = \"AM\", n = s.size(). What about s[n] and s.at(n)?",
+          language: "cpp",
+          code: `#include <iostream>
+#include <string>
+int main() {
+  std::string s = "AM";
+  std::cout << s.size() << " " << (s[s.size()] == '\\0');
+  try {
+    s.at(s.size());
+  } catch (const std::out_of_range&) {
+    std::cout << " X";
+  }
+}`,
+          steps: [
+            {
+              do: "s has A, M. size() is 2. Last valid index is 1.",
+              why: "Same 0-based line as Java. Last letter is at n − 1.",
+            },
+            {
+              do: "s.at(2) checks the bound and throws out_of_range. catch prints X.",
+              why: "at is the safe reader. Past-the-end is an exception.",
+            },
+            {
+              do: "s[2] is the data() fence. For std::string it is defined as the stored '\\0'. The == test prints 1 (true).",
+              why: "Operator [] at size() is a special C++ case. Do not use it to ‘read the last letter’.",
+            },
+            {
+              do: "s[3] would be undefined. Last letter is s[1] or s.at(1), which is M.",
+              why: "Index equal to length is not a letter in the exam sense.",
+            },
+            {
+              do: "Output 2 1 X. Prefer at or s[n-1] in answers about the last character.",
+              why: "size is a count. The character sits on n−1.",
+            },
+          ],
+          result: "2 1 X  (size 2; s[size] is '\\0'; at(size) throws)",
         },
       ],
     },
@@ -236,6 +384,66 @@ std::cout << a << " " << (b == std::string::npos);`,
           ],
           result: "find → −1; index → ValueError.",
         },
+        {
+          title: "Java lastIndexOf walks from the right",
+          prompt: "What is printed?",
+          language: "java",
+          code: `String s = "SEBI-SEBI";
+System.out.print(s.indexOf("SE") + " " + s.lastIndexOf("SE") + " " + s.lastIndexOf("Z"));`,
+          steps: [
+            {
+              do: "Indexes: 0 S 1 E … 4 - 5 S 6 E 7 B 8 I.",
+              why: "Need the number line for both left and right searches.",
+            },
+            {
+              do: "indexOf(\"SE\") takes the first hit from the left → 0.",
+              why: "First match from the left is the usual indexOf.",
+            },
+            {
+              do: "lastIndexOf(\"SE\") takes the last hit. The second SE starts at 5.",
+              why: "Same needle, other end. Not ‘length minus first index’ as a lucky guess — draw it.",
+            },
+            {
+              do: "lastIndexOf(\"Z\") never matches → −1. Missing is still −1 from the right.",
+              why: "Both methods use −1 for not found.",
+            },
+            {
+              do: "print 0 5 -1.",
+              why: "Two directions, one missing-rule.",
+            },
+          ],
+          result: "0 5 -1",
+        },
+        {
+          title: "Empty needle sits at the start (and at the end for lastIndexOf)",
+          prompt: "What is printed?",
+          language: "java",
+          code: `String s = "SEBI";
+System.out.print(s.indexOf("") + " " + s.lastIndexOf("") + " " + s.indexOf("SEBI"));`,
+          steps: [
+            {
+              do: "The empty string \"\" is a needle of length 0.",
+              why: "It can sit between letters, including before the first letter.",
+            },
+            {
+              do: "indexOf(\"\") is 0. The first place an empty needle fits is index 0.",
+              why: "Java’s rule: empty needle is found immediately at the start.",
+            },
+            {
+              do: "lastIndexOf(\"\") is 4, which equals length. That is the fence after I.",
+              why: "From the right, the last empty slot is the end fence, not index 3.",
+            },
+            {
+              do: "indexOf(\"SEBI\") is 0: the whole word matches at the start.",
+              why: "A needle equal to the haystack starts at 0.",
+            },
+            {
+              do: "print 0 4 0. Do not pick −1 for the empty needle.",
+              why: "The empty-needle MCQ is ‘0’, not ‘not found’.",
+            },
+          ],
+          result: "0 4 0",
+        },
       ],
     },
     {
@@ -291,6 +499,262 @@ print(re.findall(r"\\d+", "SEBI 2024 Grade A"))`,
             { do: "If the pattern were \\d, the list would be ['2','0','2','4'].", why: "Without + you get one character at a time." },
           ],
           result: "['2024']",
+        },
+        {
+          title: "Dot is any character; \\d is only a digit",
+          prompt: "Does 9z9 match ^\\d.\\d$ ? Does it match ^\\d\\d\\d$ ?",
+          steps: [
+            {
+              do: "Pattern ^\\d.\\d$ : start, a digit, one any-char, a digit, end. Length must be 3.",
+              why: "Read tokens in order. . is not ‘dot the punctuation’ unless escaped.",
+            },
+            {
+              do: "9z9: first 9 is a digit, z is any char, last 9 is a digit. Match.",
+              why: "z is allowed by . and forbidden by \\d.",
+            },
+            {
+              do: "^\\d\\d\\d$ wants three digits. z is not a digit. 9z9 fails.",
+              why: "One token change (. vs \\d) flips the answer.",
+            },
+            {
+              do: "909 matches both. 9.9 matches the first (the middle . is ‘any char’, which includes a real dot).",
+              why: "A real dot in the text is just another character to .",
+            },
+            {
+              do: "To match a real dot only, the pattern uses \\.  Exam: ‘any char’ vs ‘digit’ vs ‘literal dot’.",
+              why: "Name the token before you say yes or no.",
+            },
+          ],
+          result: "9z9 matches ^\\d.\\d$ and does not match ^\\d\\d\\d$.",
+        },
+        {
+          title: "^ and $ pin the whole string",
+          prompt: "Does re.search(r\"^SE\", \"SEBI\") match? Does re.search(r\"SE$\", \"SEBI\") match?",
+          language: "python",
+          code: `import re
+print(bool(re.search(r"^SE", "SEBI")),
+      bool(re.search(r"SE$", "SEBI")),
+      bool(re.search(r"BI$", "SEBI")))`,
+          steps: [
+            {
+              do: "^SE means ‘SE at the start’. SEBI starts with SE → True.",
+              why: "^ is the start anchor, even inside search.",
+            },
+            {
+              do: "SE$ means ‘SE at the end’. SEBI ends with BI, not SE → False.",
+              why: "$ is the end anchor. The letters SE are at the front, not the end.",
+            },
+            {
+              do: "BI$ is BI at the end. SEBI ends with BI → True.",
+              why: "Same word, different pin.",
+            },
+            {
+              do: "print True False True.",
+              why: "search without ^ or $ could find SE in the middle; here the anchors decide.",
+            },
+            {
+              do: "fullmatch(\"SE\", \"SEBI\") would be False because the whole string is not just SE.",
+              why: "^SE is ‘starts with’. Full match is ‘is exactly’.",
+            },
+          ],
+          result: "True False True",
+        },
+      ],
+    },
+    {
+      heading: "replace / concatenation / immutability (Java String vs StringBuilder)",
+      body: "A Java String cannot change its letters. replace, concat, substring, and toUpperCase build a new String. If you ignore the result, the old variable still points at the old letters. s.replace(\"a\",\"x\") without s = leaves s unchanged. s = s + \"x\" rebinds s to a new object.\n\nStringBuilder is a mutable box. append, reverse, and setCharAt write the same object. Two variables that point at one builder see each other’s edits. Building a long string in a loop with + makes many throw-away String objects. A builder appends into one box.\n\n== on String tests the same object. equals tests the same letters. Python strings are immutable too: s.replace returns a new str. Use a list and join if you must build in a loop.",
+      howTo: [
+        "Ask: String or StringBuilder (or Python str vs list)?",
+        "String method → new object. If you do not assign, the old variable is unchanged.",
+        "StringBuilder method → same object changes. append returns this, so chaining is one box.",
+        "s = s + t rebinds s. That is concatenation with a new String, not an in-place write.",
+        "== is identity. equals (Python ==) is letters for content questions.",
+      ],
+      bullets: [
+        "String is immutable. replace/concat must be assigned.",
+        "s = s + \"x\" rebinds. StringBuilder.append mutates.",
+        "Loop of s = s + piece builds many Strings. A builder is one buffer.",
+        "== on Java String is identity. equals is letters.",
+      ],
+      examples: [
+        {
+          title: "Discarded replace leaves the String alone",
+          prompt: "What is printed?",
+          language: "java",
+          code: `class Main {
+  public static void main(String[] args) {
+    String s = "banana";
+    s.replace("a", "o");
+    String t = s.replace("a", "o");
+    System.out.print(s + " " + t);
+  }
+}`,
+          steps: [
+            {
+              do: "s points at \"banana\".",
+              why: "The object’s letters cannot change.",
+            },
+            {
+              do: "s.replace(\"a\", \"o\") builds \"bonono\" and throws it away. s is still \"banana\".",
+              why: "Ignoring the return does not write s.",
+            },
+            {
+              do: "t = s.replace(\"a\", \"o\") keeps the new \"bonono\". s is still \"banana\".",
+              why: "You must assign if you want the replacement.",
+            },
+            {
+              do: "Every ‘a’ was replaced in the new string, not only the first. replace(CharSequence, CharSequence) replaces all.",
+              why: "Read the method: all non-overlapping hits, left to right.",
+            },
+            {
+              do: "print banana bonono.",
+              why: "Two arrows, two objects. The old word survived.",
+            },
+          ],
+          result: "banana bonono",
+        },
+        {
+          title: "Concatenation rebinds; concat must be assigned too",
+          prompt: "What is printed?",
+          language: "java",
+          code: `class Main {
+  public static void main(String[] args) {
+    String s = "SE";
+    s.concat("BI");
+    s = s + "BI";
+    System.out.print(s);
+  }
+}`,
+          steps: [
+            {
+              do: "s points at \"SE\".",
+              why: "Start with the old arrow.",
+            },
+            {
+              do: "s.concat(\"BI\") builds \"SEBI\" and throws it away. s is still \"SE\".",
+              why: "concat is a String method. No assign → no change.",
+            },
+            {
+              do: "s = s + \"BI\" builds a new \"SEBI\" and moves the name s.",
+              why: "+ with assignment rebinds. That is the usual exam spelling of concat-and-keep.",
+            },
+            {
+              do: "print SEBI.",
+              why: "Only the second line kept the glued word.",
+            },
+            {
+              do: "s += \"BI\" is the same rebind as s = s + \"BI\". Still a new String, not a mutated old one.",
+              why: "The operator looks in-place. For String it is not.",
+            },
+          ],
+          result: "SEBI",
+        },
+        {
+          title: "StringBuilder append and reverse share one object",
+          prompt: "What is printed?",
+          language: "java",
+          code: `class Main {
+  public static void main(String[] args) {
+    StringBuilder sb = new StringBuilder("SE");
+    StringBuilder tb = sb;
+    sb.append("BI");
+    tb.reverse();
+    System.out.print(sb.toString() + " " + (sb == tb));
+  }
+}`,
+          steps: [
+            {
+              do: "sb → builder holding SE. tb = sb copies the arrow. One object.",
+              why: "tb = sb does not copy the letters.",
+            },
+            {
+              do: "sb.append(\"BI\") mutates to SEBI. tb sees SEBI too.",
+              why: "append writes in place and returns this.",
+            },
+            {
+              do: "tb.reverse() mutates the same object to IBES.",
+              why: "reverse also writes in place. Both names share it.",
+            },
+            {
+              do: "sb == tb is true (same arrow). toString is IBES. print IBES true.",
+              why: "== on two builders is identity.",
+            },
+            {
+              do: "If these had been String, reverse would not exist, and concat would have needed assign.",
+              why: "Mutable vs immutable is the whole heading.",
+            },
+          ],
+          result: "IBES true",
+        },
+        {
+          title: "Loop + on String vs one StringBuilder",
+          prompt: "What does each version build, and which mutates one box?",
+          language: "java",
+          code: `String s = "";
+for (int i = 0; i < 3; i++) s = s + "ab";
+StringBuilder b = new StringBuilder();
+for (int i = 0; i < 3; i++) b.append("ab");
+System.out.print(s + " " + b.toString());`,
+          steps: [
+            {
+              do: "First loop: s starts \"\". Trip 0 builds \"ab\". Trip 1 builds \"abab\". Trip 2 builds \"ababab\". Each trip throws away the old String.",
+              why: "s = s + \"ab\" allocates a new object every time. The old one becomes garbage.",
+            },
+            {
+              do: "Three trips made three String objects (plus the empty start). Only the last is kept in s.",
+              why: "The cost grows with the number of pieces. That is the exam reason to avoid + in a long loop.",
+            },
+            {
+              do: "Second loop: one builder. append three times into the same buffer: ab, then abab, then ababab.",
+              why: "StringBuilder is mutable. One box, growing letters.",
+            },
+            {
+              do: "Both end with letters ababab. print ababab ababab.",
+              why: "Same result, different number of objects.",
+            },
+            {
+              do: "Exam pick: short exam snippets may use +. Long building → StringBuilder (Python: list + join).",
+              why: "Immutability makes + in a loop expensive, not wrong.",
+            },
+          ],
+          result: "ababab ababab  (String loop made new objects; builder mutated one)",
+        },
+        {
+          title: "Python str.replace is the same immutability idea",
+          prompt: "What is printed?",
+          language: "python",
+          code: `s = "banana"
+s.replace("a", "o")
+t = s.replace("a", "o")
+print(s, t)
+parts = []
+for p in ["SE", "BI"]:
+    parts.append(p)
+print("".join(parts))`,
+          steps: [
+            {
+              do: "s is \"banana\". s.replace(\"a\", \"o\") returns \"bonono\" and nobody stores it. s stays \"banana\".",
+              why: "Python str is immutable, like Java String.",
+            },
+            {
+              do: "t = s.replace(...) keeps \"bonono\". print banana bonono.",
+              why: "Assign to keep the new string.",
+            },
+            {
+              do: "Building in a loop: append pieces to a list, then \"\".join(parts) → SEBI.",
+              why: "A list is mutable. join makes one new str at the end. That is the Python StringBuilder.",
+            },
+            {
+              do: "s += \"x\" in Python rebinds s (new str), it does not edit the old one.",
+              why: "The name moves. Other aliases of the old str would not see the extra x.",
+            },
+            {
+              do: "Two lines: banana bonono then SEBI.",
+              why: "Same two lessons as Java: assign replace, and join a list to concatenate many pieces.",
+            },
+          ],
+          result: "banana bonono\nSEBI",
         },
       ],
     },

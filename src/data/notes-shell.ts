@@ -87,6 +87,68 @@ export const notesShell: TopicNote = {
           ],
           result: "Prints a / a / b. Empty is not unset for ${y-a}.",
         },
+        {
+          title: "export versus one-shot VAR=value cmd",
+          prompt:
+            "PATH is the usual path. Then: TRACE=1 show.sh ; echo TRACE=$TRACE ; export TRACE=1 ; show.sh. Child show.sh prints TRACE=${TRACE:-unset}. What prints?",
+          code: "TRACE=1 ./show.sh\necho TRACE=$TRACE\nexport TRACE=1\n./show.sh",
+          language: "bash",
+          steps: [
+            {
+              do: "TRACE=1 ./show.sh sets TRACE only for that child. The child prints TRACE=1.",
+              why: "name=value cmd is a one-shot sticker on that command, not on your shell.",
+            },
+            {
+              do: "After it returns, echo TRACE=$TRACE in the parent prints TRACE= (empty) if TRACE was never set in this shell.",
+              why: "The one-shot did not write the parent’s box. export was not used yet.",
+            },
+            {
+              do: "export TRACE=1 publishes the box. The second ./show.sh also prints TRACE=1, and the parent now has TRACE=1 too.",
+              why: "export is “put this on the tray that children inherit”.",
+            },
+            {
+              do: "TRACE=1 without export, then ./show.sh as a separate line, would still print unset in the child.",
+              why: "A shell variable is private until exported. Assignment alone is not a passport.",
+            },
+            {
+              do: "Quote if the value has spaces: NOTE='lot 14' ./show.sh, not NOTE=lot 14 ./show.sh (that would run 14 as a command).",
+              why: "Word splitting happens before the child starts. Same quoting rules as filenames.",
+            },
+          ],
+          result:
+            "One-shot: child sees 1, parent TRACE still empty. export: both see 1. Bare TRACE=1 does not pass to a later child.",
+        },
+        {
+          title: "rm $lot versus rm \"$lot\"",
+          prompt:
+            "lot='fill 18.csv' exists as one file. Compare rm $lot with rm \"$lot\" and echo ${#lot}.",
+          code: "lot='fill 18.csv'\necho ${#lot}\nrm $lot\nrm \"$lot\"",
+          language: "bash",
+          steps: [
+            {
+              do: "${#lot} is 11 (length of the value: f-i-l-l-space-1-8-.-c-s-v). It is not $# (argument count).",
+              why: "Hash on a name is “how many characters in the box”. Hash alone is “how many arguments”.",
+            },
+            {
+              do: "Unquoted rm $lot becomes rm fill 18.csv — two arguments. rm looks for a file named fill and a file named 18.csv, not the real name.",
+              why: "Unquoted expansion splits on spaces. That is “tip the box onto the desk”.",
+            },
+            {
+              do: "rm \"$lot\" is one word and removes fill 18.csv.",
+              why: "Double quotes keep the spaces inside the value. That is the filename form.",
+            },
+            {
+              do: "rm '$lot' would look for a file whose name is the five characters dollar-l-o-t.",
+              why: "Single quotes are a glass case: no expansion.",
+            },
+            {
+              do: "Always quote \"$lot\" in tests and in rm/mv/cp unless you mean globbing and splitting.",
+              why: "Exam default: quote. Unquoted is a deliberate split.",
+            },
+          ],
+          result:
+            "${#lot}=11. rm $lot splits into fill and 18.csv. rm \"$lot\" removes the one real file.",
+        },
       ],
     },
     {
@@ -172,6 +234,68 @@ export const notesShell: TopicNote = {
           result:
             "true|false → 1. false|true → 0 (no pipefail). false then echo status=$? → status=1.",
         },
+        {
+          title: "shift then $1 and $#",
+          prompt:
+            "bash pack.sh LOTA LOTB LOTC. Script: echo before=$# $1; shift; echo after=$# $1; shift; echo last=$# $1.",
+          code: "echo before=$# $1\nshift\necho after=$# $1\nshift\necho last=$# $1",
+          language: "bash",
+          steps: [
+            {
+              do: "Start: $0=pack.sh (or the path used), $1=LOTA, $2=LOTB, $3=LOTC, $#=3.",
+              why: "$# counts arguments, not the script name.",
+            },
+            {
+              do: "First shift throws LOTA away and renumbers. Now $1=LOTB, $2=LOTC, $#=2. before printed 3 LOTA.",
+              why: "shift is “drop the first name on the roll and slide everyone left”.",
+            },
+            {
+              do: "Second shift: $1=LOTC, $#=1. after printed 2 LOTB. last prints 1 LOTC.",
+              why: "Each shift reduces $# by one (until there are no arguments left).",
+            },
+            {
+              do: "$0 does not change. A third shift would make $#=0 and $1 empty.",
+              why: "The script name is not an argument. You cannot shift it away.",
+            },
+            {
+              do: "A loop while [ $# -gt 0 ]; do echo \"$1\"; shift; done walks LOTA, LOTB, LOTC without globbing.",
+              why: "That is the classic “eat arguments” pattern. Quote \"$1\" in case a name has a space.",
+            },
+          ],
+          result:
+            "before=3 LOTA; after=2 LOTB; last=1 LOTC. $0 stays pack.sh. shift never consumes $0.",
+        },
+        {
+          title: "Capture $? before the next echo",
+          prompt:
+            "ls /no/such/pack ; echo first=$? ; echo second=$? . Then true; x=$?; false; echo keep=$x now=$? .",
+          code: "ls /no/such/pack\necho first=$?\necho second=$?\ntrue\nx=$?\nfalse\necho keep=$x now=$?",
+          language: "bash",
+          steps: [
+            {
+              do: "ls on a missing path is non-zero (often 2). first=$? prints that non-zero.",
+              why: "$? is the last foreground command. Capture it immediately.",
+            },
+            {
+              do: "second=$? prints 0, because the previous echo succeeded.",
+              why: "echo overwrites $?. A later echo $? is echo’s success, not ls.",
+            },
+            {
+              do: "true; x=$? stores 0 in x. false then echo keep=$x now=$? prints keep=0 now=1.",
+              why: "Saving $? in a variable freezes the old status. now=$? is false’s 1.",
+            },
+            {
+              do: "Do not write echo $? on a following line if you still need the failure code for if or exit.",
+              why: "The exam trap is “they printed 0 after a failed ls”.",
+            },
+            {
+              do: "$$ is this shell’s PID, not a status. $! is the last background PID. Do not mix them with $?.",
+              why: "Three different boxes: status, me, my background child.",
+            },
+          ],
+          result:
+            "first=non-zero (ls). second=0 (echo). keep=0 now=1. Save $? before the next command.",
+        },
       ],
     },
     {
@@ -254,6 +378,68 @@ export const notesShell: TopicNote = {
             },
           ],
           result: "/etc: e=T f=F d=T. /etc/passwd: e=T f=T d=F. /no/such: all F.",
+        },
+        {
+          title: "String = versus numeric -eq",
+          prompt:
+            "a=08; b=8; [ \"$a\" = \"$b\" ]; [ \"$a\" -eq \"$b\" ]; [ 08 -eq 8 ]. Which are true? What about [ 08 -eq 08 ] in a strict integer test?",
+          code: "a=08\nb=8\n[ \"$a\" = \"$b\" ]\n[ \"$a\" -eq \"$b\" ]",
+          language: "bash",
+          steps: [
+            {
+              do: "[ \"$a\" = \"$b\" ] compares text. 08 is not the same letters as 8 → false.",
+              why: "= is string compare, like matching spellings on a form.",
+            },
+            {
+              do: "[ \"$a\" -eq \"$b\" ] compares integers. 08 equals 8 → true in bash test (leading zeros allowed here).",
+              why: "-eq is numeric. 0 is not empty, and 08 is a number eight for -eq.",
+            },
+            {
+              do: "[ \"$a\" -gt \"$b\" ] is false (8 is not greater than 8). [ \"$a\" = 08 ] would be true (same letters).",
+              why: "Pick the operator that matches the English: “same digits on the page” versus “same integer”.",
+            },
+            {
+              do: "Spaces still required: [\"$a\"=\"$b\"] is not a test.",
+              why: "[ is a command. Glueing the arguments invents a different program.",
+            },
+            {
+              do: "Always quote \"$a\". Empty unquoted [ $a -eq 8 ] becomes [ -eq 8 ] and test errors.",
+              why: "The empty value vanished, so -eq lost its left operand.",
+            },
+          ],
+          result:
+            "String = is false for 08 versus 8. Numeric -eq is true. Use = for text, -eq for integers.",
+        },
+        {
+          title: "Quote both sides of a string test",
+          prompt:
+            "p='lot 7'; q='lot 7'; r=. [ \"$p\" = \"$q\" ]; [ $p = $q ]; [ \"$r\" = \"\" ]; [ -n \"$r\" ].",
+          code: "p='lot 7'\nq='lot 7'\nr=\n[ \"$p\" = \"$q\" ]\n[ $p = $q ]\n[ \"$r\" = \"\" ]",
+          language: "bash",
+          steps: [
+            {
+              do: "[ \"$p\" = \"$q\" ] is true — one word on each side, spaces kept.",
+              why: "Quotes make each filename (or phrase) a single operand of test.",
+            },
+            {
+              do: "Unquoted [ $p = $q ] becomes [ lot 7 = lot 7 ] — too many arguments, test errors (status 2).",
+              why: "Spaces split. test then sees lot, 7, =, lot, 7 instead of two strings.",
+            },
+            {
+              do: "[ \"$r\" = \"\" ] is true (empty equals empty). [ -n \"$r\" ] is false. [ -z \"$r\" ] is true.",
+              why: "-n is non-empty, -z is empty. Quote so empty does not vanish.",
+            },
+            {
+              do: "Unquoted [ -z $r ] becomes [ -z ] and errors, same trap as the earlier empty -z example.",
+              why: "Quote every operand. The exam will put a space in the value.",
+            },
+            {
+              do: "Prefer [ \"$p\" = \"$q\" ] && [ -f \"$p\" ] as two tests rather than old -a inside one [ ].",
+              why: "Two short tests are clearer and avoid -a precedence puzzles.",
+            },
+          ],
+          result:
+            "Quoted = succeeds. Unquoted $p = $q errors. Empty r: = \"\" true, -n false. Quote both sides.",
         },
       ],
     },
@@ -341,6 +527,68 @@ export const notesShell: TopicNote = {
           result:
             "Glob keeps c d.dat as one item. $(ls) splits it into c and d.dat.",
         },
+        {
+          title: "while read drops a last line without newline",
+          prompt:
+            "File end.txt is three lines: alpha, beta, gamma with no newline after gamma. while read -r line; do echo \"$line\"; done < end.txt. What prints? How do you keep gamma?",
+          code: "while read -r line; do\n  echo \"$line\"\ndone < end.txt",
+          language: "bash",
+          steps: [
+            {
+              do: "read returns success only when it sees a newline (or a delimiter). alpha and beta print. gamma has no newline, so a bare while read skips it.",
+              why: "The last incomplete line is a classic off-by-one. read’s status is 1 at EOF even if line holds text.",
+            },
+            {
+              do: "Fix: while read -r line || [ -n \"$line\" ]; do echo \"$line\"; done < end.txt.",
+              why: "If read failed but the box still has letters, run the body once more for that tail.",
+            },
+            {
+              do: "Attach < end.txt to the whole loop, not to echo inside. Otherwise read waits on the keyboard.",
+              why: "The file must feed the while, like a hose into the loop.",
+            },
+            {
+              do: "Use read -r so backslashes in a line are not eaten. Quote \"$line\" when you echo.",
+              why: "-r is raw. Unquoted $line would split and glob.",
+            },
+            {
+              do: "for line in $(cat end.txt) would also split on spaces and is the wrong tool for lines.",
+              why: "for walks words. while read walks lines (with IFS).",
+            },
+          ],
+          result:
+            "Bare while read prints alpha and beta, drops gamma. Add || [ -n \"$line\" ] to keep the last line.",
+        },
+        {
+          title: "if grep -q as a command test",
+          prompt:
+            "File watch.dat has INEZ 4 and INEX 1. if grep -q INEZ watch.dat; then echo hit; else echo miss; fi. Then grep -q INEZ | wc -l inside if (wrong). Status of grep -q with no match?",
+          code: "if grep -q INEZ watch.dat; then\n  echo hit\nelse\n  echo miss\nfi",
+          language: "bash",
+          steps: [
+            {
+              do: "grep -q INEZ succeeds (status 0) because a match exists. if takes the then-branch and prints hit. -q stays quiet (no matched line on stdout).",
+              why: "if uses the command’s exit status. 0 → then. grep’s 0 means “I found something”.",
+            },
+            {
+              do: "grep -q INEZ on a file with no INEZ exits 1. if would print miss. That 1 is “no match”, not a crash.",
+              why: "grep: 0 match, 1 no match, 2 error. if treats any non-zero as else.",
+            },
+            {
+              do: "if grep -q INEZ watch.dat | wc -l is a trap: the pipeline’s status is wc’s 0 even when grep finds nothing (no pipefail).",
+              why: "You wanted grep’s status. The hose made wc the last command, so if would always look true.",
+            },
+            {
+              do: "Do not parse grep’s printed line as a boolean. Use the status, or grep -c and [ \"$n\" -gt 0 ].",
+              why: "The condition is a command, not a string type.",
+            },
+            {
+              do: "Quote the file: grep -q INEZ \"$f\" when f may have spaces.",
+              why: "Same filename rule as rm \"$f\".",
+            },
+          ],
+          result:
+            "if grep -q INEZ … prints hit (status 0). No match → else, status 1. Do not pipe grep -q to wc inside if.",
+        },
       ],
     },
     {
@@ -425,6 +673,68 @@ export const notesShell: TopicNote = {
           ],
           result: "A then D then last=5. if uses the function’s return status.",
         },
+        {
+          title: "No return uses the last command",
+          prompt:
+            "warn() { echo warn-out; false; }  then warn; echo st=$? .  ok2() { echo ok-out; true; } then ok2; echo st=$? . Empty body e() { :; } — status?",
+          code: "warn() { echo warn-out; false; }\nwarn\necho st=$?\nok2() { echo ok-out; true; }\nok2",
+          language: "bash",
+          steps: [
+            {
+              do: "warn prints warn-out, then false. There is no return, so the function’s status is false’s 1. st=1.",
+              why: "Falling off the end uses the last command’s status. return is optional.",
+            },
+            {
+              do: "ok2’s last command is true, so st=0 after ok2.",
+              why: "if ok2; then would take the then-branch. 0 is true in the shell.",
+            },
+            {
+              do: "An empty-looking e() { :; } runs : (true), status 0. A truly empty {} also returns 0.",
+              why: "No news is success unless a command failed.",
+            },
+            {
+              do: "return 256 becomes 0 in bash (mod 256). Stay in 0–255 if you write return N.",
+              why: "A wrapped 0 looks like success — a nasty true.",
+            },
+            {
+              do: "echo after a helper still overwrites $?. Capture st=$? on the next line, or use if warn; then.",
+              why: "Same capture rule as for plain commands.",
+            },
+          ],
+          result:
+            "warn → st=1 from false. ok2 → 0 from true. Empty / : body is 0. Last command is the status if you omit return.",
+        },
+        {
+          title: "Forward script args with \"$@\"",
+          prompt:
+            "bash wrap.sh 'lot 3' NSE. inside wrap: peek() { echo p1=$1 phash=$#; }; peek; peek \"$@\"; peek $*. What does each peek see?",
+          code: "peek() { echo p1=$1 phash=$#; }\npeek\npeek \"$@\"\npeek $*",
+          language: "bash",
+          steps: [
+            {
+              do: "peek with no arguments: function $1 empty, $#=0. Script $1 is still lot 3 after return.",
+              why: "A function gets its own argument list. The script’s list is saved and restored.",
+            },
+            {
+              do: "peek \"$@\" forwards two words: p1=lot 3 (one word), phash=2.",
+              why: "\"$@\" is the safe tray. The spaced name stays one $1 inside peek.",
+            },
+            {
+              do: "peek $* (unquoted) splits: three function arguments lot, 3, NSE — p1=lot, phash=3.",
+              why: "Unquoted $* / $@ destroy spaces. Wrappers must use cmd \"$@\".",
+            },
+            {
+              do: "peek \"$*\" would pass one mashed argument 'lot 3 NSE', phash=1.",
+              why: "\"$ *\" is one word. Rarely what you want for filenames.",
+            },
+            {
+              do: "$0 stays wrap.sh (as invoked). Functions do not rename the program.",
+              why: "Helper recipes keep the script’s name.",
+            },
+          ],
+          result:
+            "peek: $#=0. peek \"$@\": $1='lot 3', $#=2. peek $*: splits to three words. Forward with \"$@\".",
+        },
       ],
     },
     {
@@ -507,6 +817,68 @@ export const notesShell: TopicNote = {
             },
           ],
           result: "First pipeline prints 2. Second prints 1 (INEA 7 only).",
+        },
+        {
+          title: "Hide stderr of one pipeline stage",
+          prompt:
+            "find /no/vault -name '*.csv' | wc -l   then   find /no/vault -name '*.csv' 2>/dev/null | wc -l. What is on the screen each time? Pipeline status without pipefail?",
+          code: "find /no/vault -name '*.csv' | wc -l\nfind /no/vault -name '*.csv' 2>/dev/null | wc -l",
+          language: "bash",
+          steps: [
+            {
+              do: "find writes an error to stderr (missing /no/vault). That error still shows on the terminal. The hose only carries stdout, which is empty. wc -l prints 0.",
+              why: "A pipe connects stdout to the next stdin. stderr is a separate stream unless you merge it.",
+            },
+            {
+              do: "2>/dev/null on find hides the error. wc still prints 0. The screen is quiet except for that 0.",
+              why: "/dev/null is the bin for that command’s stderr. wc is not redirected.",
+            },
+            {
+              do: "Without pipefail, pipeline status is wc’s 0 even though find failed.",
+              why: "Same trap as false | true. Status is the last stage.",
+            },
+            {
+              do: "find … 2>&1 | wc -l would send the error line into wc and count it as 1 (or more) — usually the wrong answer.",
+              why: "Merging stderr into the hose turns error text into “data”. Hide or keep it; do not accidentally count it.",
+            },
+            {
+              do: "Redirect the whole script with bash s.sh > log 2>&1 if you want every echo and every error in one file.",
+              why: "> log 2>&1 (2>&1 last) is the merge order. 2>&1 > log would leave errors on the terminal.",
+            },
+          ],
+          result:
+            "First: error on screen, wc prints 0. Second: silent, wc prints 0. Status is 0 (wc) unless pipefail.",
+        },
+        {
+          title: ">> log 2>&1 versus 2>&1 >> log",
+          prompt:
+            "log already holds old. cmd prints stdout-ok and stderr-bad. (a) cmd >> log 2>&1 (b) cmd 2>&1 >> log2. What lands where? Is old kept?",
+          code: "cmd() { echo stdout-ok; echo stderr-bad >&2; }\ncmd >> log 2>&1\ncmd 2>&1 >> log2",
+          language: "bash",
+          steps: [
+            {
+              do: "(a) >> log appends stdout to log (old kept). 2>&1 then points stderr at the same place. Both lines append to log.",
+              why: "2>&1 means “stderr, copy whatever stdout currently is”. Do that after the file redirect.",
+            },
+            {
+              do: "(b) 2>&1 first clones the terminal; then >> log2 moves only stdout. stderr-bad still shows on the screen. log2 gets stdout-ok appended.",
+              why: "This is the same order bug as 2>&1 > file, now with append.",
+            },
+            {
+              do: "> log 2>&1 would have wiped old first, then written both streams. >> keeps old.",
+              why: "> is “new page”. >> is “write at the bottom”.",
+            },
+            {
+              do: "If log cannot be opened, cmd does not run.",
+              why: "The shell opens the file before starting the command.",
+            },
+            {
+              do: "Silent everything: >> /dev/null 2>&1 still discards both (append to the bin is still the bin).",
+              why: "Need a real file only when you want to keep the text.",
+            },
+          ],
+          result:
+            "(a) >> log 2>&1 appends both lines, old kept. (b) 2>&1 >> log2 leaves stderr on the terminal.",
         },
       ],
     },
@@ -593,6 +965,68 @@ export const notesShell: TopicNote = {
           ],
           result:
             "TERM is enough for untrapped sleep. Use $!, not $$. -9 only if it ignored TERM.",
+        },
+        {
+          title: "chmod 640 then 711",
+          prompt:
+            "Start 644. chmod 640 hold.cfg then chmod 711 run.sh. Bits after each? Who can read hold.cfg after 640? Who can cd into a directory chmod’d 711?",
+          code: "chmod 640 hold.cfg\nchmod 711 run.sh",
+          language: "bash",
+          steps: [
+            {
+              do: "640 = owner rw (6), group r (4), other none (0). Letters: rw-r----- . Owner and group can read; other cannot. Nobody has execute.",
+              why: "6=4+2, 4=read, 0=nothing. Config files are often 640 so other cannot read secrets.",
+            },
+            {
+              do: "711 = owner rwx (7), group --x (1), other --x (1). Letters: rwx--x--x.",
+              why: "7=4+2+1. 1 is execute only — no read, no write.",
+            },
+            {
+              do: "On a directory, execute is “search / cd”. 711 lets others cd through a folder without listing names (no r).",
+              why: "Directory r is list, x is enter, w is create/delete (with sticky bit stories later).",
+            },
+            {
+              do: "On run.sh, 711 lets others execute the script if they already know the path, even if they cannot read it — some systems still need r to run a script.",
+              why: "Exam default: 755 for scripts (rwxr-xr-x). 711 is the “enter but do not list” directory trick.",
+            },
+            {
+              do: "chmod +x hold.cfg from 640 would become 751 (u+x,g+x,o+x on 640 → 7 5 1). It is not automatically 755.",
+              why: "+x is a+x. Start from 644 to land on 755.",
+            },
+          ],
+          result:
+            "640 = rw-r----- (group can read hold.cfg, other cannot). 711 = rwx--x--x (others can cd/exec, not list/read).",
+        },
+        {
+          title: "grep -q status and kill 0",
+          prompt:
+            "alerts2.txt: NSE INEZ, bse inez. if grep -q NSE alerts2.txt; then echo yes; fi. grep -c -i inez. Then sleep 200 & ; kill -0 $! ; kill -0 $$.",
+          code: "if grep -q NSE alerts2.txt; then echo yes; fi\ngrep -c -i inez alerts2.txt\nsleep 200 &\nkill -0 $!",
+          language: "bash",
+          steps: [
+            {
+              do: "grep -q NSE matches line 1, status 0, if prints yes. Line 2 has no NSE (case-sensitive).",
+              why: "-q is quiet membership. Status 0 means hit. Do not count on stdout.",
+            },
+            {
+              do: "grep -c -i inez counts both lines → 2 (INEZ and inez). -c prints the count, not the lines.",
+              why: "-i ignores case. -c is “how many matching lines”, not wc of the whole file.",
+            },
+            {
+              do: "kill -0 $! tests whether the sleep PID exists (and you may signal it). It does not kill. Status 0 if alive.",
+              why: "Signal 0 is a probe. $! is the sleep you just backgrounded.",
+            },
+            {
+              do: "kill -0 $$ is also 0 — the shell is alive. That does not mean you should kill $$.",
+              why: "$$ is me. Probing yourself succeeds. Killing $$ would abort the script.",
+            },
+            {
+              do: "After kill $! (TERM), kill -0 $! fails (non-zero) once sleep is gone. Do not send -9 first.",
+              why: "TERM first, wait, then -9 only if it is still alive. Untrapped sleep dies on TERM.",
+            },
+          ],
+          result:
+            "grep -q NSE → yes. grep -c -i inez → 2. kill -0 $! probes the sleep; kill -0 $$ probes the shell. Use $! to manage the child.",
         },
       ],
     },

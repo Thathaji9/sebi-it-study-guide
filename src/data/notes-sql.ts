@@ -88,6 +88,67 @@ export const notesSql: TopicNote = {
           result:
             "First form is not standard SQL. GROUP BY member, city is the exam-safe spelling.",
         },
+        {
+          title: "HAVING with no GROUP BY is one bag",
+          prompt:
+            "VAULT rows: (V9, 15), (V9, 35), (V4, 9), (V8, 60). SELECT SUM(qty) HAVING SUM(qty) >= 100 — legal? What prints? What if HAVING SUM(qty) >= 200?",
+          code: "SELECT SUM(qty) AS tot\nFROM vault\nHAVING SUM(qty) >= 100;",
+          language: "sql",
+          steps: [
+            {
+              do: "No GROUP BY means the whole table is one group. SUM(qty) = 15+35+9+60 = 119.",
+              why: "HAVING still waits until a group exists. One invisible bag holds every row.",
+            },
+            {
+              do: "119 >= 100 is true, so one result row prints 119.",
+              why: "HAVING keeps or drops that single bag. It is not a per-row WHERE.",
+            },
+            {
+              do: "HAVING SUM(qty) >= 200 is false, so the result is empty — not a row of NULL.",
+              why: "A failed bag-check deletes the group. There is no leftover placeholder.",
+            },
+            {
+              do: "WHERE SUM(qty) >= 100 is still illegal. WHERE cannot see aggregates.",
+              why: "You cannot weigh the bag before you have put apples in it.",
+            },
+            {
+              do: "If you wanted vaults whose own total ≥ 100, you must GROUP BY vault_id first (V9=50, V4=9, V8=60 — nobody passes 100).",
+              why: "Missing GROUP BY is a different question: the grand total, not per vault.",
+            },
+          ],
+          result: "Legal. One row 119. HAVING SUM(qty) >= 200 returns no rows. WHERE SUM is still illegal.",
+        },
+        {
+          title: "SELECT alias is invisible in WHERE",
+          prompt:
+            "SELECT vault_id, qty * 2 AS doubled FROM vault WHERE doubled > 40 — legal? Rewrite it. Rows: (V9, 15), (V4, 9), (V8, 60).",
+          code: "SELECT vault_id, qty * 2 AS doubled\nFROM vault\nWHERE qty * 2 > 40;",
+          language: "sql",
+          steps: [
+            {
+              do: "WHERE doubled > 40 is illegal in standard SQL. WHERE runs before SELECT aliases exist.",
+              why: "Recite the order: FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY. doubled is born in SELECT.",
+            },
+            {
+              do: "Rewrite the filter as WHERE qty * 2 > 40 (or wrap the SELECT in a derived table and filter outside).",
+              why: "Repeat the expression, or name the subquery, so WHERE can see a real column.",
+            },
+            {
+              do: "Walk rows: V9 doubled 30 drop, V4 doubled 18 drop, V8 doubled 120 keep.",
+              why: "Tick the rows. Do not guess from the English.",
+            },
+            {
+              do: "ORDER BY doubled is allowed in many engines because ORDER BY runs after SELECT.",
+              why: "Aliases are late. WHERE is early. HAVING is after GROUP BY, still before SELECT in the standard story, so HAVING tot is also exam-unsafe — write HAVING SUM(qty).",
+            },
+            {
+              do: "Do not “fix” it with WHERE doubled > 40 just because a vendor might accept it.",
+              why: "The paper wants the homework order, not your laptop’s dialect.",
+            },
+          ],
+          result:
+            "WHERE doubled is not standard. Filter with WHERE qty * 2 > 40. Only (V8, 120) remains.",
+        },
       ],
     },
     {
@@ -171,6 +232,66 @@ export const notesSql: TopicNote = {
           ],
           result: "One row: buy_qty = 16, sell_qty = 4, all_qty = 20.",
         },
+        {
+          title: "Zero is not NULL in AVG",
+          prompt:
+            "fee: 5, 0, NULL, 15. Compute COUNT(*), COUNT(fee), SUM(fee), AVG(fee), and AVG if you wrongly treat NULL as 0.",
+          code: "SELECT COUNT(*), COUNT(fee), SUM(fee), AVG(fee)\nFROM lot_fee;",
+          language: "sql",
+          steps: [
+            {
+              do: "Four rows → COUNT(*) = 4. Known fees 5, 0, 15 → COUNT(fee) = 3.",
+              why: "Star counts paper rows. COUNT(col) counts filled boxes. 0 is filled.",
+            },
+            {
+              do: "SUM skips NULL but keeps 0: 5+0+15 = 20. AVG = 20/3, not 20/4.",
+              why: "AVG’s divisor is COUNT(fee), the known numbers. 0 is a known number.",
+            },
+            {
+              do: "If the English said “treat missing as 0”, that is SUM(COALESCE(fee,0))/COUNT(*) = 20/4 = 5.",
+              why: "That is a different formula. Default AVG does not invent zeros for holes.",
+            },
+            {
+              do: "Do not drop the 0 from COUNT(fee). Only NULL is a hole.",
+              why: "Zero rupees is a fact. Unknown rupees is a hole.",
+            },
+            {
+              do: "All-NULL column would give SUM NULL, COUNT(fee) 0, COUNT(*) still 4.",
+              why: "SUM of no known numbers is unknown, not 0, unless you COALESCE.",
+            },
+          ],
+          result: "4, 3, 20, 20/3. Treating NULL as 0 would be 20/4 = 5, which is not default AVG.",
+        },
+        {
+          title: "COUNT(DISTINCT city) skips NULL then unique",
+          prompt:
+            "city: Hyd, Hyd, NULL, Nagpur, Hyd. COUNT(*), COUNT(city), COUNT(DISTINCT city).",
+          code: "SELECT COUNT(*), COUNT(city), COUNT(DISTINCT city)\nFROM stop;",
+          language: "sql",
+          steps: [
+            {
+              do: "Five rows → COUNT(*) = 5.",
+              why: "Star does not care about holes or copies.",
+            },
+            {
+              do: "COUNT(city) skips the NULL → 4 (three Hyd and one Nagpur).",
+              why: "COUNT(col) is “how many filled boxes”, copies still count.",
+            },
+            {
+              do: "COUNT(DISTINCT city) skips NULL then unique-ifies {Hyd, Nagpur} → 2.",
+              why: "DISTINCT is after the NULL skip. NULL is not a city name in this count.",
+            },
+            {
+              do: "Two NULL cities would still add 0 to COUNT(DISTINCT city), not 1.",
+              why: "NULLs are not grouped as a distinct value in COUNT(DISTINCT) in the exam story.",
+            },
+            {
+              do: "If they wanted “how many different labels including unknown”, that is not COUNT(DISTINCT city).",
+              why: "Read the English. Default COUNT(DISTINCT) ignores holes.",
+            },
+          ],
+          result: "5, 4, 2. DISTINCT city is Hyd and Nagpur. The NULL is not a third city.",
+        },
       ],
     },
     {
@@ -253,6 +374,67 @@ export const notesSql: TopicNote = {
             },
           ],
           result: "Three rows. CEO Ira is dropped by INNER JOIN.",
+        },
+        {
+          title: "Fan-out: three lots on one custodian",
+          prompt:
+            "CUSTODIAN: (C1, HDFC), (C2, ICICI). LOT: (L1, C1), (L2, C1), (L3, C1), (L4, C2), (L5, C9). INNER JOIN on cust_id. How many rows? Who vanishes?",
+          code: "SELECT l.lot_id, c.name\nFROM lot l\nINNER JOIN custodian c ON l.cust_id = c.id;",
+          language: "sql",
+          steps: [
+            {
+              do: "L1, L2, L3 match HDFC (three copies of C1). L4 matches ICICI. L5’s C9 is missing — drop.",
+              why: "Inner join is a handshake. No partner, no row. k matches → k copies of the parent.",
+            },
+            {
+              do: "Count four result rows, not two custodians and not five lots.",
+              why: "You count matching pairs, not parents and not the original lot list.",
+            },
+            {
+              do: "HDFC appears three times because it has three lots. That is fan-out, not a bug.",
+              why: "One-to-many multiplies the “one” side.",
+            },
+            {
+              do: "A custodian with zero lots (if you added C3) would also vanish on INNER JOIN.",
+              why: "Zero matches → gone. Only LEFT JOIN would keep that empty seat.",
+            },
+            {
+              do: "ON and WHERE agree here: WHERE l.cust_id = c.id after CROSS JOIN yields the same four rows.",
+              why: "For inner joins, ON and WHERE both filter the grid. They split only on outer joins.",
+            },
+          ],
+          result:
+            "(L1, HDFC), (L2, HDFC), (L3, HDFC), (L4, ICICI). Lot L5 and any lot-less custodian disappear.",
+        },
+        {
+          title: "Empty right table wipes an inner join",
+          prompt:
+            "KRA has 3 rows. MATCHED is empty. SELECT * FROM kra k INNER JOIN matched m ON k.pan = m.pan. How many rows? What about CROSS JOIN?",
+          code: "SELECT k.pan\nFROM kra k\nINNER JOIN matched m ON k.pan = m.pan;",
+          language: "sql",
+          steps: [
+            {
+              do: "Inner join of 3 × 0 matches = 0 rows. Every KRA pan fails the handshake.",
+              why: "No partner, no row. Empty is the extreme “zero matches”.",
+            },
+            {
+              do: "CROSS JOIN is also 3 × 0 = 0. An empty operand wipes the product.",
+              why: "Keeping the other table is an outer-join idea, not a product idea.",
+            },
+            {
+              do: "LEFT JOIN FROM kra LEFT JOIN matched would keep 3 KRA rows padded with NULL.",
+              why: "Left join preserves the left even without a partner. That is the next heading’s tool.",
+            },
+            {
+              do: "Do not say “3 rows of KRA” for INNER JOIN. That is mixing join kinds.",
+              why: "Exam trap: empty child table does not “keep the parents” on an inner join.",
+            },
+            {
+              do: "INNER JOIN ON TRUE with an empty right is still empty (same as CROSS JOIN).",
+              why: "TRUE does not invent right-hand rows.",
+            },
+          ],
+          result: "Inner join: 0 rows. CROSS JOIN: 0 rows. Only LEFT JOIN would keep the 3 KRA pans.",
         },
       ],
     },
@@ -338,6 +520,68 @@ export const notesSql: TopicNote = {
             },
           ],
           result: "KYC 2, Algo 1, Insider 0. Must LEFT JOIN and COUNT(a.cid).",
+        },
+        {
+          title: "FULL JOIN keeps both orphans",
+          prompt:
+            "KRA pans: P11, P12. FILED pans: P12, P19. FULL OUTER JOIN on pan. List rows. Who would INNER / LEFT / RIGHT keep?",
+          code: "SELECT k.pan AS kra_pan, f.pan AS filed_pan\nFROM kra k\nFULL OUTER JOIN filed f ON k.pan = f.pan;",
+          language: "sql",
+          steps: [
+            {
+              do: "Match first: P12 pairs with P12. Then pad unused left P11 with NULL on the right, unused right P19 with NULL on the left.",
+              why: "FULL JOIN = inner matches + left orphans + right orphans. Do not duplicate the match.",
+            },
+            {
+              do: "Three result rows: (P11, NULL), (P12, P12), (NULL, P19).",
+              why: "Paper method: matches, then one padded row per unused side.",
+            },
+            {
+              do: "INNER would keep only (P12, P12). LEFT FROM kra would keep P11 and P12, drop P19. RIGHT FROM kra would keep P12 and P19, drop P11.",
+              why: "The preserved side is the difference between the four join words.",
+            },
+            {
+              do: "Never add a second (P12, P12) when you add pads.",
+              why: "Pads are only for unused keys. Matched keys already have a row.",
+            },
+            {
+              do: "WHERE f.pan IS NOT NULL after FULL JOIN throws P11 away and is no longer full.",
+              why: "A WHERE on the other side’s key turns outer back toward inner.",
+            },
+          ],
+          result:
+            "FULL: (P11, NULL), (P12, P12), (NULL, P19). INNER only P12. LEFT drops P19. RIGHT drops P11.",
+        },
+        {
+          title: "Put the right filter in ON to keep the pad",
+          prompt:
+            "FROM kra k LEFT JOIN filed f ON k.pan = f.pan AND f.year = 2026. KRA: P11, P12. FILED: (P12, 2025), (P12, 2026). What stays?",
+          code: "SELECT k.pan, f.year\nFROM kra k\nLEFT JOIN filed f\n  ON k.pan = f.pan AND f.year = 2026;",
+          language: "sql",
+          steps: [
+            {
+              do: "ON decides matching. P12 matches the 2026 row only. The 2025 row is not a match.",
+              why: "Extra ON predicates are match rules, not “delete the left row”.",
+            },
+            {
+              do: "P11 has no 2026 file → keep P11 with year NULL (the pad).",
+              why: "Left join preserves the left even when the extra ON filter fails.",
+            },
+            {
+              do: "Result: (P11, NULL) and (P12, 2026). The 2025 filing is invisible from this join.",
+              why: "Unmatched right rows are not kept on a left join.",
+            },
+            {
+              do: "If you had LEFT JOIN only on pan, then WHERE f.year = 2026, P11’s NULL year would fail WHERE and vanish — inner join in disguise.",
+              why: "WHERE on a right column throws empty seats away. ON keeps them.",
+            },
+            {
+              do: "Need “parents with zero 2026 files”? This ON pattern, then COUNT(f.pan) = 0 in HAVING.",
+              why: "Zeros need the pad, then COUNT of the child key, not COUNT(*).",
+            },
+          ],
+          result:
+            "(P11, NULL) and (P12, 2026). Filter year in ON, not WHERE, if you still want unmatched KRA rows.",
         },
       ],
     },
@@ -425,6 +669,68 @@ export const notesSql: TopicNote = {
           result:
             "(a) table remains (b) rows remain without margin (c) table and indexes gone if no dependents.",
         },
+        {
+          title: "Grouped view cannot take INSERT",
+          prompt:
+            "View v_desk_tot = SELECT desk, SUM(qty) FROM fill GROUP BY desk. INSERT INTO v_desk_tot VALUES ('D7', 40). Simple view v_nse = fills WHERE venue='NSE' — can that INSERT a BSE row without CHECK OPTION?",
+          code: "CREATE VIEW v_desk_tot AS\nSELECT desk, SUM(qty) AS tot FROM fill GROUP BY desk;\nINSERT INTO v_desk_tot VALUES ('D7', 40);",
+          language: "sql",
+          steps: [
+            {
+              do: "v_desk_tot is grouped. There is no single base row to write back to. INSERT is rejected.",
+              why: "A bag of fills is not one fill. GROUP BY and DISTINCT views are usually not updatable.",
+            },
+            {
+              do: "v_nse is a simple row filter. Without CHECK OPTION, INSERT of a BSE row can succeed on FILL and then vanish from the view.",
+              why: "That vanishing row is legal unless WITH CHECK OPTION is on.",
+            },
+            {
+              do: "WITH CHECK OPTION on v_nse would refuse the BSE insert because the row would fall out of venue='NSE'.",
+              why: "The window must still show the row after the change.",
+            },
+            {
+              do: "CHECK OPTION does not magically make v_desk_tot updatable.",
+              why: "The grouped view is blocked by grain, not by the filter.",
+            },
+            {
+              do: "DROP VIEW v_desk_tot leaves FILL in place. DROP TABLE fill would take the view with CASCADE, or fail with RESTRICT.",
+              why: "VIEW gone ≠ table gone. Know which object you named.",
+            },
+          ],
+          result:
+            "INSERT into the SUM view fails. Simple v_nse can accept a BSE row without CHECK OPTION (then it disappears from the view).",
+        },
+        {
+          title: "ALTER ADD COLUMN keeps rows; DROP TABLE does not",
+          prompt:
+            "Table SIP has 6 rows. Contrast ALTER TABLE sip ADD COLUMN step_up INT; with DROP TABLE sip; and DELETE FROM sip;",
+          code: "ALTER TABLE sip ADD COLUMN step_up INT;\nDELETE FROM sip;\nDROP TABLE sip;",
+          language: "sql",
+          steps: [
+            {
+              do: "ALTER ADD COLUMN keeps the 6 rows. New step_up is NULL (unless a default is given).",
+              why: "ALTER changes shape. The notebook stays; you add a new margin column.",
+            },
+            {
+              do: "DELETE FROM sip removes the 6 rows but the table (and indexes, grants) remain. You may INSERT again.",
+              why: "DELETE is row-level emptying. WHERE would have been allowed. Triggers fire.",
+            },
+            {
+              do: "DROP TABLE sip removes the object. Rows, indexes, and the name are gone. A later SELECT sip fails.",
+              why: "DROP is “throw away the notebook”, not “erase the lines”.",
+            },
+            {
+              do: "TRUNCATE would also empty all rows, with no WHERE, usually no per-row triggers.",
+              why: "TRUNCATE is the bulk reset between DELETE and DROP.",
+            },
+            {
+              do: "Need the 6 SIPs plus a new column → ALTER. Need the rows gone but the table kept → DELETE/TRUNCATE. Need the name gone → DROP.",
+              why: "Exam quartet: ALTER = shape, DELETE/TRUNCATE = rows, DROP = the thing is gone.",
+            },
+          ],
+          result:
+            "ALTER ADD: 6 rows remain, step_up NULL. DELETE: 0 rows, table remains. DROP: table gone.",
+        },
       ],
     },
     {
@@ -505,6 +811,66 @@ export const notesSql: TopicNote = {
             },
           ],
           result: "circ EXCEPT ack = {C3}. ack EXCEPT circ = empty.",
+        },
+        {
+          title: "UNION ALL then DISTINCT is UNION",
+          prompt:
+            "WATCH_A: Q1, Q1, Q2. WATCH_B: Q2, Q3, Q3. Row counts for UNION ALL, UNION, and SELECT DISTINCT of the UNION ALL.",
+          code: "SELECT isin FROM watch_a\nUNION ALL\nSELECT isin FROM watch_b;",
+          language: "sql",
+          steps: [
+            {
+              do: "UNION ALL concatenates six rows: Q1, Q1, Q2, Q2, Q3, Q3.",
+              why: "ALL means “keep the pile, do not tidy”. Copies from both sides stay.",
+            },
+            {
+              do: "UNION unique-ifies to {Q1, Q2, Q3} — three rows.",
+              why: "Plain UNION is concat + DISTINCT.",
+            },
+            {
+              do: "SELECT DISTINCT of that UNION ALL is also {Q1, Q2, Q3}. Same three names, extra work.",
+              why: "DISTINCT after UNION ALL reconstructs UNION. Prefer UNION if that is the meaning.",
+            },
+            {
+              do: "Two NULL rows, one on each side, collapse to one under UNION and stay two under UNION ALL.",
+              why: "Set operators treat NULL as equal to NULL, unlike WHERE col = NULL.",
+            },
+            {
+              do: "Column count must match. UNION of (isin, qty) with (isin) is an error.",
+              why: "Stacking needs the same width. Names come from the first SELECT.",
+            },
+          ],
+          result: "UNION ALL → 6 rows. UNION → 3 rows (Q1, Q2, Q3). DISTINCT of UNION ALL is the same 3.",
+        },
+        {
+          title: "EXCEPT drops the left-only names",
+          prompt:
+            "LIST_A: P7, P8, P8, P9. LIST_B: P8, P10. LIST_A EXCEPT LIST_B, then the swap, then INTERSECT.",
+          code: "SELECT pan FROM list_a\nEXCEPT\nSELECT pan FROM list_b;",
+          language: "sql",
+          steps: [
+            {
+              do: "Distinct sets: A = {P7, P8, P9}, B = {P8, P10}. A − B = {P7, P9}.",
+              why: "Default EXCEPT is DISTINCT. Extra P8 on the left still removes P8 once it appears on the right.",
+            },
+            {
+              do: "Swap: B − A = {P10}. Not the same as {P7, P9}.",
+              why: "EXCEPT is not symmetric. Always name which query is the left.",
+            },
+            {
+              do: "INTERSECT is {P8}. One row, even though A had P8 twice.",
+              why: "Intersect compares whole rows as a set by default. It does not fan out like a join.",
+            },
+            {
+              do: "EXCEPT ALL (where supported) would start from two P8s on the left and subtract one P8, leaving one P8 plus P7 and P9.",
+              why: "ALL uses multiplicities. If the paper is silent, answer DISTINCT EXCEPT.",
+            },
+            {
+              do: "Empty LIST_B ⇒ LIST_A EXCEPT LIST_B is {P7, P8, P9} (distinct left).",
+              why: "Minus nothing leaves the left set. That is not the NOT IN plus NULL trap.",
+            },
+          ],
+          result: "A EXCEPT B = {P7, P9}. B EXCEPT A = {P10}. INTERSECT = {P8}.",
         },
       ],
     },
@@ -589,6 +955,67 @@ export const notesSql: TopicNote = {
           ],
           result: "IN → no rows. NOT IN and NOT EXISTS → M1, M2, M3.",
         },
+        {
+          title: "IN does not fan out duplicates",
+          prompt:
+            "PAN_ROLL: P21, P22, P23. FILED: P21, P21, P22. WHERE pan IN (SELECT pan FROM filed).",
+          code: "SELECT pan FROM pan_roll\nWHERE pan IN (SELECT pan FROM filed);",
+          language: "sql",
+          steps: [
+            {
+              do: "Inner set {P21, P22}. Keep P21 and P22. Drop P23.",
+              why: "IN is a membership test, like “is this roll number on the sheet?”, not a join.",
+            },
+            {
+              do: "Two P21 rows in FILED do not duplicate P21 in the result.",
+              why: "IN is not a join fan-out. One outer row still prints once.",
+            },
+            {
+              do: "EXISTS (SELECT 1 FROM filed f WHERE f.pan = pan_roll.pan) returns the same two pans.",
+              why: "No NULLs, so IN and EXISTS agree.",
+            },
+            {
+              do: "An INNER JOIN on pan would print P21 twice (2 inner copies × 1 outer).",
+              why: "That is the join-versus-IN trap. Membership does not multiply.",
+            },
+            {
+              do: "Empty FILED would keep nobody for IN, and keep everybody for NOT IN (still no NULL).",
+              why: "Empty is vacuous, not poison. Poison is a NULL inside NOT IN.",
+            },
+          ],
+          result: "P21 and P22 once each. IN does not copy duplicates from the subquery.",
+        },
+        {
+          title: "NOT EXISTS survives a NULL inner row",
+          prompt:
+            "PAN_ROLL P21, P22, P23. FILED pans: P21 and NULL. NOT EXISTS (SELECT 1 FROM filed f WHERE f.pan = pan_roll.pan).",
+          code: "SELECT pan FROM pan_roll p\nWHERE NOT EXISTS (\n  SELECT 1 FROM filed f\n  WHERE f.pan = p.pan\n);",
+          language: "sql",
+          steps: [
+            {
+              do: "For P21 the inner finds the P21 file row → EXISTS true → NOT EXISTS drops P21.",
+              why: "A real equal match is enough. Extra NULL in FILED does not matter for this pan.",
+            },
+            {
+              do: "For P22: f.pan = P22 is false on P21 and unknown on NULL. No row qualifies → EXISTS false → keep P22. Same for P23.",
+              why: "NOT EXISTS only cares whether a matching row appeared. NULL = P22 is not true, so that inner row is not a match.",
+            },
+            {
+              do: "NOT IN (SELECT pan FROM filed) would be P22 <> P21 AND P22 <> NULL → unknown, and every outer pan dies.",
+              why: "That is the poison. Same data, opposite outer result.",
+            },
+            {
+              do: "Prefer NOT EXISTS (or LEFT JOIN … WHERE f.pan IS NULL) for “not in the list”.",
+              why: "Exam slogan: anti-membership → NOT EXISTS, never NOT IN (nullable_col).",
+            },
+            {
+              do: "Filter the subquery with pan IS NOT NULL inside NOT IN if you must use IN.",
+              why: "A clean list has no poison. EXISTS does not need that extra filter to stay safe.",
+            },
+          ],
+          result:
+            "NOT EXISTS keeps P22 and P23. NOT IN on the same list would return zero rows because of the NULL.",
+        },
       ],
     },
     {
@@ -671,6 +1098,67 @@ export const notesSql: TopicNote = {
             },
           ],
           result: "(M1, city, 100) and (M3, city, 60). HAVING filtered before the join.",
+        },
+        {
+          title: "Scalar subquery: 0 becomes NULL, 2 is an error",
+          prompt:
+            "DESK has D4 margin 9 and D5 margin 9. WHERE id = (SELECT id FROM desk WHERE margin = 9). What happens? What if margin = 9 matches nobody? What if you wrap with AVG?",
+          code: "SELECT id FROM desk\nWHERE id = (SELECT id FROM desk WHERE margin = 9);",
+          language: "sql",
+          steps: [
+            {
+              do: "The inner SELECT returns D4 and D5 — two rows, one column. A scalar subquery must be at most one row. The query errors.",
+              why: "Equals wants one value. Two names cannot sit on the right of =.",
+            },
+            {
+              do: "If nobody has margin 9, the scalar becomes NULL. id = NULL is unknown, so WHERE keeps nobody.",
+              why: "Zero rows in a scalar is NULL, not an error. Unknown fails the test.",
+            },
+            {
+              do: "IN (SELECT id FROM desk WHERE margin = 9) would legally keep D4 and D5.",
+              why: "IN/EXISTS may return many rows. Scalar may not.",
+            },
+            {
+              do: "(SELECT AVG(margin) FROM desk) always returns one row, even if DESK is empty (AVG of empty is NULL; COUNT of empty is 0).",
+              why: "An aggregate without GROUP BY is a one-row scalar. That is the safe rewrite when you wanted “the typical margin”.",
+            },
+            {
+              do: "Do not write WHERE margin = AVG(margin) without a subquery — AVG is not a per-row WHERE function.",
+              why: "Aggregates need GROUP BY/HAVING or a subquery.",
+            },
+          ],
+          result:
+            "Two matching ids → scalar error. Zero matches → NULL, outer WHERE empty. Use IN or AVG to avoid the two-row crash.",
+        },
+        {
+          title: "Correlated: fee above the city’s average",
+          prompt:
+            "STOP rows: (Mum, 8), (Mum, 4), (Pune, 12), (Pune, 3), (Pune, 6). Keep cities’ rows whose fee > AVG(fee) of the same city.",
+          code: "SELECT city, fee FROM stop s\nWHERE fee > (\n  SELECT AVG(fee) FROM stop t\n  WHERE t.city = s.city\n);",
+          language: "sql",
+          steps: [
+            {
+              do: "The inner query mentions s.city, so it is correlated — conceptually once per outer row.",
+              why: "Each stop asks “what is the average fee in my city?”",
+            },
+            {
+              do: "Mum AVG = (8+4)/2 = 6. Keep Mum 8, drop Mum 4. Pune AVG = (12+3+6)/3 = 7. Keep Pune 12, drop 3 and 6.",
+              why: "Tick groups separately. The grand average is 33/5 = 6.6 — a different bar. Correlation uses the city’s own average.",
+            },
+            {
+              do: "The uncorrelated WHERE fee > (SELECT AVG(fee) FROM stop) compares everyone to 6.6, so Pune 6 would still drop, but the English would be “above the overall average”, not “above my city”.",
+              why: "Correlation is the “same city” pin. Remove t.city = s.city and you changed the English.",
+            },
+            {
+              do: "A derived table of city averages joined on city is the uncorrelated rewrite: JOIN (SELECT city, AVG(fee) AS a FROM stop GROUP BY city) x ON x.city = s.city WHERE s.fee > x.a.",
+              why: "Same answer, one group-by, then a join. Alias the derived table.",
+            },
+            {
+              do: "Rows that tie the city average drop. Need “≥” if the English said “at least the city average”.",
+              why: "Read the comparison. This stem was strict >.",
+            },
+          ],
+          result: "Keep (Mum, 8) and (Pune, 12). City AVGs are 6 and 7. Grand AVG 6.6 is a different question.",
         },
       ],
     },

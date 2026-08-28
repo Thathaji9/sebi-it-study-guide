@@ -94,6 +94,72 @@ export const notesEnglish: TopicNote = {
           result:
             "(B) A number of funds have filed; the number of funds has risen.",
         },
+        {
+          title: "or / nor follows the nearer name",
+          prompt:
+            "Pick the correct pair. (A) Neither the trustees nor the AMC have filed; neither the AMC nor the trustees has filed. (B) Neither the trustees nor the AMC has filed; neither the AMC nor the trustees have filed. (C) Neither the trustees nor the AMC have filed; neither the AMC nor the trustees have filed.",
+          steps: [
+            {
+              do: "Find or / nor. The verb must match the name closest to it.",
+              why: "When two names are joined by or or nor, the nearer name wins. Do not add the two names together.",
+            },
+            {
+              do: "First clause: … nor the AMC. AMC is one body.",
+              why: "The nearer name is singular, so the verb is has, not have.",
+            },
+            {
+              do: "Second clause: … nor the trustees. trustees is plural.",
+              why: "The nearer name is many people, so the verb is have, not has.",
+            },
+            {
+              do: "Drop (A). It swaps both verbs.",
+              why: "have next to AMC and has next to trustees is the opposite of the nearer-name rule.",
+            },
+            {
+              do: "Drop (C). It uses have in both slots.",
+              why: "have next to AMC treats one AMC as many.",
+            },
+            {
+              do: "Pick (B).",
+              why: "has matches AMC; have matches trustees. That is the exam pair.",
+            },
+          ],
+          result:
+            "(B) nor the AMC has; nor the trustees have. Match the name next to the verb.",
+        },
+        {
+          title: "each is singular; ignore the of-phrase",
+          prompt:
+            "Find the errors: (i) ‘Each of the circulars have been filed.’ (ii) ‘The quality of the reports are poor.’ Fixes: (A) have → has; are → is (B) circulars → circular; reports → report (C) No error in either.",
+          steps: [
+            {
+              do: "In (i), underline Each. Cross out of the circulars.",
+              why: "Each is the head. The of-phrase only names the group. each takes a singular verb in this exam.",
+            },
+            {
+              do: "Change have to has in (i).",
+              why: "has matches Each. Keep circulars plural after of — you pick from a group.",
+            },
+            {
+              do: "In (ii), underline quality. Cross out of the reports.",
+              why: "quality is one thing. reports is only the tail. The nearest noun must not steal the verb.",
+            },
+            {
+              do: "Change are to is in (ii).",
+              why: "is matches quality. Do not make reports the subject.",
+            },
+            {
+              do: "Reject (B).",
+              why: "Changing the nouns after of is the wrong fix. The nouns stay plural; the verbs change.",
+            },
+            {
+              do: "Pick (A).",
+              why: "Both sentences needed a singular verb for a singular head.",
+            },
+          ],
+          result:
+            "(A) Each of the circulars has been filed. The quality of the reports is poor.",
+        },
       ],
     },
     {
@@ -186,6 +252,72 @@ export const notesEnglish: TopicNote = {
           result:
             "(C) The Chairperson issued information to the public. Unique office → the; mass noun → no article.",
         },
+        {
+          title: "an IPO, a SEBI report — say the letters",
+          prompt:
+            "Fill the blanks: ‘___ IPO follows ___ SEBI circular and ___ RBI note on ___ hour’s delay.’ (A) A, an, a, a (B) An, a, an, an (C) An, an, a, an (D) A, a, an, a.",
+          steps: [
+            {
+              do: "Say IPO out loud: eye-pee-oh.",
+              why: "The first sound is a vowel (eye). Vowel sound → an IPO.",
+            },
+            {
+              do: "Say SEBI: seb-ee. It starts with an s sound.",
+              why: "Consonant sound → a SEBI circular, even though other S-words can begin with ‘ess’.",
+            },
+            {
+              do: "Say RBI: are-bee-eye.",
+              why: "The first sound is a vowel (are). Vowel sound → an RBI note.",
+            },
+            {
+              do: "Say hour. The h is silent.",
+              why: "You hear our → an hour, so an hour’s delay.",
+            },
+            {
+              do: "Drop (A) and (D) because they start with A IPO.",
+              why: "A before a vowel sound is the classic trap.",
+            },
+            {
+              do: "Drop (C) because it writes an SEBI. Pick (B).",
+              why: "SEBI does not start with a vowel sound. The test is sound, not the first letter on the page.",
+            },
+          ],
+          result:
+            "(B) an IPO; a SEBI circular; an RBI note; an hour’s delay. Sound, not the first letter.",
+        },
+        {
+          title: "Zero article for people in general",
+          prompt:
+            "Choose: (A) The investors need the disclosure before they buy. (B) Investors need disclosure before they buy. (C) An investors need a disclosure before they buy. (D) Investors need an information before they buy.",
+          steps: [
+            {
+              do: "Ask whether the sentence means all investors, or a named group already in the story.",
+              why: "A general group takes no article. A unique or already-named group takes the.",
+            },
+            {
+              do: "Here it means investors as a class, and disclosure as the idea of telling facts.",
+              why: "So both nouns stay bare: Investors need disclosure.",
+            },
+            {
+              do: "Drop (A) because the investors and the disclosure sound like one known packet.",
+              why: "the is for ‘this set’ or a unique office, not a general rule.",
+            },
+            {
+              do: "Drop (C). An investors mixes a singular article with a plural noun.",
+              why: "an cannot sit before a plural.",
+            },
+            {
+              do: "Drop (D). information is a mass noun.",
+              why: "You do not write an information. You write information or a piece of information.",
+            },
+            {
+              do: "Pick (B).",
+              why: "General plural and general mass noun both take zero article.",
+            },
+          ],
+          result:
+            "(B) Investors need disclosure before they buy. General people and a mass idea take no article.",
+        },
       ],
     },
     {
@@ -269,6 +401,71 @@ export const notesEnglish: TopicNote = {
           ],
           result:
             "(B) to. Recipients take to; author takes by; law takes under; purpose takes for.",
+        },
+        {
+          title: "prohibit from, not prohibit to",
+          prompt:
+            "Spot the error: ‘SEBI shall prohibit connected persons to trade while they hold unpublished results.’ (A) shall prohibit (B) connected persons to trade (C) while they hold (D) unpublished results.",
+          steps: [
+            {
+              do: "Look at prohibit … to trade.",
+              why: "The set phrase is prohibit someone from doing. prohibit to trade is the error.",
+            },
+            {
+              do: "Keep shall prohibit as the verb idea.",
+              why: "shall plus prohibit is fine. The fault is the small word after the people.",
+            },
+            {
+              do: "Keep while they hold as ordinary English.",
+              why: "The time clause is not the designed error.",
+            },
+            {
+              do: "Keep unpublished results as sense, not grammar.",
+              why: "The idea is UPSI in GA. This item wants the preposition, not a new noun.",
+            },
+            {
+              do: "Write the fix: prohibit connected persons from trading.",
+              why: "from + -ing is the shape after prohibit. to would name a purpose, which is the wrong idea.",
+            },
+            {
+              do: "Remember a cousin pair: eligible for a licence, not eligible of.",
+              why: "Another small-word trap in the same family. Do not mix it into this underlined slot.",
+            },
+          ],
+          result: "Error in (B): prohibit from trading, not prohibit to trade.",
+        },
+        {
+          title: "not only … but also must stay parallel",
+          prompt:
+            "Pick the parallel sentence. (A) The circular not only requires disclosure but also filing on time. (B) The circular requires not only disclosure but also a timely filing. (C) The circular not only requires disclosure but also to file on time.",
+          steps: [
+            {
+              do: "Underline not only and but also. Check that the two halves have the same grammar shape.",
+              why: "The pair must join two verbs, or two nouns, not a noun and a to-verb.",
+            },
+            {
+              do: "In (A), not only sits before requires (a verb) but but also sits before filing (a noun).",
+              why: "Verb then noun is a broken pair.",
+            },
+            {
+              do: "In (C), disclosure is a noun and to file is a to-verb.",
+              why: "That mix is the same trap as a broken list after shall.",
+            },
+            {
+              do: "In (B), not only disclosure … but also a timely filing.",
+              why: "Two noun phrases share requires. That is a matching pair.",
+            },
+            {
+              do: "A second good shape would be requires not only to disclose but also to file.",
+              why: "Two to-verbs would also match. That option is not on this list.",
+            },
+            {
+              do: "Pick (B).",
+              why: "Same shape on both sides of but also.",
+            },
+          ],
+          result:
+            "(B) not only disclosure but also a timely filing — two nouns after requires.",
         },
       ],
     },
@@ -358,6 +555,72 @@ export const notesEnglish: TopicNote = {
           result:
             "(B) mitigate. You mitigate a risk. You do not mitigate a Chairperson or a circular.",
         },
+        {
+          title: "although + clause; despite + noun",
+          prompt:
+            "Fill both blanks: ‘___ the Board warned early, brokers delayed the upgrade. ___ that delay, T+1 still went live in phases.’ (A) Although, Despite (B) Despite, Although (C) However, Although (D) Although, However.",
+          steps: [
+            {
+              do: "Look at blank 1. It sits before a full clause: the Board warned early.",
+              why: "although takes a clause. despite would need a noun, as in despite the warning.",
+            },
+            {
+              do: "Look at blank 2. It sits before a noun phrase: that delay.",
+              why: "despite takes a noun. although that delay is missing a verb.",
+            },
+            {
+              do: "Drop (B). It swaps the two connectors.",
+              why: "Despite the Board warned is not English. Although that delay is not a full clause.",
+            },
+            {
+              do: "Drop (C). However the Board warned tries to join two clauses with however.",
+              why: "however usually starts a new sentence. It is not although.",
+            },
+            {
+              do: "Drop (D). However that delay is the same noun-after-however fault.",
+              why: "You would need a full stop: Brokers delayed. However, T+1 still went live.",
+            },
+            {
+              do: "Pick (A).",
+              why: "although + clause; despite + noun. That is the connector pair to memorise.",
+            },
+          ],
+          result:
+            "(A) Although the Board warned early … Despite that delay …. however is not a mid-clause linker.",
+        },
+        {
+          title: "surveillance watches trades; prudent is carefully wise",
+          prompt:
+            "Stock exchanges keep the order book under ___. A ___ intermediary still discloses a material rumour. (A) disclosure, festive (B) surveillance, prudent (C) novation, edible (D) repo, comic.",
+          steps: [
+            {
+              do: "Blank 1 is what exchanges do to the order book.",
+              why: "Watching trades for tricks is surveillance, not disclosure (companies file) and not novation (the CCP stands in the middle).",
+            },
+            {
+              do: "Blank 2 describes the intermediary who still tells the market.",
+              why: "prudent means carefully wise. That matches a rule-following intermediary, not a party word.",
+            },
+            {
+              do: "Kill (A). festive is not official English, and disclosure is the company’s job.",
+              why: "Exchanges watch; companies disclose. Do not swap the verbs.",
+            },
+            {
+              do: "Kill (C) and (D) as nonsense tone.",
+              why: "edible and comic are not market words. repo is an RBI tool, not an order-book watch.",
+            },
+            {
+              do: "Pick (B).",
+              why: "Both blanks fit: surveillance on the book; a prudent intermediary discloses.",
+            },
+            {
+              do: "Remember material from the earlier pair: the rumour must be important enough to matter.",
+              why: "Official tone wants disclose / material / surveillance / prudent, not hide / juicy / fix up.",
+            },
+          ],
+          result:
+            "(B) surveillance, prudent. Exchanges watch the book; prudent means carefully wise.",
+        },
       ],
     },
     {
@@ -445,6 +708,70 @@ export const notesEnglish: TopicNote = {
           result:
             "Opener B; pair B–D; closer A. A good full order is B–D–C–A.",
         },
+        {
+          title: "Four sentences on UPSI",
+          prompt:
+            "Arrange: A. Hence a private chat is still communication, not a safe harbour. B. Unpublished price-sensitive information can move a share price if it leaks. C. That is why PIT allows sharing only for a real work or legal need, with records. D. An oral promise not to trade does not make a leak safe.",
+          steps: [
+            {
+              do: "Find the opener. Pick B.",
+              why: "A has Hence (result). C has That is why (needs a cause). D is a later warning about a promise. B names UPSI with no backward word.",
+            },
+            {
+              do: "Pair B with C.",
+              why: "C’s That is why points at B’s idea that a leak can move the price.",
+            },
+            {
+              do: "Place D after C.",
+              why: "D comments on a false defence once the sharing rule is on the table. D cannot open the paragraph.",
+            },
+            {
+              do: "Put A last.",
+              why: "Hence packs the warning into a closer: a private chat is still communication.",
+            },
+            {
+              do: "Reject orders that start with A or C.",
+              why: "Hence and That is why look backward. They cannot open.",
+            },
+            {
+              do: "Read B–C–D–A as a paragraph.",
+              why: "Idea, rule, false defence, then the chat-group closer. No stranded pronoun.",
+            },
+          ],
+          result: "B–C–D–A. Opener B; pair B–C; closer A.",
+        },
+        {
+          title: "this / these cannot open",
+          prompt:
+            "A. These ratios are RBI tools, not SEBI listing rules. B. Repo injects rupees against collateral; CRR parks cash at the Reserve Bank. C. Therefore a sentence that says ‘SEBI’s repo’ is already wrong. D. That mix of two regulators is a common Paper 1 trap. Find opener, pair, closer.",
+          steps: [
+            {
+              do: "Cross out A as opener.",
+              why: "These ratios needs ratios already named.",
+            },
+            {
+              do: "Cross out C as opener.",
+              why: "Therefore marks a result.",
+            },
+            {
+              do: "Cross out D as opener.",
+              why: "That mix needs a mix already on the table.",
+            },
+            {
+              do: "Pick B as first. Pair B with A.",
+              why: "B names repo and CRR. A’s These ratios points at that pair.",
+            },
+            {
+              do: "Park D after A. Put C last.",
+              why: "D’s That mix points at the SEBI/RBI mix. Therefore then closes: ‘SEBI’s repo’ is wrong.",
+            },
+            {
+              do: "Read B–A–D–C. Kill any order that strands These or That.",
+              why: "A true RBI fact in A does not make A first. A pointing word still needs a home.",
+            },
+          ],
+          result: "B–A–D–C. Opener B; pair B–A; closer C.",
+        },
       ],
     },
     {
@@ -528,6 +855,72 @@ export const notesEnglish: TopicNote = {
           ],
           result:
             "(B) is the main idea. (A) fights the passage. (C) and (D) are off-passage.",
+        },
+        {
+          title: "Kill always / never unless the passage is that strong",
+          prompt:
+            "Passage: ‘Optional T+0 is a limited extra path. Most cash stocks still settle T+1.’ Options: (A) Every listed stock must settle on the trade date (B) T+0 is not the default for every stock (C) India never uses T+1 (D) Brokers always finish custody by noon. Which follows?",
+          steps: [
+            {
+              do: "Label the question as inference, not a memory test.",
+              why: "You may use only the printed lines.",
+            },
+            {
+              do: "Drop (A). must and every plus trade date over-claim T+0.",
+              why: "The passage calls T+0 limited and extra, not compulsory same-day for all.",
+            },
+            {
+              do: "Drop (C). never fights the line that most stocks still settle T+1.",
+              why: "Extreme never is wrong when the passage names T+1 as the usual cycle.",
+            },
+            {
+              do: "Drop (D). always and by noon are not in the passage.",
+              why: "A true operations worry from class is still extra GK here.",
+            },
+            {
+              do: "Keep (B).",
+              why: "limited extra path plus most stocks still T+1 force that one step: T+0 is not the default for every stock.",
+            },
+            {
+              do: "Write the extreme-word test in the margin: always / never / must / only.",
+              why: "Those words are often wrong unless the passage was that strong.",
+            },
+          ],
+          result:
+            "(B). (A), (C), and (D) add always / never / must. The passage was not that strong.",
+        },
+        {
+          title: "Do not add outside Chairperson GK",
+          prompt:
+            "Passage: ‘The Board’s 2024 annual report was signed while the then Chairperson still had months left in the term that began in March 2022.’ A student picks Pandey because ‘that is today’s Chair’. What does the passage actually support?",
+          steps: [
+            {
+              do: "Treat this as a fact question about the passage’s own dating.",
+              why: "Fact = point to a line. The line says the term began in March 2022 and still covered 2024.",
+            },
+            {
+              do: "March 2022 start matches Buch’s term in the GA table, but you still follow the passage.",
+              why: "Even if you know the names, the passage did not print Pandey.",
+            },
+            {
+              do: "Reject Pandey as an import.",
+              why: "Pandey took charge in March 2025. That is true in the world and still the wrong answer to this passage.",
+            },
+            {
+              do: "Reject Tyagi.",
+              why: "Tyagi’s term ended February 2022, before a March 2022 start.",
+            },
+            {
+              do: "Answer with the passage: the Chair whose term began March 2022 and covered 2024.",
+              why: "If the options name Buch, that is the fact lookup. If they only paraphrase the dates, pick that paraphrase.",
+            },
+            {
+              do: "Write the rule: a true later fact can still be off-passage.",
+              why: "Same trap as inventing a Chair in a precis.",
+            },
+          ],
+          result:
+            "Fact: the March 2022 Chair still signed in 2024 (Buch in GA). Pandey is true later, not this passage.",
         },
       ],
     },
@@ -617,6 +1010,72 @@ export const notesEnglish: TopicNote = {
           ],
           result:
             "Faults: 250 for 25, 2022 for 2024, extra Chair. Faithful: limited optional T+0 from March 2024 beside T+1.",
+        },
+        {
+          title: "Cut the story; keep the claim it proved",
+          prompt:
+            "Passage: ‘A kettle on a desk does not make the water safe. In the same way, a new trading app does not make the price, the prize, or a child’s spend safe. The useful tests stay old: is the price clear, is the chance of a prize disclosed, can a child spend without a parent?’ Student precis: ‘A kettle on a desk is a SEBI product. Ban all apps.’ Rewrite.",
+          steps: [
+            {
+              do: "Name the claim: a new app does not by itself make three old risks go away.",
+              why: "The kettle is only a picture. The claim is about price, prize, and a child’s spend.",
+            },
+            {
+              do: "Drop the kettle from the precis (or keep it in three words if you must).",
+              why: "Examples and props are the first cut. The exam wants the idea, not the furniture.",
+            },
+            {
+              do: "Keep the three tests in short words.",
+              why: "Those tests carry the claim. Cutting them leaves only a slogan.",
+            },
+            {
+              do: "Kill Ban all apps.",
+              why: "The author asked useful questions. The author did not order a ban. Same-stance rule.",
+            },
+            {
+              do: "Kill A kettle … is a SEBI product.",
+              why: "That invents a product and a regulator fact the passage did not state.",
+            },
+            {
+              do: "Write: ‘A new app does not remove old duties: clear price, disclosed prize, and a check on a child’s spend.’",
+              why: "Same order, shorter, no new policy.",
+            },
+          ],
+          result:
+            "Keep the three tests. Cut the kettle. Do not add a ban or a fake SEBI product.",
+        },
+        {
+          title: "Title the precis with a noun phrase, not a slogan",
+          prompt:
+            "Passage stance: optional T+0 should stay a limited test. Candidate titles: (A) T+0 forever (B) Make T+0 compulsory now (C) Optional same-day settlement as a limited test (D) I hate settlement cycles. Which title is allowed?",
+          steps: [
+            {
+              do: "A precis title is a plain noun phrase of the issue.",
+              why: "It names the topic. It does not cheer, ban, or add ‘I’.",
+            },
+            {
+              do: "Drop (A) T+0 forever.",
+              why: "That is a slogan and it reverses limited test.",
+            },
+            {
+              do: "Drop (B).",
+              why: "compulsory fights optional. The title cannot change the stance.",
+            },
+            {
+              do: "Drop (D).",
+              why: "First person and a feeling are not the author’s title.",
+            },
+            {
+              do: "Keep (C).",
+              why: "It names optional same-day settlement and keeps limited test, without a campaign line.",
+            },
+            {
+              do: "If you write a one-line precis under that title, keep the custody-and-funding caution.",
+              why: "The title is not enough. The body must still match the author’s warning.",
+            },
+          ],
+          result:
+            "(C) Optional same-day settlement as a limited test. No slogan, no reverse, no ‘I’.",
         },
       ],
     },
