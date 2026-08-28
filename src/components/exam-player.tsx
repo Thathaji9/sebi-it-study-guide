@@ -109,7 +109,13 @@ export function MockRunner({
   const updateLive = (partial: Partial<LiveExam>) => {
     setLive((prev) => {
       if (!prev) return prev;
-      const next = { ...prev, ...partial };
+      const next: LiveExam = {
+        ...prev,
+        ...partial,
+        answers: partial.answers
+          ? { ...prev.answers, ...partial.answers }
+          : prev.answers,
+      };
       sessionStorage.setItem(persistKey(paperId), JSON.stringify(next));
       return next;
     });

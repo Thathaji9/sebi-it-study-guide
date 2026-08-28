@@ -108,7 +108,13 @@ export function DescriptiveRunner({
   const patch = (partial: Partial<LiveWriting>) => {
     setLive((prev) => {
       if (!prev) return prev;
-      const next = { ...prev, ...partial };
+      const next: LiveWriting = {
+        ...prev,
+        ...partial,
+        answers: partial.answers
+          ? { ...prev.answers, ...partial.answers }
+          : prev.answers,
+      };
       sessionStorage.setItem(persistKey(paperId), JSON.stringify(next));
       return next;
     });
