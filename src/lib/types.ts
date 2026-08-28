@@ -39,6 +39,7 @@ export type ExamKind =
   | "phase1-paper2"
   | "phase1-paper1"
   | "phase2-paper2"
+  | "phase2-paper1"
   | "topic"
   | "revise-wrong";
 
@@ -52,6 +53,7 @@ export type MockPaper = {
   minutes: number;
   marksEach: number;
   cutoffPercent: number;
+  mode?: "mcq" | "descriptive";
 };
 
 export type AttemptRecord = {
@@ -74,6 +76,12 @@ export type MockResult = {
   skipped: number;
   cutoffPercent: number;
   attempts: AttemptRecord[];
+  writing?: {
+    set: number;
+    chosenEssay: number;
+    essay: string;
+    precis: string;
+  };
 };
 
 export type ProgressState = {

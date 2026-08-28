@@ -1,3 +1,4 @@
+import { descriptiveRcQuestions } from "@/data/descriptive";
 import { paper1Hard } from "@/data/questions-paper1-hard";
 import { paper1Questions } from "@/data/questions-paper1";
 import { phase1HardDbSql, phase1HardRest } from "@/data/questions-phase1-hard";
@@ -16,6 +17,7 @@ export const allQuestions: Question[] = [
   ...phase2Hard,
   ...paper1Questions,
   ...paper1Hard,
+  ...descriptiveRcQuestions,
 ];
 
 export function questionsByTopic(topic: TopicId): Question[] {

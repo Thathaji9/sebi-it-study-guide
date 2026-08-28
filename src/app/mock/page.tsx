@@ -9,10 +9,9 @@ export default function MockIndexPage() {
       <header>
         <h1 className="font-heading text-3xl">Timed mocks</h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Six distinct papers per stage, written at SEBI Grade A IT difficulty
-          or a notch harder (GATE-style traces, traps, and multi-step reasoning).
-          Official-style weightages, a running clock, question palette,
-          mark-for-review, and −¼ negative marking.
+          Six distinct papers for every official written paper, plus interview
+          panels. IT MCQs are SEBI Grade A or a notch harder. Descriptive
+          English is a 60-minute typing paper (essay, precis, RC).
         </p>
       </header>
 
@@ -28,14 +27,24 @@ export default function MockIndexPage() {
                 </p>
               </div>
               <ul className="text-sm text-muted-foreground">
-                <li>
-                  {family.questions} questions · {family.minutes} min
-                </li>
-                <li>
-                  {family.marksEach} marks each · −{family.marksEach * 0.25} if
-                  wrong
-                </li>
-                <li>Cut-off {family.cutoffPercent}%</li>
+                {family.mode === "descriptive" ? (
+                  <>
+                    <li>Essay + precis (typed) · 5 RC MCQs</li>
+                    <li>{family.minutes} min · RC {family.marksEach} marks each</li>
+                    <li>Cut-off 30% of 100 (writing is self-checked)</li>
+                  </>
+                ) : (
+                  <>
+                    <li>
+                      {family.questions} questions · {family.minutes} min
+                    </li>
+                    <li>
+                      {family.marksEach} marks each · −{family.marksEach * 0.25}{" "}
+                      if wrong
+                    </li>
+                    <li>Cut-off {family.cutoffPercent}%</li>
+                  </>
+                )}
               </ul>
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

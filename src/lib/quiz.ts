@@ -1,3 +1,4 @@
+import { descriptiveBySet } from "@/data/descriptive";
 import { allQuestions, questionsByTopic } from "@/data/questions";
 import { mockById, mocks } from "@/data/exam";
 import type { ExamKind, MockPaper, Question, TopicId } from "@/lib/types";
@@ -49,7 +50,8 @@ const PHASE2_P2: { topic: TopicId; count: number }[] = [
 function quotaFor(kind: MockPaper["kind"]) {
   if (kind === "phase1-paper2") return PHASE1_P2;
   if (kind === "phase1-paper1") return PHASE1_P1;
-  return PHASE2_P2;
+  if (kind === "phase2-paper2") return PHASE2_P2;
+  return [];
 }
 
 function poolFor(kind: MockPaper["kind"]) {
@@ -59,7 +61,10 @@ function poolFor(kind: MockPaper["kind"]) {
   if (kind === "phase1-paper1") {
     return allQuestions.filter((q) => q.paper === 1);
   }
-  return allQuestions.filter((q) => q.phase === 2);
+  if (kind === "phase2-paper2") {
+    return allQuestions.filter((q) => q.phase === 2 && q.paper === 2);
+  }
+  return [];
 }
 
 /** Stable order so Mock N always draws the same slice of each topic. */
@@ -88,6 +93,9 @@ function sliceForSet(
 }
 
 export function buildMockPaper(paper: MockPaper): Question[] {
+  if (paper.kind === "phase2-paper1") {
+    return descriptiveBySet(paper.set)?.rc ?? [];
+  }
   const rng = mulberry32(paper.set * 9973 + 17);
   const pool = poolFor(paper.kind);
   const picked = quotaFor(paper.kind).flatMap(({ topic, count }) =>

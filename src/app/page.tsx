@@ -66,7 +66,7 @@ export default function HomePage() {
             {allQuestions.length} questions in the bank
           </p>
         </div>
-        <div className="grid gap-3 md:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {mockFamilies.map((f) => (
             <Link
               key={f.kind}
@@ -75,7 +75,11 @@ export default function HomePage() {
             >
               <p className="font-heading text-lg">{f.familyTitle}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                6 distinct mocks · {f.questions} questions · {f.minutes} min
+                6 distinct mocks ·{" "}
+                {"mode" in f && f.mode === "descriptive"
+                  ? "essay, precis, RC"
+                  : `${f.questions} questions`}{" "}
+                · {f.minutes} min
               </p>
               <p className="mt-3 text-sm font-medium text-primary">
                 Choose a paper →
