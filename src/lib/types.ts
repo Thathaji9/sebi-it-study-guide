@@ -54,6 +54,11 @@ export type MockPaper = {
   marksEach: number;
   cutoffPercent: number;
   mode?: "mcq" | "descriptive";
+  /** Timed practice paper vs memory-based previous-year reconstruction. */
+  source?: "mock" | "pyq";
+  year?: number;
+  /** When set, the paper is the questions whose ids start with this prefix. */
+  idPrefix?: string;
 };
 
 export type AttemptRecord = {

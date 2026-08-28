@@ -16,6 +16,7 @@ Mocks are pitched at **SEBI Grade A IT difficulty or a notch harder** (GATE-styl
   - Phase I Paper 2: 50 questions, 40 minutes (official IT length)
   - Phase II Paper 1: descriptive English — essay + precis (typed) + 5 RC MCQs, 60 minutes
   - Phase II Paper 2: 25 dry-run / debug MCQs, 45 minutes
+- **PYQs** — memory-based reconstructions (SEBI does not publish official papers) for 2020–2026 cycles across Phase I Papers 1–2 and Phase II Papers 1–2. Original items in the reported topic mix, not copied coaching PDFs.
 - **Interview** — pattern (15% of final merit) plus three mock panels with talking points
 - **Review** — score vs cut-off, topic split, full answer key
 - **Wrong-question revision** — misses stay on this browser (localStorage)

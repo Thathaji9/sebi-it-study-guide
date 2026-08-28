@@ -336,6 +336,7 @@ export const mocks = mockFamilies.flatMap((family) =>
       id: `${family.kind}-m${set}`,
       kind: family.kind,
       set,
+      source: "mock" as const,
       title: `${family.familyTitle} · Mock ${set}`,
       blurb: family.familyBlurb,
       questions: family.questions,
@@ -347,8 +348,90 @@ export const mocks = mockFamilies.flatMap((family) =>
   }),
 );
 
+const PYQ_NOTE =
+  "Memory-based reconstruction. SEBI does not publish official papers. Original items in the style of reported PYQ topics — not a verbatim coaching PDF.";
+
+const pyqKindMeta = {
+  "phase1-paper1": {
+    short: "p1p1",
+    familyTitle: "Phase I · Paper 1 (screening)",
+    questions: 40,
+    minutes: 30,
+    marksEach: 1.25,
+    cutoffPercent: 30,
+    mode: "mcq" as const,
+  },
+  "phase1-paper2": {
+    short: "p1p2",
+    familyTitle: "Phase I · Paper 2 (IT)",
+    questions: 50,
+    minutes: 40,
+    marksEach: 2,
+    cutoffPercent: 40,
+    mode: "mcq" as const,
+  },
+  "phase2-paper1": {
+    short: "p2p1",
+    familyTitle: "Phase II · Paper 1 (descriptive English)",
+    questions: 5,
+    minutes: 60,
+    marksEach: 8,
+    cutoffPercent: 30,
+    mode: "descriptive" as const,
+  },
+  "phase2-paper2": {
+    short: "p2p2",
+    familyTitle: "Phase II · Paper 2 (coding logic)",
+    questions: 25,
+    minutes: 45,
+    marksEach: 4,
+    cutoffPercent: 40,
+    mode: "mcq" as const,
+  },
+};
+
+const pyqYears: {
+  kind: keyof typeof pyqKindMeta;
+  years: number[];
+}[] = [
+  { kind: "phase1-paper1", years: [2020, 2022, 2024, 2025] },
+  { kind: "phase1-paper2", years: [2020, 2022, 2024, 2025] },
+  { kind: "phase2-paper1", years: [2024, 2026] },
+  { kind: "phase2-paper2", years: [2022, 2024, 2025, 2026] },
+];
+
+export const pyqPapers = pyqYears.flatMap(({ kind, years }) =>
+  years.map((year) => {
+    const meta = pyqKindMeta[kind];
+    return {
+      id: `pyq-${year}-${kind}`,
+      kind,
+      set: year,
+      year,
+      source: "pyq" as const,
+      idPrefix: `pyq-${year}-${meta.short}-`,
+      title: `${meta.familyTitle} · PYQ ${year}`,
+      blurb: `${year} cycle. ${PYQ_NOTE}`,
+      questions: meta.questions,
+      minutes: meta.minutes,
+      marksEach: meta.marksEach,
+      cutoffPercent: meta.cutoffPercent,
+      mode: meta.mode,
+    };
+  }),
+);
+
+export const pyqFamilies = pyqYears.map(({ kind, years }) => ({
+  kind,
+  years,
+  ...pyqKindMeta[kind],
+}));
+
+/** Named mocks plus memory-based PYQ papers. */
+export const sitPapers = [...mocks, ...pyqPapers];
+
 export function mockById(id: string) {
-  return mocks.find((m) => m.id === id);
+  return sitPapers.find((m) => m.id === id);
 }
 
 export const topicById = Object.fromEntries(

@@ -1,10 +1,11 @@
 import { makeQuestion } from "@/data/make-question";
+import { descriptivePyqPapers } from "@/data/descriptive-pyq";
 import type { Question } from "@/lib/types";
 
 const rc = makeQuestion(2, 1);
 
 export type DescriptivePaper = {
-  set: 1 | 2 | 3 | 4 | 5 | 6;
+  set: number;
   essayPrompts: string[];
   essayWordLimit: number;
   essayMarks: number;
@@ -635,9 +636,13 @@ IT officers who treat golden-record work as janitorial will spend their careers 
 ];
 
 export function descriptiveBySet(set: number) {
-  return descriptivePapers.find((p) => p.set === set);
+  return (
+    descriptivePapers.find((p) => p.set === set) ??
+    descriptivePyqPapers.find((p) => p.set === set)
+  );
 }
 
-export const descriptiveRcQuestions: Question[] = descriptivePapers.flatMap(
-  (p) => p.rc,
-);
+export const descriptiveRcQuestions: Question[] = [
+  ...descriptivePapers.flatMap((p) => p.rc),
+  ...descriptivePyqPapers.flatMap((p) => p.rc),
+];

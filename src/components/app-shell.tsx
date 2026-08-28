@@ -78,9 +78,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-border/80 bg-background/90 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4">
           <Link href="/" className="flex min-w-0 items-center gap-2.5">
-            <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-primary font-heading text-sm text-primary-foreground">
-              A
-            </span>
+            <svg
+              viewBox="0 0 32 32"
+              className="size-8 shrink-0"
+              aria-hidden="true"
+            >
+              <rect width="32" height="32" rx="7" fill="#1F4E5F" />
+              <path
+                fill="#F7F4EE"
+                fillRule="evenodd"
+                d="M16 6.2 25.4 23.2h-2.95l-1.72-4.55H11.27L9.55 23.2H6.6L16 6.2Zm0 5.15-2.72 5.5h5.44L16 11.35Z"
+              />
+              <rect
+                x="10.2"
+                y="24.55"
+                width="11.6"
+                height="1.45"
+                rx="0.72"
+                fill="#C4A35A"
+              />
+            </svg>
             <span className="min-w-0">
               <span className="block font-heading text-base leading-none tracking-tight">
                 {APP_NAME}

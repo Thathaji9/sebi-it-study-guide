@@ -2,9 +2,9 @@ import { notFound } from "next/navigation";
 
 import { DescriptiveRunner } from "@/components/descriptive-player";
 import { MockRunner } from "@/components/exam-player";
-import { mocks } from "@/data/exam";
+import { sitPapers } from "@/data/exam";
 
-const allowed = new Set(mocks.map((m) => m.id));
+const allowed = new Set(sitPapers.map((m) => m.id));
 
 export default async function MockPaperPage({
   params,
@@ -15,7 +15,7 @@ export default async function MockPaperPage({
 }) {
   const { kind } = await params;
   const query = await searchParams;
-  const paper = mocks.find((m) => m.id === kind);
+  const paper = sitPapers.find((m) => m.id === kind);
   if (!paper || !allowed.has(kind)) notFound();
 
   return (

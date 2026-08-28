@@ -54,15 +54,21 @@ function quotaFor(kind: MockPaper["kind"]) {
   return [];
 }
 
+function isPyqQuestion(q: Question) {
+  return q.id.startsWith("pyq-");
+}
+
 function poolFor(kind: MockPaper["kind"]) {
+  // Keep named mocks disjoint from PYQ reconstructions.
+  const bank = allQuestions.filter((q) => !isPyqQuestion(q));
   if (kind === "phase1-paper2") {
-    return allQuestions.filter((q) => q.phase === 1 && q.paper === 2);
+    return bank.filter((q) => q.phase === 1 && q.paper === 2);
   }
   if (kind === "phase1-paper1") {
-    return allQuestions.filter((q) => q.paper === 1);
+    return bank.filter((q) => q.phase === 1 && q.paper === 1);
   }
   if (kind === "phase2-paper2") {
-    return allQuestions.filter((q) => q.phase === 2 && q.paper === 2);
+    return bank.filter((q) => q.phase === 2 && q.paper === 2);
   }
   return [];
 }
@@ -92,9 +98,22 @@ function sliceForSet(
   return picked;
 }
 
+function questionsByPrefix(prefix: string): Question[] {
+  return allQuestions.filter((q) => q.id.startsWith(prefix)).sort(byId);
+}
+
 export function buildMockPaper(paper: MockPaper): Question[] {
   if (paper.kind === "phase2-paper1") {
     return descriptiveBySet(paper.set)?.rc ?? [];
+  }
+  if (paper.idPrefix) {
+    const listed = questionsByPrefix(paper.idPrefix);
+    const rng = mulberry32(paper.year ?? paper.set * 9973 + 17);
+    const picked =
+      listed.length >= paper.questions
+        ? listed.slice(0, paper.questions)
+        : listed;
+    return shuffle(picked, rng);
   }
   const rng = mulberry32(paper.set * 9973 + 17);
   const pool = poolFor(paper.kind);
