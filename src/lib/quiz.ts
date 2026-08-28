@@ -1,6 +1,6 @@
 import { allQuestions, questionsByTopic } from "@/data/questions";
-import { mocks } from "@/data/exam";
-import type { ExamKind, Question, TopicId } from "@/lib/types";
+import { mockById, mocks } from "@/data/exam";
+import type { ExamKind, MockPaper, Question, TopicId } from "@/lib/types";
 
 function mulberry32(seed: number) {
   return function rng() {
@@ -20,14 +20,6 @@ function shuffle<T>(items: T[], rng: () => number): T[] {
   return a;
 }
 
-function take(topic: TopicId, count: number, rng: () => number, pool = allQuestions) {
-  const from = shuffle(
-    pool.filter((q) => q.topic === topic),
-    rng,
-  );
-  return from.slice(0, Math.min(count, from.length));
-}
-
 const PHASE1_P2: { topic: TopicId; count: number }[] = [
   { topic: "database", count: 5 },
   { topic: "sql", count: 5 },
@@ -41,10 +33,10 @@ const PHASE1_P2: { topic: TopicId; count: number }[] = [
 ];
 
 const PHASE1_P1: { topic: TopicId; count: number }[] = [
-  { topic: "ga", count: 5 },
-  { topic: "english", count: 5 },
-  { topic: "quant", count: 5 },
-  { topic: "reasoning", count: 5 },
+  { topic: "ga", count: 10 },
+  { topic: "english", count: 10 },
+  { topic: "quant", count: 10 },
+  { topic: "reasoning", count: 10 },
 ];
 
 const PHASE2_P2: { topic: TopicId; count: number }[] = [
@@ -54,39 +46,72 @@ const PHASE2_P2: { topic: TopicId; count: number }[] = [
   { topic: "strings", count: 3 },
 ];
 
-export function buildMock(kind: ExamKind, seed = Date.now()): Question[] {
-  const rng = mulberry32(seed);
-  if (kind === "phase1-paper2") {
-    const pool = allQuestions.filter((q) => q.phase === 1 && q.paper === 2);
-    return shuffle(
-      PHASE1_P2.flatMap(({ topic, count }) => take(topic, count, rng, pool)),
-      rng,
-    );
-  }
-  if (kind === "phase1-paper1") {
-    const pool = allQuestions.filter((q) => q.paper === 1);
-    return shuffle(
-      PHASE1_P1.flatMap(({ topic, count }) => take(topic, count, rng, pool)),
-      rng,
-    );
-  }
-  if (kind === "phase2-paper2") {
-    const pool = allQuestions.filter((q) => q.phase === 2);
-    const picked = PHASE2_P2.flatMap(({ topic, count }) => take(topic, count, rng, pool));
-    if (picked.length < 25) {
-      const extras = shuffle(
-        pool.filter((q) => !picked.some((p) => p.id === q.id)),
-        rng,
-      );
-      picked.push(...extras.slice(0, 25 - picked.length));
-    }
-    return shuffle(picked.slice(0, 25), rng);
-  }
-  return [];
+function quotaFor(kind: MockPaper["kind"]) {
+  if (kind === "phase1-paper2") return PHASE1_P2;
+  if (kind === "phase1-paper1") return PHASE1_P1;
+  return PHASE2_P2;
 }
 
-export function mockConfig(kind: ExamKind) {
-  return mocks.find((m) => m.kind === kind);
+function poolFor(kind: MockPaper["kind"]) {
+  if (kind === "phase1-paper2") {
+    return allQuestions.filter((q) => q.phase === 1 && q.paper === 2);
+  }
+  if (kind === "phase1-paper1") {
+    return allQuestions.filter((q) => q.paper === 1);
+  }
+  return allQuestions.filter((q) => q.phase === 2);
+}
+
+/** Stable order so Mock N always draws the same slice of each topic. */
+function byId(a: Question, b: Question) {
+  return a.id.localeCompare(b.id);
+}
+
+function sliceForSet(
+  pool: Question[],
+  topic: TopicId,
+  count: number,
+  setIndex: number,
+) {
+  const from = pool.filter((q) => q.topic === topic).sort(byId);
+  if (from.length === 0 || count <= 0) return [];
+  const start = ((setIndex - 1) * count) % from.length;
+  const picked: Question[] = [];
+  const used = new Set<string>();
+  for (let i = 0; i < from.length && picked.length < count; i++) {
+    const item = from[(start + i) % from.length];
+    if (used.has(item.id)) continue;
+    used.add(item.id);
+    picked.push(item);
+  }
+  return picked;
+}
+
+export function buildMockPaper(paper: MockPaper): Question[] {
+  const rng = mulberry32(paper.set * 9973 + 17);
+  const pool = poolFor(paper.kind);
+  const picked = quotaFor(paper.kind).flatMap(({ topic, count }) =>
+    sliceForSet(pool, topic, count, paper.set),
+  );
+  if (picked.length < paper.questions) {
+    const extras = pool
+      .filter((q) => !picked.some((p) => p.id === q.id))
+      .sort(byId);
+    picked.push(...extras.slice(0, paper.questions - picked.length));
+  }
+  return shuffle(picked.slice(0, paper.questions), rng);
+}
+
+/** @deprecated Prefer buildMockPaper; kept for callers that only have a kind. */
+export function buildMock(kind: ExamKind, seed = Date.now()): Question[] {
+  const paper = mocks.find((m) => m.kind === kind);
+  if (!paper) return [];
+  if (kind === "topic" || kind === "revise-wrong") return [];
+  return buildMockPaper({ ...paper, set: (seed % 6) + 1 });
+}
+
+export function mockConfig(id: string) {
+  return mockById(id);
 }
 
 export function scoreAttempt(

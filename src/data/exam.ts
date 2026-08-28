@@ -244,8 +244,17 @@ export const pattern = {
     },
     {
       name: "Phase III — Interview",
-      note: "Interview 15% + Phase II 85%. You may choose Hindi or English.",
-      papers: [],
+      note: "Interview 15% + Phase II 85%. You may choose Hindi or English. Typical panel: 15–25 minutes, mixed technical + markets + HR. No official published paper — practise talking points, not MCQs.",
+      papers: [
+        {
+          name: "Interview (viva)",
+          marks: 100,
+          durationMin: 25,
+          cutoff: 0,
+          extra:
+            "Weight 15% of final merit. Depth in DSA/DBMS/networks/security, awareness of SEBI’s tech and market role, projects, and integrity. Language: Hindi or English.",
+        },
+      ],
     },
   ],
   negativeMarking: "1/4th of the marks assigned to the question (MCQs).",
@@ -266,43 +275,66 @@ export const strategy = [
     body: "The 2025 IT Paper 2 (Phase II) is an MCQ coding-logic paper: outputs, bugs, incomplete logic. Trace code on paper every day in Java, C++, and Python.",
   },
   {
-    title: "Negative marking is real",
-    body: "1/4th penalty. In a 50-question Paper 2, a wild guess that is wrong costs 0.5 marks. Skip when two options still look equally plausible.",
+    title: "Sit papers harder than the cut-off",
+    body: "Mocks here are pitched at SEBI Grade A IT or a notch above (GATE-style dry-runs and traps). If you can clear 40% on these with negative marking, the real Paper 2 feels slower, not stranger.",
   },
 ];
 
-export const mocks = [
+export const MOCKS_PER_PAPER = 6;
+
+export const mockFamilies = [
   {
-    id: "phase1-paper2",
     kind: "phase1-paper2" as const,
-    title: "Phase I · Paper 2 (IT)",
-    blurb: "50 MCQs · 100 marks · 40 minutes · −0.5 per wrong · 40% cut-off",
+    familyTitle: "Phase I · Paper 2 (IT)",
+    familyBlurb:
+      "Official-length IT paper. 50 MCQs · 100 marks · 40 minutes · −0.5 per wrong · 40% cut-off. Six distinct question papers.",
     questions: 50,
     minutes: 40,
     marksEach: 2,
     cutoffPercent: 40,
   },
   {
-    id: "phase1-paper1",
     kind: "phase1-paper1" as const,
-    title: "Phase I · Paper 1 (screening)",
-    blurb: "20 MCQs · 25 marks · 15 minutes · −0.25 per wrong · 30% cut-off",
-    questions: 20,
-    minutes: 15,
+    familyTitle: "Phase I · Paper 1 (screening)",
+    familyBlurb:
+      "GA, English, Quant, Reasoning. 40 MCQs · 50 marks · 30 minutes · −0.3125 per wrong · 30% cut-off. Six distinct papers.",
+    questions: 40,
+    minutes: 30,
     marksEach: 1.25,
     cutoffPercent: 30,
   },
   {
-    id: "phase2-paper2",
     kind: "phase2-paper2" as const,
-    title: "Phase II · Paper 2 (coding logic)",
-    blurb: "25 dry-run / debug MCQs · 100 marks · 45 minutes · 40% cut-off",
+    familyTitle: "Phase II · Paper 2 (coding logic)",
+    familyBlurb:
+      "Dry-run / debug / DSA MCQs. 25 questions · 100 marks · 45 minutes · −1 per wrong · 40% cut-off. Six distinct papers.",
     questions: 25,
     minutes: 45,
     marksEach: 4,
     cutoffPercent: 40,
   },
 ];
+
+export const mocks = mockFamilies.flatMap((family) =>
+  Array.from({ length: MOCKS_PER_PAPER }, (_, i) => {
+    const set = i + 1;
+    return {
+      id: `${family.kind}-m${set}`,
+      kind: family.kind,
+      set,
+      title: `${family.familyTitle} · Mock ${set}`,
+      blurb: family.familyBlurb,
+      questions: family.questions,
+      minutes: family.minutes,
+      marksEach: family.marksEach,
+      cutoffPercent: family.cutoffPercent,
+    };
+  }),
+);
+
+export function mockById(id: string) {
+  return mocks.find((m) => m.id === id);
+}
 
 export const topicById = Object.fromEntries(
   [...phase1Paper2, ...phase2Paper2, ...phase1Paper1Sections.map((s) => ({

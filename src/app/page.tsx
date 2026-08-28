@@ -3,7 +3,7 @@ import { ArrowRight, Clock, Target, Trophy } from "lucide-react";
 
 import { HomeProgress } from "@/components/home-progress";
 import { Button } from "@/components/ui/button";
-import { examMeta, mocks, strategy } from "@/data/exam";
+import { examMeta, mockFamilies, strategy } from "@/data/exam";
 import { allQuestions } from "@/data/questions";
 
 export default function HomePage() {
@@ -21,19 +21,22 @@ export default function HomePage() {
             </h1>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
               A working desk for the IT stream: official-weightage syllabus,
-              high-yield notes, topic MCQs, and timed papers that mimic Phase I
-              Paper 2 and the Phase II coding-logic paper. Progress stays in this
-              browser.
+              high-yield notes, topic MCQs, six timed papers per stage pitched
+              at SEBI Grade A or harder, and interview panels. Progress stays in
+              this browser.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
               <Button asChild>
-                <Link href="/mock/phase1-paper2?new=1">
-                  Sit Phase I Paper 2
+                <Link href="/mock/phase1-paper2-m1?new=1">
+                  Sit Phase I Paper 2 · Mock 1
                   <ArrowRight />
                 </Link>
               </Button>
               <Button variant="outline" asChild>
                 <Link href="/practice/programming">Drill programming (30%)</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/interview">Interview panels</Link>
               </Button>
             </div>
           </div>
@@ -64,15 +67,19 @@ export default function HomePage() {
           </p>
         </div>
         <div className="grid gap-3 md:grid-cols-3">
-          {mocks.map((m) => (
+          {mockFamilies.map((f) => (
             <Link
-              key={m.id}
-              href={`/mock/${m.id}?new=1`}
+              key={f.kind}
+              href="/mock"
               className="rounded-xl border bg-card p-4 transition-colors hover:border-primary/40"
             >
-              <p className="font-heading text-lg">{m.title}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{m.blurb}</p>
-              <p className="mt-3 text-sm font-medium text-primary">Start →</p>
+              <p className="font-heading text-lg">{f.familyTitle}</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                6 distinct mocks · {f.questions} questions · {f.minutes} min
+              </p>
+              <p className="mt-3 text-sm font-medium text-primary">
+                Choose a paper →
+              </p>
             </Link>
           ))}
         </div>

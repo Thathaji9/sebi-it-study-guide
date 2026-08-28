@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { topicById } from "@/data/exam";
 import { recordMock } from "@/lib/progress";
-import { buildMock, mockConfig, scoreAttempt } from "@/lib/quiz";
+import { buildMockPaper, mockConfig, scoreAttempt } from "@/lib/quiz";
 import type { ExamKind, Question } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +26,7 @@ type PaletteState = "unseen" | "seen" | "answered" | "marked";
 
 type LiveExam = {
   kind: ExamKind;
+  paperId: string;
   title: string;
   questions: Question[];
   answers: Record<string, number | null>;
@@ -47,24 +48,25 @@ function formatTime(total: number) {
 }
 
 export function MockRunner({
-  kind,
+  paperId,
   fresh,
 }: {
-  kind: ExamKind;
+  paperId: string;
   fresh?: boolean;
 }) {
-  const config = mockConfig(kind);
+  const config = mockConfig(paperId);
   const [live, setLive] = useState<LiveExam | null>(null);
 
   useEffect(() => {
     if (!config) return;
-    const key = persistKey(kind);
+    const key = persistKey(paperId);
     if (fresh) sessionStorage.removeItem(key);
     const raw = !fresh ? sessionStorage.getItem(key) : null;
     if (raw) {
       try {
         const parsed = JSON.parse(raw) as LiveExam;
         if (parsed.questions?.length) {
+          parsed.paperId = parsed.paperId ?? paperId;
           queueMicrotask(() => setLive(parsed));
           return;
         }
@@ -72,10 +74,11 @@ export function MockRunner({
         /* fall through */
       }
     }
-    const questions = buildMock(kind);
+    const questions = buildMockPaper(config);
     queueMicrotask(() =>
       setLive({
-        kind,
+        kind: config.kind,
+        paperId,
         title: config.title,
         questions,
         answers: {},
@@ -86,7 +89,7 @@ export function MockRunner({
         startedAt: Date.now(),
       }),
     );
-  }, [kind, fresh, config]);
+  }, [paperId, fresh, config]);
 
   useEffect(() => {
     if (!live) return;
@@ -94,20 +97,20 @@ export function MockRunner({
       setLive((prev) => {
         if (!prev || prev.remaining <= 0) return prev;
         const next = { ...prev, remaining: prev.remaining - 1 };
-        sessionStorage.setItem(persistKey(kind), JSON.stringify(next));
+        sessionStorage.setItem(persistKey(paperId), JSON.stringify(next));
         return next;
       });
     }, 1000);
     return () => window.clearInterval(id);
     // Start the clock once a paper is in memory; do not restart on each tick.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [kind, live?.startedAt]);
+  }, [paperId, live?.startedAt]);
 
   const updateLive = (partial: Partial<LiveExam>) => {
     setLive((prev) => {
       if (!prev) return prev;
       const next = { ...prev, ...partial };
-      sessionStorage.setItem(persistKey(kind), JSON.stringify(next));
+      sessionStorage.setItem(persistKey(paperId), JSON.stringify(next));
       return next;
     });
   };
@@ -159,7 +162,7 @@ function ExamPlayer({
     }
     const tallied = scoreAttempt(questions, filled, marksEach);
     const result = {
-      id: `${live.kind}-${live.startedAt}`,
+      id: `${live.paperId ?? live.kind}-${live.startedAt}`,
       kind: live.kind,
       title: live.title,
       startedAt: live.startedAt,
@@ -179,7 +182,7 @@ function ExamPlayer({
     };
     recordMock(result);
     sessionStorage.setItem("grade-a-it-desk-last-result", JSON.stringify(result));
-    sessionStorage.removeItem(persistKey(live.kind));
+    sessionStorage.removeItem(persistKey(live.paperId ?? live.kind));
     router.push("/result");
   }, [questions, live, marksEach, cutoffPercent, router]);
 

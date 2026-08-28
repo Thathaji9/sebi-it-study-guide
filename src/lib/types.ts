@@ -42,6 +42,18 @@ export type ExamKind =
   | "topic"
   | "revise-wrong";
 
+export type MockPaper = {
+  id: string;
+  kind: Exclude<ExamKind, "topic" | "revise-wrong">;
+  set: number;
+  title: string;
+  blurb: string;
+  questions: number;
+  minutes: number;
+  marksEach: number;
+  cutoffPercent: number;
+};
+
 export type AttemptRecord = {
   questionId: string;
   chosen: number | null;

@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 
 import { MockRunner } from "@/components/exam-player";
 import { mocks } from "@/data/exam";
-import type { ExamKind } from "@/lib/types";
 
 const allowed = new Set(mocks.map((m) => m.id));
 
@@ -23,7 +22,7 @@ export default async function MockPaperPage({
         Stay in this tab. The clock keeps running. Unanswered questions score 0;
         a wrong answer costs one-fourth of the marks for that question.
       </p>
-      <MockRunner kind={kind as ExamKind} fresh={query.new === "1"} />
+      <MockRunner paperId={kind} fresh={query.new === "1"} />
     </div>
   );
 }
