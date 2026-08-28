@@ -17,21 +17,37 @@ import { notesSql } from "@/data/notes-sql";
 import { notesStrings } from "@/data/notes-strings";
 import { notesWarehouse } from "@/data/notes-warehouse";
 
+export type NoteStep = {
+  do: string;
+  why?: string;
+};
+
 export type NoteExample = {
   title: string;
   prompt: string;
   code?: string;
   language?: CodeLang;
-  steps: string[];
+  /** Prefer { do, why } so a beginner sees the action and the reason. Strings still render. */
+  steps: Array<string | NoteStep>;
   result: string;
 };
 
 export type NoteBlock = {
   heading: string;
   body: string;
+  /** Short recipe shown as “How to solve”. */
+  howTo?: string[];
   bullets?: string[];
   examples?: NoteExample[];
 };
+
+export function stepDo(step: string | NoteStep) {
+  return typeof step === "string" ? step : step.do;
+}
+
+export function stepWhy(step: string | NoteStep) {
+  return typeof step === "string" ? undefined : step.why;
+}
 
 export type TopicNote = {
   topic: TopicId;

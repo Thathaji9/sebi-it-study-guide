@@ -8,9 +8,10 @@ export default function NotesIndexPage() {
       <header>
         <h1 className="font-heading text-3xl">Worked notes</h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Every syllabus topic has a long revision sheet: the rule, then several
-          exam-style examples with a numbered dry-run. Read a section, copy the
-          steps on paper, then drill the matching practice bank.
+          Every official syllabus topic is here. Each page starts in plain
+          English, then a short “how to solve” recipe, then 2–5 exam examples
+          with numbered steps (what to do, then why). Written so a beginner can
+          follow without a coaching class.
         </p>
       </header>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -25,7 +26,7 @@ export default function NotesIndexPage() {
               <p className="font-heading text-lg">{n.title}</p>
               <p className="mt-1 text-sm text-muted-foreground">{n.blurb}</p>
               <p className="mt-3 text-xs text-muted-foreground">
-                {stats.sections} sections · {stats.examples} worked examples
+                {stats.sections} techniques · {stats.examples} examples
               </p>
             </Link>
           );

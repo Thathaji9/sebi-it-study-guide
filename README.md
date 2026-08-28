@@ -9,7 +9,7 @@ Mocks are pitched at **SEBI Grade A IT difficulty or a notch harder** (GATE-styl
 ## What you can do here
 
 - **Syllabus** — Phase I Paper 2 (IT), Phase II Paper 2 (DSA / strings / OOP), and Paper 1 screening topics, with indicative weightages
-- **Notes** — long revision sheets for every syllabus topic, each with worked examples and numbered dry-run steps (normal forms, SQL joins, Java/C++/Python traces, OSI, CIA, ETL, shell specials, DSA, Paper 1 GA/English/Quant/Reasoning)
+- **Notes** — beginner-friendly techniques for every syllabus topic. Each page has a plain-English recipe, then 2–5 worked examples whose steps say what to do and why (Quant and Reasoning include named exam tricks such as LCM, reverse percentage, Venn, seating, ranking).
 - **Topic practice** — MCQs with immediate explanations, including Java/C++/Python dry-runs
 - **Timed mocks** — **six distinct papers** per official paper
   - Phase I Paper 1: 40 questions, 30 minutes (half-length screening mix)

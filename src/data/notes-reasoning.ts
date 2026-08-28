@@ -2,277 +2,596 @@ import type { TopicNote } from "@/data/notes";
 
 export const notesReasoning: TopicNote = {
   topic: "reasoning",
-  title: "Reasoning for SEBI Paper 1 — worked notes",
+  title: "Reasoning — techniques (beginner)",
   blurb:
-    "Phase I Reasoning is about 25 marks of timed puzzles: syllogism, coded inequality, blood relations, directions, coding-decoding, a small linear or circular row, order ranking, one input-output machine, and a one-question box puzzle. Draw. Do not ‘see’. Every seating example below names left and right from the person’s view, step by step.",
+    "Twelve drawing tricks. Each section is one technique: what it is, the usual trap, a short recipe, three remember lines, and three worked examples. Every example step says what to do and why. Draw on paper. Do not guess.",
   blocks: [
     {
-      heading: "Syllogism — Venn, some / all / none, and the extra-overlap ban",
-      body: "A syllogism item gives two or three categorical premises and four conclusions. You may tick only what must be true in every diagram the premises allow. ‘Some A are B’ is an existential overlap: at least one A-B. ‘All A are B’ puts the A circle inside B (A can still equal B). ‘No A is B’ is disjoint circles. ‘Some A are not B’ is an A-region outside B.\n\nThe exam’s favourite trap is assuming extra overlap. From ‘All markets are regulated’ and ‘Some regulated entities are listed’, the listed blob may sit entirely in the non-market part of regulated. You may not conclude that some markets are listed, nor that no market is listed. ‘Possibility’ conclusions (if the paper uses that older style) follow when a diagram can be drawn; definite conclusions follow only when every diagram agrees.\n\nStandard conversions that do follow: All A are B ⇒ Some B are A (in exam syllogism, ‘all’ is taken to import existence). No A is B ⇔ No B is A. Some A are B ⇔ Some B are A. All A are B plus All B are C ⇒ All A are C, and also Some C are A. No A is B plus All C are B ⇒ No C is A (C sits inside B, which is disjoint from A).\n\nTwo ‘some’ premises never force a ‘some’ between the ends: Some A are B and Some B are C does not give Some A are C. Complement conclusions (‘some not’) follow from All A are B plus No B is C ⇒ No A is C, hence Some A are not C if existence is assumed. Draw two Venns when in doubt; if they disagree on the conclusion, it does not follow.",
+      heading: "Syllogism with Venn — all, some, and no",
+      body: "A syllogism gives two or three sentences (premises) and asks which conclusions must be true. Draw circles. All A are B: put circle A fully inside circle B. Some A are B: the two circles share a patch (at least one A is a B). No A is B: the two circles stay apart and do not touch.\n\nThe favourite trap is extra overlap. If the sentences do not force two circles to meet, you must not draw them meeting — and you also must not swear they never meet. A conclusion is definite only when every allowed drawing agrees.",
+      howTo: [
+        "Write the premises. For each, draw a fresh pair of circles (all = inside, some = forced overlap, no = apart).",
+        "Do not add a meeting or a gap that the sentences did not force. If two drawings are both legal, keep both.",
+        "Read conclusion I. Tick it only if it is true in every legal drawing.",
+        "Read conclusion II the same way. If I is true in one drawing and false in another, I does not follow.",
+        "Watch reverses: All A are B does not mean All B are A. Two ‘some’ sentences do not chain.",
+      ],
       bullets: [
-        "Definite = true in every allowed Venn; possibility = true in at least one.",
-        "Do not add overlap that the premises do not force.",
-        "All A are B ⇒ Some B are A (exam import). Two ‘somes’ do not chain.",
-        "No A is B plus All C are B ⇒ No C is A.",
+        "Definite = true in every legal Venn. If two drawings disagree, it does not follow.",
+        "Never add extra overlap. ‘Some B are C’ need not touch A even if All A are B.",
+        "All A are B plus All B are C does give All A are C. Two ‘somes’ do not.",
       ],
       examples: [
         {
-          title: "All markets are regulated; some regulated are listed",
+          title: "Do not add extra overlap",
           prompt:
-            "Statements: All markets are regulated. Some regulated entities are listed. Conclusions: I Some markets are listed. II No market is listed. III Some markets may be listed — cannot say from the premises as given. Which follows as a definite claim?",
+            "Statements: All cats are animals. Some animals are brown. Conclusions: I. Some cats are brown. II. No cat is brown. Which follows as definite?",
           steps: [
-            "Draw circle Market inside circle Regulated. Place a Listed blob that intersects Regulated.",
-            "The Listed blob can sit wholly in Regulated-but-not-Market. Then I is false in that diagram.",
-            "The Listed blob can also cut Market. Then I is true in that diagram, and II is false.",
-            "Because I is not true in every diagram and II is not true in every diagram, neither I nor II is a definite conclusion. The honest definite statement is that overlap between markets and listed is not forced.",
-            "Exam key: do not assume extra overlap. The option ‘Some markets may be listed — cannot say from the premises as given’ is the correct attitude; ‘All listed entities are markets’ and ‘All regulated entities are markets’ reverse the first premise and fail.",
+            {
+              do: "Draw circle Cat fully inside circle Animal (All cats are animals).",
+              why: "‘All A are B’ means every cat sits in the animal circle. Cat cannot stick out.",
+            },
+            {
+              do: "Draw a Brown patch that cuts the Animal circle. That is ‘Some animals are brown’.",
+              why: "‘Some’ only forces a meeting of Animal and Brown. It does not say where that meeting sits.",
+            },
+            {
+              do: "First legal picture: put the Brown patch only in Animal-but-not-Cat. Then I is false and II is true in this picture.",
+              why: "The brown animals can all be dogs or cows. Cats need not be brown.",
+            },
+            {
+              do: "Second legal picture: slide Brown so it also cuts Cat. Then I is true and II is false in this picture.",
+              why: "The premises still hold: cats are still inside animals, and some animals are still brown.",
+            },
+            {
+              do: "I is not true in every picture. II is not true in every picture. Tick neither.",
+              why: "A definite conclusion needs every allowed Venn to agree. Extra overlap was never forced, and a total ban on overlap was never forced either.",
+            },
+            {
+              do: "Reject ‘All brown things are cats’ and ‘All animals are cats’ if those appear as options.",
+              why: "Those reverse ‘All cats are animals’. Reversing ‘all’ is a standard wrong tick.",
+            },
           ],
           result:
-            "Neither ‘some markets are listed’ nor ‘no market is listed’ is definite. Extra overlap is forbidden. Possibility of overlap remains.",
+            "Neither I nor II is definite. Some cats may be brown, but you must not add that overlap, and you must not forbid it.",
         },
         {
-          title: "All A are B, all B are C — some / all that follow",
+          title: "All + all chains",
           prompt:
-            "Statements: All brokers are intermediaries. All intermediaries are registered. Conclusions: I All brokers are registered. II Some registered are brokers. III Some registered are not brokers. IV No broker is registered.",
+            "Statements: All roses are flowers. All flowers are plants. Conclusions: I. All roses are plants. II. Some plants are roses. III. Some plants are not roses. Which follow?",
           steps: [
-            "Venn: Brokers ⊂ Intermediaries ⊂ Registered. So Brokers ⊂ Registered. I follows (all).",
-            "Because the inner circle of brokers sits inside registered, at least those brokers are registered entities. Conversion of I gives II: Some registered are brokers. Follows.",
-            "III (some registered are not brokers) is a possibility — registered may be larger — but it is not forced: the three circles could coincide. In strict definite syllogism, III does not follow.",
-            "IV contradicts I. Does not follow.",
-            "Tick I and II only. ‘Some / all / none’ map: I is all, II is some (conversion), III is a non-forced some-not, IV is none (false).",
+            {
+              do: "Draw Rose inside Flower, and Flower inside Plant. So Rose sits inside Plant.",
+              why: "Two ‘all’ sentences chain: All A are B and All B are C means All A are C.",
+            },
+            {
+              do: "Tick I: All roses are plants.",
+              why: "The inner circle cannot leave the outer circle. Every legal drawing has this.",
+            },
+            {
+              do: "Tick II: Some plants are roses.",
+              why: "The roses themselves are plants, so at least those plants are roses. Exam syllogism treats ‘all’ as having members, so conversion All A are B gives Some B are A.",
+            },
+            {
+              do: "Leave III unticked: Some plants are not roses.",
+              why: "Plant may be bigger than Rose, but the three circles could also be the same size. III is possible, not definite.",
+            },
+            {
+              do: "Reject ‘No rose is a plant’ if it appears.",
+              why: "That fights I. A ‘no’ cannot follow from two ‘alls’ in a chain.",
+            },
+            {
+              do: "Final ticks: I and II only.",
+              why: "Chain the insides for ‘all’. Convert the outer circle for ‘some’. Do not force a leftover ring for ‘some not’.",
+            },
           ],
-          result: "Only I and II follow (all brokers registered; some registered are brokers).",
+          result: "Only I and II follow. III is a possible leftover, not a must.",
         },
         {
-          title: "No A is B, all C are B — none follows",
+          title: "No + all gives no",
           prompt:
-            "Statements: No insider is a public shareholder in this model. All designated persons are insiders. Conclusions: I No designated person is a public shareholder. II Some public shareholders are designated persons. III All public shareholders are designated persons.",
+            "Statements: No dog is a cat. All puppies are dogs. Conclusions: I. No puppy is a cat. II. Some cats are puppies. III. All cats are puppies. Which follow?",
           steps: [
-            "No insider is a public shareholder: the Insider and Public-shareholder circles are disjoint.",
-            "All designated persons are insiders: Designated ⊂ Insider. So Designated sits entirely inside a circle that does not meet Public-shareholder.",
-            "Therefore Designated is disjoint from Public-shareholder: I follows (none).",
-            "II requires overlap of public shareholders and designated persons — forbidden by the disjoint diagram. III puts all public shareholders inside designated, which would put them inside insiders, contradicting ‘no insider is a public shareholder’.",
-            "Only I follows. This is the ‘no / all / none’ chain: All C are B, No A is B (here A = public shareholder, B = insider) ⇒ No C is A.",
+            {
+              do: "Draw Dog and Cat as two circles that do not touch (No dog is a cat).",
+              why: "‘No A is B’ means the sets are disjoint. No shared patch.",
+            },
+            {
+              do: "Put Puppy fully inside Dog (All puppies are dogs).",
+              why: "Every puppy is a dog, so the puppy circle cannot leave the dog circle.",
+            },
+            {
+              do: "Puppy sits inside a circle that never meets Cat, so Puppy never meets Cat. Tick I.",
+              why: "All C are B, and No A is B, gives No C is A. Here C = puppy, B = dog, A = cat.",
+            },
+            {
+              do: "II needs a meeting of Cat and Puppy. The drawing forbids that meeting. II fails.",
+              why: "You must not add extra overlap against a ‘no’.",
+            },
+            {
+              do: "III puts all cats inside puppies, which would put cats inside dogs and break ‘No dog is a cat’. III fails.",
+              why: "An ‘all’ in the reverse direction is even stronger than the illegal ‘some’.",
+            },
+            {
+              do: "Tick I only.",
+              why: "A clean ‘no’ plus an inner ‘all’ still gives a ‘no’ on the inner circle. Do not invent a meeting.",
+            },
           ],
-          result: "Only I: no designated person is a public shareholder. II and III fail.",
-        },
-        {
-          title: "Some + some does not give some on the ends",
-          prompt:
-            "Statements: Some FPIs are pension funds. Some pension funds are listed. Conclusions: I Some FPIs are listed. II Some listed are pension funds. III All FPIs are listed.",
-          steps: [
-            "Some FPIs are pension funds: overlap FPI ∩ Pension. Some pension funds are listed: overlap Pension ∩ Listed.",
-            "Those two overlaps can be different slices of Pension. FPI and Listed need not meet. I does not follow.",
-            "II is the conversion of the second premise (Some pension funds are listed ⇔ Some listed are pension funds). II follows from statement 2 alone.",
-            "III (all FPIs listed) is stronger than I and also unforced.",
-            "Tick II only. Memory: two ‘somes’ never chain to a definite ‘some’ on the end terms; conversion of a given ‘some’ is safe.",
-          ],
-          result: "Only II follows. I is the extra-overlap trap; III is an illicit all.",
+          result: "Only I follows: no puppy is a cat. II and III need a meeting that the ‘no’ bans.",
         },
       ],
     },
     {
-      heading: "Inequalities — coded signs and the missing-link test",
-      body: "A chain such as P > Q ≥ R = S < T is read left to right. Equal signs copy the value; ≥ and ≤ are ‘at least / at most’. A definite > between two letters exists only if you can walk from one to the other using a path that is entirely ≥ or = except at least one strict > in the same direction, and no opposing break.\n\nIn P > Q ≥ R = S, you have P > S (because P > Q and Q is at least S). You do not have Q < T: the path Q ≥ R = S < T goes down after S, so Q could be 10 and T 9, or Q 10 and T 100. When a < and a > fight inside the same walk, the pair is incomparable.\n\nCoded inequality replaces symbols with letters: @ means ≥, * means >, # means =, $ means ≤, & means < — the mapping is given in the stem, not memorised. Decode onto a scratch chain first, then apply the same walk test. Combined items give two conclusions I and II: only I, only II, either, both, or neither.\n\n‘Either I or II’ is rare and needs complementary conclusions (x > y or x ≤ y covering all cases). Do not tick ‘either’ just because both look possible. Either is for when exactly one of two complementary statements must hold and you cannot tell which.",
+      heading: "Conversions and only-a-few",
+      body: "Some conclusions are just a rewrite of one premise. That rewrite is called conversion. All A are B gives Some B are A (and Some A are B). No A is B gives No B is A. Some A are B gives Some B are A. Some A are not B does not convert to Some B are not A.\n\nOnly a few A are B means two things at once: Some A are B, and Some A are not B. The trap is treating ‘only a few’ as a plain ‘some’ (you drop the ‘some not’) or as ‘only A are B’ (which means All B are A — a different sentence).",
+      howTo: [
+        "If the conclusion uses the same two terms as one premise, try conversion first before drawing a big chain.",
+        "Flip All A are B into Some B are A. Flip No A is B into No B is A. Flip Some A are B into Some B are A.",
+        "Do not flip Some A are not B. That conversion is not safe.",
+        "If you see ‘only a few A are B’, write two ticks: Some A are B, and Some A are not B. Then combine with the other premises.",
+        "Do not mix up ‘only a few A are B’ with ‘only A are B’. The second means All B are A.",
+      ],
       bullets: [
-        "Decode coded signs onto >, ≥, =, ≤, < before comparing.",
-        "A definite > needs a same-direction path with at least one strict inequality.",
-        "A < facing a > in the same walk ⇒ cannot compare.",
-        "Either/or only for complementary pairs, not for two ‘maybes’.",
+        "Safe flips: all → some the other way; no ↔ no; some ↔ some. Not ‘some not’.",
+        "Only a few A are B = some A are B AND some A are not B.",
+        "Two ‘some’ premises still do not chain. Conversion is not a chain.",
       ],
       examples: [
         {
-          title: "P > Q ≥ R = S < T — which conclusions",
+          title: "Safe conversion of all and some",
           prompt:
-            "Statements: P > Q ≥ R = S < T. Conclusions: I. P > S  II. Q < T. Options: only I, only II, both, neither.",
+            "Statement: All banks are offices. Conclusions: I. Some offices are banks. II. Some banks are offices. III. All offices are banks. Which follow?",
           steps: [
-            "Path P to S: P > Q ≥ R = S. From P down to Q (strict), then Q is ≥ S. So P is strictly above S. I follows.",
-            "Path Q to T: Q ≥ R = S < T. After S the chain rises to T. Q could still be larger than T (Q = 10, S = 8, T = 9) or smaller (Q = 8, S = 8, T = 12).",
-            "Because both Q > T and Q < T (and Q = T) are drawable, II does not follow as a definite.",
-            "Not ‘both’. Not ‘either’ — I is already definite; II is not complementary to I.",
-            "Answer: only I. The S < T limb does not licence a comparison between Q and T.",
+            {
+              do: "Draw Bank inside Office.",
+              why: "All banks are offices. The inner circle may be smaller, or the two circles may match.",
+            },
+            {
+              do: "Tick I: Some offices are banks.",
+              why: "The banks themselves are offices, so some offices (at least those) are banks. This is the exam conversion of ‘all’.",
+            },
+            {
+              do: "Tick II: Some banks are offices.",
+              why: "That is just a weaker reading of All banks are offices. Every bank is an office, so some are.",
+            },
+            {
+              do: "Leave III: All offices are banks.",
+              why: "That reverses the ‘all’. Office can be bigger. The reverse is not forced.",
+            },
+            {
+              do: "If a fourth line said ‘No bank is an office’, reject it.",
+              why: "It fights the given ‘all’.",
+            },
+            {
+              do: "Answer: I and II follow; III does not.",
+              why: "Conversion of ‘all’ gives ‘some’ both ways. It never gives the reverse ‘all’.",
+            },
+          ],
+          result: "I and II follow. III is the illegal reverse of ‘all’.",
+        },
+        {
+          title: "Only a few means some and some-not",
+          prompt:
+            "Statements: Only a few cups are plates. All plates are bowls. Conclusions: I. Some cups are bowls. II. Some cups are not plates. III. All cups are bowls. Which follow?",
+          steps: [
+            {
+              do: "Rewrite ‘Only a few cups are plates’ as two facts: Some cups are plates, and Some cups are not plates.",
+              why: "That is the meaning of ‘only a few’. You need both the overlap and the leftover.",
+            },
+            {
+              do: "Tick II at once: Some cups are not plates.",
+              why: "It is half of the ‘only a few’ sentence. No extra drawing needed.",
+            },
+            {
+              do: "The cups that are plates sit inside Bowl, because All plates are bowls. So some cups are bowls. Tick I.",
+              why: "Some A are B plus All B are C gives Some A are C. Here A = cups, B = plates, C = bowls.",
+            },
+            {
+              do: "Leave III: All cups are bowls.",
+              why: "Only some cups are plates. The leftover cups (the ‘some not plates’) need not be bowls.",
+            },
+            {
+              do: "Do not tick ‘All bowls are cups’ or ‘Only cups are bowls’.",
+              why: "Those mix up ‘only a few’ with ‘only A are B’ (All B are A).",
+            },
+            {
+              do: "Answer: I and II follow; III does not.",
+              why: "Keep both halves of ‘only a few’, then chain only the overlap through ‘all plates are bowls’.",
+            },
+          ],
+          result:
+            "I and II follow. ‘Only a few’ already gives II. The overlap plus ‘all plates are bowls’ gives I. III is too strong.",
+        },
+        {
+          title: "Some-not from all plus no",
+          prompt:
+            "Statements: All pens are tools. No tool is a toy. Conclusions: I. Some pens are not toys. II. Some tools are pens. III. Some toys are pens. Which follow?",
+          steps: [
+            {
+              do: "Draw Pen inside Tool. Draw Toy fully apart from Tool.",
+              why: "All pens are tools, and no tool is a toy, so the toy circle never meets the tool circle.",
+            },
+            {
+              do: "Pen sits inside Tool, so Pen also never meets Toy. No pen is a toy.",
+              why: "Same ‘no + all’ chain as in Venn: the inner circle inherits the gap.",
+            },
+            {
+              do: "Tick I: Some pens are not toys.",
+              why: "If no pen is a toy, then (with pens existing) some pens are not toys. This is the ‘some not’ that does follow.",
+            },
+            {
+              do: "Tick II: Some tools are pens.",
+              why: "Conversion of All pens are tools. Safe flip.",
+            },
+            {
+              do: "Leave III: Some toys are pens.",
+              why: "That needs a meeting that ‘no tool is a toy’ forbids. Do not convert ‘some not’ into a meeting the other way.",
+            },
+            {
+              do: "Answer: I and II follow.",
+              why: "‘Some not’ is definite here because a full ‘no’ sits under it. III is extra overlap against a ‘no’.",
+            },
+          ],
+          result: "I and II follow. III is an illegal meeting. ‘Some not’ is safe when a full ‘no’ supports it.",
+        },
+      ],
+    },
+    {
+      heading: "Coded inequality — decode, then walk the chain",
+      body: "A coded inequality replaces >, ≥, =, ≤, < with signs such as @, *, #, $, &. First decode onto a single chain of letters. Then walk from one letter to the other. A definite > needs a same-direction path with at least one strict > (or < the other way) and no break the other way.\n\nThe trap is comparing across a break. In P > Q ≥ R = S < T you can say P > S, but you cannot say Q < T, because after S the chain goes up. When a < and a > fight in the same walk, the pair cannot be compared.",
+      howTo: [
+        "Copy the code key: which symbol is >, ≥, =, ≤, <.",
+        "Rewrite the whole statement as one chain of letters and real signs. Do not compare on the coded symbols.",
+        "To test ‘A > B’, walk from A to B. You need every step ≥ or = in that direction, plus at least one strict >.",
+        "If the walk goes up and then down (or down then up), stop. Those two letters cannot be compared.",
+        "Tick ‘either I or II’ only when the two conclusions are complements (one of them must hold, and they cannot both hold). Two ‘maybes’ are not either/or.",
+      ],
+      bullets: [
+        "Decode first. Never walk on @ and * until they are >, ≥, =, ≤, <.",
+        "A definite > needs a one-way path with a strict step and no opposing break.",
+        "A < facing a > in the same walk means ‘cannot say’.",
+      ],
+      examples: [
+        {
+          title: "Walk P > Q ≥ R = S < T",
+          prompt:
+            "Statements: P > Q ≥ R = S < T. Conclusions: I. P > S. II. Q < T. Options: only I, only II, both, neither.",
+          steps: [
+            {
+              do: "Write the chain as given: P > Q ≥ R = S < T. No code to decode this time.",
+              why: "The walk test is the same for plain and coded items. Start with a clean line.",
+            },
+            {
+              do: "Walk P to S: P > Q ≥ R = S. All steps go the same way, and there is a strict >. Tick I.",
+              why: "P is above Q, and Q is at least S, so P is strictly above S.",
+            },
+            {
+              do: "Walk Q to T: Q ≥ R = S < T. After S the chain rises to T.",
+              why: "That is a down-then-up break. Q could be 10, S = 8, T = 9 (Q > T) or Q = 8, T = 12 (Q < T).",
+            },
+            {
+              do: "Leave II. Q and T cannot be compared.",
+              why: "Both Q < T and Q > T (and Q = T) can be drawn. A definite conclusion needs one result only.",
+            },
+            {
+              do: "Do not pick ‘either’. I is already definite, and II is not the complement of I.",
+              why: "Either/or is for a pair such as A > B versus A ≤ B covering every case. That is not this pair.",
+            },
+            {
+              do: "Answer: only I.",
+              why: "The limb S < T does not licence a comparison between Q and T.",
+            },
           ],
           result: "Only I follows (P > S). Q and T are incomparable.",
         },
         {
-          title: "Coded: @ is ≥, * is >, # is =",
+          title: "Decode @ * # $ then walk",
           prompt:
-            "If A @ B means A ≥ B, A * B means A > B, A # B means A = B, A $ B means A ≤ B. Statement: M * N @ P # Q $ R. Conclusions: I. M > Q  II. N ≥ R.",
+            "A @ B means A ≥ B, A * B means A > B, A # B means A = B, A $ B means A ≤ B. Statement: M * N @ P # Q $ R. Conclusions: I. M > Q. II. N ≥ R.",
           steps: [
-            "Decode: M * N is M > N. N @ P is N ≥ P. P # Q is P = Q. Q $ R is Q ≤ R. Chain: M > N ≥ P = Q ≤ R.",
-            "I: M to Q is M > N ≥ P = Q, so M > Q. I follows.",
-            "II: N ≥ P = Q ≤ R. N is at least Q, and Q is at most R, so N versus R is the same incomparable pattern as Q versus T above. N could be 5, R 9; or N 9, R 9; or N 12, R 9.",
-            "II does not follow. (N ≥ R would require a ≥ path from N to R with no opposing rise after Q.)",
-            "Only I. If a third conclusion M > R were offered, it would also fail: M > Q ≤ R leaves M versus R open.",
+            {
+              do: "Decode each pair: M * N is M > N. N @ P is N ≥ P. P # Q is P = Q. Q $ R is Q ≤ R.",
+              why: "The mapping is in the question, not in memory. Write the real signs before any comparison.",
+            },
+            {
+              do: "Chain: M > N ≥ P = Q ≤ R.",
+              why: "One line lets you see breaks. Do not jump from the coded string.",
+            },
+            {
+              do: "Walk M to Q: M > N ≥ P = Q. Same direction, with a strict >. Tick I: M > Q.",
+              why: "M is above N, and N is at least Q, so M is strictly above Q.",
+            },
+            {
+              do: "Walk N to R: N ≥ P = Q ≤ R. After Q the chain may rise to R.",
+              why: "N is at least Q, and Q is at most R, so N versus R is open: N could be 5 and R 9, or N 12 and R 9.",
+            },
+            {
+              do: "Leave II. N ≥ R does not follow.",
+              why: "You would need a ≥ path from N down to R with no opposing rise. The ≤ after Q is that rise.",
+            },
+            {
+              do: "If a third line said M > R, leave that too: M > Q ≤ R still has a break.",
+              why: "A strict lead on the left of a ≤ does not decide the right end.",
+            },
           ],
           result: "Only I (M > Q). N ≥ R does not follow from N ≥ Q ≤ R.",
         },
         {
-          title: "Both conclusions, no missing link",
+          title: "Both follow when there is no break",
           prompt:
-            "A ≥ B > C = D ≥ E. Conclusions: I. A > E  II. B > D.",
+            "A ≥ B > C = D ≥ E. Conclusions: I. A > E. II. B > D. Both, only I, only II, or neither?",
           steps: [
-            "A to E: A ≥ B > C = D ≥ E. There is a strict > between B and C on that path, and every other sign is ≥ or =. So A > E. I follows.",
-            "B to D: B > C = D, hence B > D. II follows (the = copies C onto D).",
-            "Both walks are same-direction with a strict inequality. No opposing break.",
-            "Tick both I and II. Not ‘either’.",
-            "A = E is impossible because of B > C in the middle. So I is strict >, not ≥. That matches the stated I.",
+            {
+              do: "Write the chain: A ≥ B > C = D ≥ E.",
+              why: "Same-direction signs all the way from A to E, with a strict > in the middle.",
+            },
+            {
+              do: "Walk A to E. There is a strict > between B and C, and every other sign is ≥ or =. Tick I: A > E.",
+              why: "A cannot equal E, because B is already strictly above C on that path.",
+            },
+            {
+              do: "Walk B to D: B > C = D, so B > D. Tick II.",
+              why: "The equals sign copies C onto D. A strict drop to C is a strict drop to D.",
+            },
+            {
+              do: "No opposing break in either walk. Pick both, not either.",
+              why: "Both conclusions are definite. Either/or would need a complementary pair, which this is not.",
+            },
+            {
+              do: "Reject A = E if it appears. The middle > kills equality.",
+              why: "I is strict >, not ≥. That matches the stated I.",
+            },
+            {
+              do: "Answer: both I and II follow.",
+              why: "Same-direction path plus a strict step is the whole test. Here both walks pass.",
+            },
           ],
           result: "Both I and II follow (A > E and B > D).",
-        },
-        {
-          title: "Neither — opposing signs in the middle",
-          prompt:
-            "F > G < H ≥ I = J. Conclusions: I. F > I  II. G < J.",
-          steps: [
-            "F to I: F > G < H ≥ I. After G the chain goes the other way (up to H). F and I are not comparable. I fails.",
-            "G to J: G < H ≥ I = J. G is below H, J is at most H, so G could be 2, J 5 (G < J) or G 4, J 3 if H = 5, I = J = 3 (G > J). II fails.",
-            "Neither conclusion is definite.",
-            "A follow-up that would work: H ≥ J (true, because H ≥ I = J). If that had been I, it would follow.",
-            "Answer: neither I nor II. The < between G and H is the break.",
-          ],
-          result: "Neither I nor II follows. G < H ≥ I blocks both walks.",
         },
       ],
     },
     {
-      heading: "Blood relations — only-child, photograph, and coded relations",
-      body: "Translate every phrase into a tiny family tree before you look at options. ‘My grandfather’s only son’ is father (if the speaker is a child of that grandfather through that son — and if grandfather has only one son, that son is unique). ‘Son of my grandfather’s only son’ is the speaker or the speaker’s brother. Gender of the photograph is given by ‘he’ or ‘she’; do not assume the speaker’s gender unless named.\n\nOnly / only daughter / only son are the strongest words: they collapse extra branches. Brother-in-law is spouse’s brother or sister’s husband — two diagrams until the stem decides. Maternal uncle is mother’s brother. Paternal aunt is father’s sister.\n\nCoded relations (‘A + B means A is the father of B’) must be decoded into a directed labelled edge. Combine two codes only at a shared person. Generation checks: if the conclusion skips a generation the code did not, it is false.\n\nPointing-to-a-photograph items: replace ‘my’ with the speaker’s name, draw, then name the photographed person relative to the speaker. If two answers remain (himself or brother), the option ‘brother or himself’ is the designed key.",
+      heading: "Blood relations — draw generations",
+      body: "Turn every phrase into a small family tree before you look at options. Put older people on a higher line and children on the next line down. Mark gender when you know it (box for male, circle for female, or just write M/F). ‘Only son’ and ‘only daughter’ close extra branches.\n\nThe trap is skipping a generation or guessing gender. ‘Son of my grandfather’s only son’ is the speaker or the speaker’s brother — not the father and not an uncle. In-laws (brother-in-law, sister-in-law) need two candidate pictures until a clue picks one.",
+      howTo: [
+        "Replace ‘my’ with the speaker’s name. Pointing-to-a-photo items: the photo is ‘he’ or ‘she’, not the speaker, unless the line says so.",
+        "Draw one line per generation. Couple on the same line; their children on the line below.",
+        "Honour ‘only’: only son means that man has no brother. Only daughter means no second daughter.",
+        "For coded relations (A + B means A is father of B), decode each pair into a labelled arrow, then join at the shared person.",
+        "Name the asked person relative to the other person. If two answers remain (himself or brother), that pair is often the key.",
+      ],
       bullets: [
-        "Grandfather’s only son = father of the speaker (given one paternal grandfather).",
-        "That father’s son = speaker or speaker’s brother.",
-        "Only collapses extra siblings. In-laws need two candidate diagrams.",
-        "Decode +/− codes to labelled edges before combining.",
+        "Grandfather’s only son = the speaker’s father (one son on that line).",
+        "That father’s son = the speaker or the speaker’s brother.",
+        "Draw generations. Do not jump uncle / cousin without an extra sibling on the upper line.",
       ],
       examples: [
         {
           title: "Photograph — grandfather’s only son",
           prompt:
-            "Pointing to a photograph, Ravi says, ‘He is the son of my grandfather’s only son.’ The person is Ravi’s: (A) brother or himself (B) uncle (C) cousin only (D) father.",
+            "Pointing to a photograph, Ravi says, ‘He is the son of my grandfather’s only son.’ The person is Ravi’s: (A) brother or himself (B) uncle (C) cousin (D) father.",
           steps: [
-            "Ravi’s grandfather’s only son is unique: that man is Ravi’s father (Ravi’s grandfather has no other son).",
-            "‘He’ is the son of that man, i.e. a son of Ravi’s father.",
-            "Sons of Ravi’s father are Ravi and Ravi’s brothers (if any).",
-            "(B) uncle would be grandfather’s son other than father — but there is no other son. (C) cousin needs an uncle’s child. (D) father is the ‘only son’, not the ‘son of the only son’.",
-            "The photograph is therefore Ravi or Ravi’s brother. Key (A). The stem does not tell us whether Ravi has a brother, so both remain.",
+            {
+              do: "Draw Ravi’s grandfather on the top line. ‘Only son’ of that grandfather is one man on the next line.",
+              why: "Only one son means no second son, so that man is Ravi’s father, not an uncle.",
+            },
+            {
+              do: "The photo is ‘the son of’ that man, so the photo is a son of Ravi’s father.",
+              why: "Sons of Ravi’s father are Ravi and any brothers Ravi has.",
+            },
+            {
+              do: "Reject (D) father. The father is ‘the only son’, not ‘the son of the only son’.",
+              why: "The sentence has two steps down from grandfather: only son, then that man’s son.",
+            },
+            {
+              do: "Reject (B) uncle and (C) cousin.",
+              why: "Uncle would need a second son of the grandfather. Cousin would need an uncle’s child. ‘Only’ forbids that branch.",
+            },
+            {
+              do: "Keep (A): brother or himself.",
+              why: "The stem does not say whether Ravi has a brother, so both remain. That is the designed answer.",
+            },
+            {
+              do: "Gender check: the photo is ‘he’, so a male. That still fits Ravi or a brother.",
+              why: "Do not assume the speaker is or is not in the photo until the options force it.",
+            },
           ],
-          result: "Brother or himself. Not uncle, cousin, or father.",
+          result: "(A) brother or himself. Not uncle, cousin, or father.",
         },
         {
-          title: "Only daughter of only son",
+          title: "Three generations on a tree",
           prompt:
-            "Pointing to a girl, Meera says, ‘She is the only daughter of the only son of my grandmother.’ How is the girl related to Meera if Meera’s grandmother has a single son who is Meera’s father?",
+            "A is the father of B. B is the sister of C. C is the father of D. How is A related to D?",
           steps: [
-            "Meera’s grandmother’s only son = Meera’s father (the stem’s extra clause confirms the unique son is the father).",
-            "The only daughter of that father is Meera herself if Meera is female and an only daughter, or Meera’s sister if the only daughter is a sister and Meera is not that daughter.",
-            "The girl is the unique daughter of Meera’s father. If Meera is that unique daughter, the girl is Meera. If Meera has no sister and is that daughter, photograph = Meera.",
-            "Standard key when the speaker is a woman and the girl is ‘only daughter of my father’: the girl is the speaker (or the speaker is pointing at herself — unusual) / the girl is the speaker’s sister only if Meera is not herself the only daughter, which would contradict ‘only’.",
-            "With ‘only daughter’, there is exactly one daughter of the father: Meera is that daughter, so the girl is Meera. Relation: she herself. (If an option says ‘sister’, it needed a second daughter, which ‘only’ forbids.)",
+            {
+              do: "Top line: A (male). Next line: A’s child B. B is sister of C, so C is also A’s child, on the same line as B.",
+              why: "Sister means B is female and shares a parent with C. A is father of B, so A is also father of C unless a different parent is named — here there is none.",
+            },
+            {
+              do: "Mark C as male, because C is the father of D. Put D on the line below C.",
+              why: "Father is a generation down. D is C’s child, so D is A’s grandchild.",
+            },
+            {
+              do: "B’s gender is female; C’s gender is male. D’s gender is not given.",
+              why: "‘Father of D’ does not say whether D is a son or a daughter. The relation of A to D does not need D’s gender.",
+            },
+            {
+              do: "A is male and two generations above D, through C (A’s son). A is D’s grandfather (paternal).",
+              why: "The path is A → C → D, both steps father-to-child.",
+            },
+            {
+              do: "Reject uncle, brother, and father.",
+              why: "Uncle would be a brother of C. Father would be C. Brother would be the same generation as D.",
+            },
+            {
+              do: "Answer: A is D’s grandfather.",
+              why: "Three lines on the page: A; then B and C; then D under C.",
+            },
           ],
-          result:
-            "The girl is Meera (the only daughter of her father). ‘Sister’ would require a second daughter.",
+          result: "A is D’s grandfather. D’s gender is open.",
         },
         {
-          title: "Coded: P × Q = P is mother of Q",
+          title: "Coded: mother, father, sister",
           prompt:
-            "P × Q means P is the mother of Q; P + Q means P is the father of Q; P − Q means P is the sister of Q. Expression: A × B + C − D. How is A related to D?",
+            "P × Q means P is the mother of Q. P + Q means P is the father of Q. P − Q means P is the sister of Q. Expression: A × B + C − D. How is A related to D?",
           steps: [
-            "A × B: A is mother of B. A is female, B is A’s child.",
-            "B + C: B is father of C. So B is male. Thus B is A’s son, and C is B’s child, i.e. A’s grandchild.",
-            "C − D: C is sister of D. C is female; D is C’s sibling, also B’s child, also A’s grandchild.",
-            "A is the mother of D’s father B, hence A is D’s paternal grandmother.",
-            "Gender of D is not fixed by ‘sister of D’ (D can be brother or sister). The relation of A to D is grandmother either way.",
+            {
+              do: "Decode A × B: A is mother of B. A is female. B is A’s child (gender still open).",
+              why: "Each code is one labelled edge. Do not combine until each pair is a sentence.",
+            },
+            {
+              do: "Decode B + C: B is father of C. So B is male. B is A’s son, and C is B’s child — A’s grandchild.",
+              why: "The shared person is B. Mother-of-B plus B-is-father-of-C stacks two generations.",
+            },
+            {
+              do: "Decode C − D: C is sister of D. C is female. D is C’s sibling, also B’s child, also A’s grandchild.",
+              why: "Sister places C and D on the same generation. D’s gender is still open.",
+            },
+            {
+              do: "A is the mother of D’s father B, so A is D’s paternal grandmother.",
+              why: "Three generations: A (female) → B (male) → C and D.",
+            },
+            {
+              do: "Do not claim D is female. ‘C is sister of D’ does not fix D.",
+              why: "D can be a brother or a sister. Grandmother holds either way.",
+            },
+            {
+              do: "Answer: A is D’s grandmother.",
+              why: "Coded items fail when you skip a generation or assign a gender the code did not give.",
+            },
           ],
           result: "A is D’s grandmother (paternal). D’s gender is open.",
-        },
-        {
-          title: "Two-step in-law",
-          prompt:
-            "Karan is the brother of Lata. Lata is the wife of Mohit. Nisha is Mohit’s sister. How is Karan related to Nisha?",
-          steps: [
-            "Karan — brother — Lata. Lata — wife — Mohit, so Mohit is Karan’s brother-in-law.",
-            "Nisha is Mohit’s sister, so Nisha is Lata’s sister-in-law.",
-            "Karan is Lata’s brother, therefore Karan is also a brother-in-law of Mohit, and to Nisha he is her brother’s wife’s brother.",
-            "In ordinary exam options that relation is ‘brother-in-law’ only if they treat Karan as Nisha’s sister-in-law’s brother; the precise label is ‘wife’s brother’ relative to Mohit, and relative to Nisha it is ‘brother of brother’s wife’ — not Nisha’s brother.",
-            "Karan is not Nisha’s brother (different parents unless stated). The designed relation: Karan is Nisha’s sister-in-law’s brother, i.e. no blood relation, in-law via Mohit–Lata. If options give ‘Brother-in-law’, that is from Mohit’s view, not Nisha’s. From Nisha: brother’s brother-in-law.",
-          ],
-          result:
-            "Karan is the brother of Nisha’s sister-in-law Lata (no blood tie). Not Nisha’s brother.",
         },
       ],
     },
     {
-      heading: "Directions — square walks, turns, and shortest distance",
-      body: "Draw a plus sign: North up, East right, South down, West left. A person facing North who turns right faces East; left faces West; about-turn faces South. Each segment needs a length if a distance is asked. Pythagoras on a right-angled leftover: √(a² + b²).\n\n‘A is to the north of B’ places A above B. ‘C is to the east of B’ places C to B’s right. If AB = CD and the four points form a square, D ends east of A (or west, depending on the turning sense — draw it). Do not rotate the page mentally without redrawing.\n\nSunrise / shadow items: in India, morning sun is east, so a shadow falls west. The exam still mostly uses the plus-sign walk, not astronomy. Two-person meeting items: draw both paths on the same axes.\n\nIf the question asks ‘in which direction is D from A’, the answer is the compass of the vector A → D, not D’s facing. Facing and location are different questions; read the last five words.",
+      heading: "Direction sense — N E S W, turns, shortest path",
+      body: "Draw a plus sign every time: North up, East right, South down, West left. A person facing North who turns right faces East; left faces West; about-turn faces South. Write each walking leg as a length on that plus. Location (‘where is she from the start?’) is not the same as facing (‘which way is she looking?’).\n\nThe trap is answering with the last facing when the question asked for location — or adding the walking legs when the question asked for shortest distance. Shortest distance is the straight line, often a leftover on one axis, or √(x² + y²) on a right triangle.",
+      howTo: [
+        "Sketch N (up), E (right), S (down), W (left). Mark the start as (0, 0) if a distance is asked.",
+        "For each leg: move the stated length, then if there is a turn, turn from the heading you just walked.",
+        "Right from North = East. Right from East = South. Right from South = West. Right from West = North. Left is the other way.",
+        "After the last leg, read the question: facing, or location from start, or shortest distance.",
+        "Shortest distance: cancel opposite legs, then if two leftover legs are perpendicular, use √(a² + b²). Do not add the walking total.",
+      ],
       bullets: [
         "North up, East right. Right turn from North = East.",
-        "Location (‘D is to the east of A’) ≠ facing.",
-        "Equal-length square: walk the four sides in the stated order, then read A→D.",
-        "Shortest distance: remaining legs as a right triangle, then √(x²+y²).",
+        "Location of a point and facing of a person are different questions.",
+        "Shortest path is the leftover triangle, not the sum of the walk.",
       ],
       examples: [
         {
-          title: "Square ABCD — D east of A",
+          title: "Two right turns — location versus facing",
           prompt:
-            "A is to the north of B. C is to the east of B. D is to the north of C. AB = CD and all four segments are equal-length sides of a square. D is to the _____ of A.",
+            "Priya walks 8 km north, turns right, walks 6 km, turns right, walks 8 km. How far and in which direction is she from the start? Which way does she face now?",
           steps: [
-            "Place B. A is north of B, so A is one side-length up from B. Draw A above B.",
-            "C is east of B, same length, so C is one side-length right of B. Now we have a right angle at B.",
-            "D is north of C, same length as AB (and CD = AB), so D is one side-length up from C.",
-            "Compare D and A: both are one side-length north of the B–C line, and D is one side-length east of A (because C is east of B by that length). Vector A→D is due east.",
-            "Options: North would be D above A; West would reverse the C-from-B step; South would put D below. Answer East. (If C had been west of B, D would be west of A.)",
+            {
+              do: "Put start at (0, 0). First leg 8 km north to (0, 8). She is heading north.",
+              why: "North is +y. The first verb is ‘walks north’, so that is both the move and the heading.",
+            },
+            {
+              do: "Turn right from north: she now faces east. Walk 6 km to (6, 8).",
+              why: "Right from North is East. East is +x.",
+            },
+            {
+              do: "Turn right from east: she now faces south. Walk 8 km to (6, 0).",
+              why: "Right from East is South. South is −y. The 8 km south cancels the 8 km north.",
+            },
+            {
+              do: "From start (0, 0) to (6, 0): 6 km due east. That is location.",
+              why: "The north and south legs cancel. Only the 6 km east remains.",
+            },
+            {
+              do: "She faces south (last heading). Do not answer ‘south’ for the location question.",
+              why: "The trap is mixing facing with ‘in which direction from the start’.",
+            },
+            {
+              do: "Answer both parts separately: 6 km east of start, facing south.",
+              why: "Distance 6 km, direction east, facing south. Three different words.",
+            },
           ],
-          result: "East. Square A–B–C–D with B south of A and C east of B puts D east of A.",
-        },
-        {
-          title: "Walk with two right turns",
-          prompt:
-            "Priya walks 8 km north, turns right, walks 6 km, turns right, walks 8 km. How far and in which direction is she from the start, and which way does she now face?",
-          steps: [
-            "Start facing north by implication of the first leg (or at least moving north). After 8 km north she is at (0, 8) if start is (0,0).",
-            "Turn right: she was heading north, right = east. Walk 6 km to (6, 8).",
-            "Turn right: heading east, right = south. Walk 8 km to (6, 0).",
-            "From start (0,0) to (6,0): 6 km east. She faces south (last heading).",
-            "Location versus facing: she is 6 km east of start, facing south. Do not answer ‘south’ for the location question.",
-          ],
-          result: "6 km east of start; facing south.",
+          result: "6 km east of the start; facing south.",
         },
         {
           title: "Shortest distance after a dog-leg",
           prompt:
-            "A man walks 12 km west, 5 km south, then 12 km east. How far is he from the starting point?",
+            "A man walks 12 km west, then 5 km south, then 12 km east. How far is he from the start, and in which direction?",
           steps: [
-            "West 12: (−12, 0). South 5: (−12, −5). East 12: (0, −5).",
-            "The east leg cancels the west leg exactly.",
-            "He is 5 km due south of start. Straight-line distance = 5 km.",
-            "Pythagoras is unnecessary here because the leftover is a single axis. If the east leg had been 9 km he would be at (−3, −5), distance √(9+25)=√34.",
-            "Answer 5 km south (distance 5 km). Not 12, not 17 (the total walking distance).",
+            {
+              do: "Start (0, 0). West 12 km to (−12, 0).",
+              why: "West is −x. Write the point; do not keep the path in your head.",
+            },
+            {
+              do: "South 5 km to (−12, −5).",
+              why: "South is −y.",
+            },
+            {
+              do: "East 12 km to (0, −5).",
+              why: "East +12 cancels the first west 12. Only the south 5 remains.",
+            },
+            {
+              do: "He is 5 km due south of the start. Straight-line distance = 5 km.",
+              why: "The leftover is on one axis, so Pythagoras is not needed.",
+            },
+            {
+              do: "Reject 29 km (12+5+12) and reject 17 km (12+5).",
+              why: "Those are walking distance, or a partial sum. The question asked how far he is, meaning the straight leftover.",
+            },
+            {
+              do: "If the last leg had been 9 km east he would be at (−3, −5), distance √(9+25)=√34. Here it is simply 5 km south.",
+              why: "Use √(x²+y²) only when two leftover legs remain.",
+            },
           ],
-          result: "5 km (due south of start). Walking distance 29 km is a trap.",
+          result: "5 km due south of the start. Walking distance 29 km is the trap.",
         },
         {
-          title: "Two people, who is north-west of whom",
+          title: "Who is north-west of whom",
           prompt:
-            "X walks 10 km east from P. Y walks 10 km north from P. Who is north-west of whom, and what is the straight-line XY?",
+            "From point P, X walks 10 km east and Y walks 10 km north. Who is north-west of whom? What is the straight-line XY?",
           steps: [
-            "P at (0,0). X at (10, 0). Y at (0, 10).",
-            "Vector X→Y = (−10, 10): 10 west and 10 north, i.e. north-west of X. So Y is north-west of X.",
-            "Vector Y→X = (10, −10): south-east. X is south-east of Y, not north-west.",
-            "Straight-line XY = √(10² + 10²) = √200 = 10√2 km.",
-            "Read ‘who is north-west of whom’ as location of the first relative to the second. Y is north-west of X. Distance 10√2 km.",
+            {
+              do: "P at (0, 0). X at (10, 0). Y at (0, 10).",
+              why: "East is +x for X. North is +y for Y. Same start, two different ends.",
+            },
+            {
+              do: "Vector from X to Y: (−10, +10) — 10 west and 10 north. Y is north-west of X.",
+              why: "‘A is north-west of B’ means A sits in the north-west from B. Here A = Y, B = X.",
+            },
+            {
+              do: "Vector from Y to X: (+10, −10) — south-east. X is south-east of Y, not north-west.",
+              why: "The trap is flipping the ‘of’. Always read from the second name.",
+            },
+            {
+              do: "Straight-line XY = √(10² + 10²) = √200 = 10√2 km.",
+              why: "The leftover is a right triangle with equal legs. Walking total 20 km is not the answer.",
+            },
+            {
+              do: "If the question asked ‘in which direction is X from Y’, the answer is south-east.",
+              why: "Location of X as seen from Y is the opposite compass of Y as seen from X.",
+            },
+            {
+              do: "Answer: Y is north-west of X; XY = 10√2 km.",
+              why: "Draw both paths on one plus sign, then read one vector and one hypotenuse.",
+            },
           ],
-          result: "Y is north-west of X; XY = 10√2 km.",
+          result: "Y is north-west of X. Straight-line XY = 10√2 km.",
         },
       ],
     },
     {
-      heading: "Coding–decoding — letter +1, reverse, and mixed number-letter",
-      body: "The cheapest coding item is a uniform Caesar shift: each letter +1, SEBI → T, F, C, J. Apply the same shift to NIFTY: N→O, I→J, F→G, T→U, Y→Z, hence OJGUZ. Check the last letter first so you do not decode four letters and then guess the fifth.\n\nOther regulars: reverse the word then shift; opposite letters (A↔Z, B↔Y, position k maps to 27−k); consonant +1 vowel −1; or a number code from position values (A=1, …, Z=26) summed or multiplied. Mixed series (A2, C5, F10, J17) is +1 letter-skip growing plus +3, +5, +7 on the numbers.\n\nIn sentence coding (‘red is called blue…’) replace from the inside: if they ask the colour of the sky and sky is ‘called grass’, the answer is the new name, not the real-world colour. Keep a two-column table.\n\nNever mix two rules. If SEBI → TFCJ is +1, NIFTY is not a reverse of NIFTY. The distractor MJESX is −1; OHGSX is a botched skip. Work every letter.",
+      heading: "Letter coding — +1, −1, and reverse alphabet",
+      body: "Letter coding hides a regular alphabet trick. The cheap one is a uniform shift: each letter +1 (SEBI → TFCJ) or each letter −1. Another regular is reverse alphabet: A pairs with Z, B with Y, position k pairs with 27 − k. A third is reverse the word first, then shift.\n\nThe trap is mixing two rules. If SEBI → TFCJ is +1, do not also reverse NIFTY. Check the last letter first so you do not decode four letters and then guess the fifth. The option that is every letter −1 is the usual distractor for a +1 stem.",
+      howTo: [
+        "Compare the first given pair letter by letter: S to T, E to F, and so on. Write +1, −1, reverse, or reverse-then-shift.",
+        "Confirm the same rule on the last letter of that pair. If the last letter disagrees, the rule is mixed (often reverse then shift).",
+        "Apply only that rule to the asked word. Work every letter. Do not skip the last one.",
+        "Opposite letter of position k is 27 − k (A = 1, Z = 26).",
+        "Kill options that are the opposite shift (−1 when the stem was +1) or that drop the last letter.",
+      ],
       bullets: [
-        "Uniform shift: check the last letter first, then fill the rest.",
-        "Opposite letter of k is 27−k (A=1).",
-        "Sentence codes: answer in the coded language, not in English reality.",
-        "One rule per item; MJESX is the −1 trap for a +1 stem.",
+        "Uniform +1: check the last letter first, then fill the rest.",
+        "Opposite of k is 27 − k. A↔Z, B↔Y, C↔X.",
+        "One rule per item. MJESX is the −1 trap for a +1 stem.",
       ],
       examples: [
         {
@@ -280,115 +599,441 @@ export const notesReasoning: TopicNote = {
           prompt:
             "In a certain code SEBI is written as TFCJ. How is NIFTY written? (A) OJGUZ (B) MJESX (C) OHGSX (D) OJGUX",
           steps: [
-            "S→T is +1, E→F is +1, B→C is +1, I→J is +1. Uniform +1, no reverse.",
-            "N + 1 = O. I + 1 = J. F + 1 = G. T + 1 = U. Y + 1 = Z. That is O-J-G-U-Z.",
-            "(B) MJESX is each letter −1 (N→M, …). Wrong direction.",
-            "(C) OHGSX mishandles I and T. (D) OJGUX is OJGUZ with Z dropped to X — last-letter slip.",
-            "Answer (A) OJGUZ. Last-letter check: Y must become Z, which only (A) has.",
+            {
+              do: "S→T is +1, E→F is +1, B→C is +1, I→J is +1. The rule is uniform +1. No reverse.",
+              why: "Every letter moved one step forward. If it had been reverse-then-+1, SEBI reversed is IBES, which is not TFCJ.",
+            },
+            {
+              do: "N+1 = O, I+1 = J, F+1 = G, T+1 = U, Y+1 = Z. That is O-J-G-U-Z.",
+              why: "Apply the same +1 to each letter of NIFTY. Do not skip Y.",
+            },
+            {
+              do: "Last-letter check: Y must become Z. Only (A) OJGUZ ends with Z.",
+              why: "Checking the last letter first would have killed (D) OJGUX immediately.",
+            },
+            {
+              do: "Reject (B) MJESX: that is each letter −1.",
+              why: "N→M, I→H would be −1; the option is the standard opposite-shift trap.",
+            },
+            {
+              do: "Reject (C) OHGSX: it mishandles I and T.",
+              why: "A mixed skip is not the stem’s rule. Stick to one shift.",
+            },
+            {
+              do: "Answer (A) OJGUZ.",
+              why: "Uniform +1, last letter Z, no reverse.",
+            },
           ],
           result: "OJGUZ (each letter +1). MJESX is the minus-one trap.",
         },
         {
-          title: "Reverse then +1",
-          prompt:
-            "If RBI is coded as JCS, test the rule ‘reverse then +1’ on SEBI, and code NABARD under reverse-then-+1.",
-          steps: [
-            "RBI reversed is IBR. +1 on each: JCS. That matches the stem, so the rule is reverse then +1.",
-            "SEBI reversed is IBES. +1: J, C, F, T → JCFT. (Not TFCJ — that was the other item’s rule.)",
-            "NABARD reversed is DRABAN. +1: E, S, B, C, B, O → ESBCBO.",
-            "Do not apply reverse-then-+1 to a stem that already fitted uniform +1 without reverse. Each question has its own code.",
-            "Asked code: NABARD → ESBCBO. Check last letter: N (first of NABARD) becomes the last of the reverse (N) then +1 = O. Last letter O is the checksum.",
-          ],
-          result: "NABARD → ESBCBO under reverse-then-+1. SEBI would be JCFT under that same rule.",
-        },
-        {
-          title: "Opposite letters",
+          title: "Reverse alphabet: HOLD → SLOW",
           prompt:
             "If HOLD is coded as SLOW, decode the rule, then code MINT.",
           steps: [
-            "Positions: H=8, opposite 27−8=19 = S. O=15, 27−15=12 = L. L=12, 27−12=15 = O. D=4, 27−4=23 = W. HOLD → SLOW. Opposite-letter code.",
-            "M=13, 27−13=14 = N. I=9, 27−9=18 = R. N=14, 27−14=13 = M. T=20, 27−20=7 = G.",
-            "MINT → NRMG.",
-            "Checksum: first letter M (13) opposite N; last T opposite G. If an option ends in H you used 27−19 by mistake.",
-            "This is not +1 (that would be NJOS). Do not mix with the SEBI item.",
+            {
+              do: "Positions: H=8, opposite 27−8=19=S. O=15, 27−15=12=L. L=12, 27−12=15=O. D=4, 27−4=23=W. HOLD → SLOW.",
+              why: "Each letter maps to its opposite in the alphabet. That is not +1 (that would be IPME).",
+            },
+            {
+              do: "M=13, 27−13=14=N. I=9, 27−9=18=R. N=14, 27−14=13=M. T=20, 27−20=7=G.",
+              why: "Same opposite rule on MINT, letter by letter.",
+            },
+            {
+              do: "Write NRMG. Checksum: first letter M (13) opposite N; last letter T opposite G.",
+              why: "If an option ends in H you used 27−19 by mistake, or you shifted instead of reversing.",
+            },
+            {
+              do: "Reject NJOS (that would be +1) and LHMS (that would be −1).",
+              why: "This item is opposite letters, not a Caesar shift. Do not reuse the SEBI rule.",
+            },
+            {
+              do: "A↔Z, B↔Y is the same map: M is the 13th letter, opposite the 14th letter N.",
+              why: "You can count in from both ends of the alphabet if you do not want 27−k.",
+            },
+            {
+              do: "Answer: MINT → NRMG.",
+              why: "Each letter’s opposite. Last-letter G is the checksum.",
+            },
           ],
-          result: "MINT → NRMG (each letter’s opposite in the alphabet).",
+          result: "MINT → NRMG (opposite letters). Not +1 and not −1.",
         },
         {
-          title: "Sentence code — sky is called…",
+          title: "Reverse the word, then +1",
           prompt:
-            "If ‘red’ is called ‘blue’, ‘blue’ is called ‘green’, ‘green’ is called ‘white’, and ‘white’ is called ‘black’, what is the colour of milk in that language? And the colour of the clear afternoon sky?",
+            "If RBI is coded as JCS, test the rule ‘reverse then +1’, then code NABARD under that rule.",
           steps: [
-            "Real colour of milk is white. In the code, white is called black. Milk is ‘black’.",
-            "Real colour of a clear afternoon sky is blue. In the code, blue is called green. Sky is ‘green’.",
-            "Do not answer ‘white’ for milk (that is English, not the code). Do not answer ‘blue’ for sky.",
-            "Chain only one step from the real colour to what that word is called. Do not double-step milk→white→black→… into a further colour.",
-            "Two answers: milk = black; sky = green.",
+            {
+              do: "Reverse RBI: IBR. Then +1 on each letter: JCS. That matches the stem.",
+              why: "Uniform +1 without reverse would be SCJ, not JCS. The reverse step is required.",
+            },
+            {
+              do: "NABARD reversed is DRABAN.",
+              why: "Write the reverse in full before you shift. Do not shift and reverse in one messy pass.",
+            },
+            {
+              do: "Add 1: D→E, R→S, A→B, B→C, A→B, N→O. Code = ESBCBO.",
+              why: "Same two-step rule as the stem. Every letter, including the last.",
+            },
+            {
+              do: "Checksum: the first letter of NABARD is N, which becomes the last letter of the reverse, then +1 = O. The code must end with O.",
+              why: "Last-letter check again. If an option ends with N or P, the reverse or the shift slipped.",
+            },
+            {
+              do: "Under this rule SEBI would be JCFT (reverse IBES, then +1), not TFCJ.",
+              why: "Each question has its own code. Do not carry +1-without-reverse into this item.",
+            },
+            {
+              do: "Answer: NABARD → ESBCBO.",
+              why: "Reverse first, then +1. End letter O.",
+            },
           ],
-          result: "Milk is called black; the sky is called green. One substitution from the real colour.",
+          result: "NABARD → ESBCBO. Reverse, then each letter +1.",
         },
       ],
     },
     {
-      heading: "Linear and circular seating — draw left and right from the person",
-      body: "Linear row, everyone facing north: the person’s left is west, right is east. If you draw positions 1 to 6 from west to east (left to right on the page when north is up), then ‘immediate left of B’ is the next lower index, i.e. towards position 1. ‘A is second to the left of B’ means two seats westward of B. Say it in words as you place each person: ‘A is 2nd left of B, so if B is at seat 5, A is at seat 3’.\n\nCircular table facing the centre: from above, a person’s left-hand neighbour is clockwise (the left hand of someone facing inward points clockwise). ‘Second to the left of B’ is two seats clockwise from B. If they face outward, left and right swap. This file’s circular examples all face the centre; the first sentence of each example restates that.\n\n‘Immediate neighbours of X are Y and Z’ places Y and Z on the two sides of X without yet saying who is left. Combine with a left/right clue to lock the side. Opposite in a hexagon (6 seats) is three seats away. Opposite in an octagon is four seats away. Five people in a circle have no unique geometric opposite; the paper will not ask ‘opposite’ for five unless it defines a facing pair.\n\nNever place two people in one seat. If a clue contradicts a drawing, the last clue is not wrong — an earlier optional branch was. Keep two sketches until a clue kills one.",
+      heading: "Number and symbol coding",
+      body: "Number coding turns words into digits, or turns letters into their place-values. Symbol coding swaps operators (+ means ×) or gives a number-code for each word in a short sentence. Always find what is common: the word that repeats and the digit that repeats are a pair.\n\nThe trap is adding the wrong letters, or assigning a repeating digit to a word that does not repeat. Decode the key first, then apply it. After operator swaps, use normal order of operations on the decoded expression unless the paper says left-to-right only.",
+      howTo: [
+        "Letter-to-number: write A=1 … Z=26 (or the reverse A=26 … Z=1 if the stem fits that). Sum or list as the stem requires.",
+        "Sentence-to-digits: underline the word that appears in two lines, and the digit that appears in those same two lines. That digit is that word.",
+        "Repeat until each word has a digit. The leftover word takes the leftover digit.",
+        "Operator swap: rewrite the expression with the real signs, then compute with BODMAS.",
+        "Never reuse a letter-coding shift here. This is numbers and symbols, not +1 on letters.",
+      ],
       bullets: [
-        "Facing north in a row: left = west. Number seats west→east as 1…n.",
-        "Facing centre in a circle: left = clockwise (from above).",
-        "‘Second to the left of B’ = skip one seat in B’s left direction.",
-        "Opposite in even-n circle = n/2 seats away.",
+        "Repeating word + repeating digit = a matched pair.",
+        "A=1 … Z=26 unless the stem uses reverse place-value.",
+        "Swap the operators first; then compute. Do not compute on the printed signs.",
       ],
       examples: [
         {
-          title: "Six in a row facing north — place by left-counts",
+          title: "Place-value sum",
           prompt:
-            "Six people A, B, C, D, E, F sit in a straight line facing north (so their left is west). Seats 1–6 are west to east. B sits at seat 4. A is second to the left of B. C is immediate right of A. F is at the east end. D is not next to F. Who sits at seats 1 to 6?",
+            "If CAT is coded as 24 (C=3, A=1, T=20, sum), how is DOG coded? How is BAT coded?",
           steps: [
-            "Facing north, left = west = towards seat 1. B is at 4. A is second to the left of B: from 4, one left is 3, two left is 2. A is at 2. (‘A is 2nd left of B so A is two seats west of B.’)",
-            "C is immediate right of A. A’s right is east = seat 3. C at 3.",
-            "F is at the east end = seat 6.",
-            "Remaining people D and E for seats 1 and 5. D is not next to F. F at 6 is next to 5, so D cannot be at 5. D at 1, therefore E at 5.",
-            "Order west→east: D, A, C, B, E, F. Check: A (seat 2) is two left of B (4); C (3) is immediate right of A; F east end; D not next to F.",
+            {
+              do: "Confirm the rule on CAT: C=3, A=1, T=20. 3+1+20=24. Sum of place-values, A=1.",
+              why: "The stem already states the map. Check it so you do not use reverse place-value by habit.",
+            },
+            {
+              do: "DOG: D=4, O=15, G=7. Sum 4+15+7=26.",
+              why: "Same map, every letter. O is 15, not 0.",
+            },
+            {
+              do: "BAT: B=2, A=1, T=20. Sum 2+1+20=23.",
+              why: "BAT is CAT with C replaced by B, so the code should drop by 1: 24−1=23. Matches.",
+            },
+            {
+              do: "Reject 26 as a code for BAT, and reject 6+15+7=28 if someone used F for G.",
+              why: "Off-by-one on a letter is the usual slip. Recheck G=7 and B=2.",
+            },
+            {
+              do: "If a later item used reverse place-value, CAT would be 24+26+7=57. That is a different rule.",
+              why: "Do not mix A=1 with A=26 in one item.",
+            },
+            {
+              do: "Answers: DOG = 26, BAT = 23.",
+              why: "Place-value sum with A=1.",
+            },
           ],
-          result: "West to east: D, A, C, B, E, F.",
+          result: "DOG = 26. BAT = 23. Rule = sum of A=1 positions.",
         },
         {
-          title: "Five in a row — ends and a neighbour pair",
+          title: "Which digit means which word",
           prompt:
-            "P, Q, R, S, T face north in a row. Seats 1–5 are west to east. P is at the west end. T is second to the right of P. Q is at the east end. S is immediate left of Q. Who sits between T and Q, and who is at seat 2?",
+            "In a code, 247 means ‘eat hot food’, 256 means ‘hot red chilli’, 367 means ‘eat cold chilli’. What is the code for ‘cold’? What is the code for ‘food’?",
           steps: [
-            "Facing north, right = east. Seat 1 is west, seat 5 is east. P at the west end ⇒ P at 1.",
-            "T is second to the right of P: from seat 1, first right is 2, second right is 3. T at 3. (‘T is 2nd right of P so T is two seats east of P.’)",
-            "Q is at the east end ⇒ Q at 5.",
-            "S is immediate left of Q. Left = west, so the seat immediately west of 5 is 4. S at 4.",
-            "The leftover seat is 2 and the leftover person is R. West-to-east order: P, R, T, S, Q. Between T (seat 3) and Q (seat 5) sits S. Seat 2 is R.",
+            {
+              do: "247 = eat hot food. 256 = hot red chilli. The common word is hot. The common digit is 2. So 2 = hot.",
+              why: "A word that repeats and a digit that repeats on the same two lines are a pair.",
+            },
+            {
+              do: "247 = eat hot food. 367 = eat cold chilli. Common word eat. Common digit 7. So 7 = eat.",
+              why: "Same matching on a different pair of lines.",
+            },
+            {
+              do: "247 is 2=hot, 7=eat, leftover 4. Leftover word is food. So 4 = food.",
+              why: "Once two of three are known, the last digit is the last word.",
+            },
+            {
+              do: "256 and 367 both have chilli. Common digit now (after 2 and 7 are used) is 6. So 6 = chilli. Then 256 leftover 5 = red. 367 leftover 3 = cold.",
+              why: "chilli is in 256 and 367. Digits of 256 are 2,5,6; of 367 are 3,6,7. Shared leftover is 6.",
+            },
+            {
+              do: "Code for cold is 3. Code for food is 4.",
+              why: "Read back: 367 = 3 cold, 6 chilli, 7 eat. 247 = 2 hot, 4 food, 7 eat. Fits every line.",
+            },
+            {
+              do: "Reject 6 for cold (that is chilli) and 2 for food (that is hot).",
+              why: "The trap is pairing a leftover digit with a repeating word.",
+            },
           ],
-          result: "West to east: P, R, T, S, Q. S sits between T and Q. Seat 2 is R.",
+          result: "cold = 3. food = 4. (hot=2, eat=7, chilli=6, red=5)",
         },
         {
-          title: "Six around a table facing the centre",
+          title: "Operator swap, then compute",
           prompt:
-            "A, B, C, D, E, F sit around a hexagon facing the centre (left = clockwise from above). A sits second to the left of B. C sits immediate right of A. D sits opposite B. E sits immediate left of D. F sits immediate right of B. Who sits opposite C, and who are B’s neighbours?",
+            "If + means ×, × means +, − means ÷, and ÷ means −, what is the value of 8 + 2 × 4 − 2?",
           steps: [
-            "Place B at position 1. Number 1–6 clockwise. Facing the centre, left = clockwise and right = anti-clockwise.",
-            "A is second to the left of B: two seats clockwise from 1 is 3. A at 3. (‘A is 2nd left of B so from B skip one clockwise seat to A.’)",
-            "C is immediate right of A. Right of A is anti-clockwise from 3, which is 2. C at 2.",
-            "D sits opposite B. In a hexagon opposite is three seats away: from 1 that is 4. D at 4. E is immediate left of D: clockwise from 4 is 5. E at 5. F is immediate right of B: anti-clockwise from 1 is 6. F at 6.",
-            "Clockwise from B: B, C, A, D, E, F. Opposite C (seat 2) is seat 5 = E. B’s neighbours are C (clockwise) and F (anti-clockwise). Check: A two left of B, C right of A, D opposite B, E left of D, F right of B.",
+            {
+              do: "Rewrite every sign: + becomes ×, × becomes +, − becomes ÷. Do not compute yet.",
+              why: "The printed 8 + 2 is not a sum. Computing on the page signs is the trap.",
+            },
+            {
+              do: "The expression becomes 8 × 2 + 4 ÷ 2.",
+              why: "8 + 2 → 8 × 2. 2 × 4 → 2 + 4. 4 − 2 → 4 ÷ 2. The digits stay; only signs change.",
+            },
+            {
+              do: "BODMAS on the decoded line: × and ÷ first. 8 × 2 = 16. 4 ÷ 2 = 2.",
+              why: "After the swap we use ordinary order, unless the paper says left-to-right only (it did not).",
+            },
+            {
+              do: "Then 16 + 2 = 18.",
+              why: "The leftover sign is +.",
+            },
+            {
+              do: "Reject 8 + 2 × 4 − 2 computed on the printed signs (that would be 8+8−2=14).",
+              why: "That ignores the code. Also reject 8 × 2 + 4 − 2 = 18 then minus 2 as if − stayed minus.",
+            },
+            {
+              do: "Answer 18.",
+              why: "Decode, then ordinary ×÷ before +−.",
+            },
+          ],
+          result: "18. Decoded line is 8 × 2 + 4 ÷ 2 = 16 + 2 = 18.",
+        },
+      ],
+    },
+    {
+      heading: "Linear seating — left and right from the person’s view",
+      body: "People in a straight row. Left and right are from each sitter’s view, not from yours if they face you. If everyone faces north, their left is west and their right is east. Draw the row west → east as left → right on the page, so their left matches the left of your drawing.\n\nThe trap is flipping left/right because ‘I am looking at them’. If they face south, their left is east — the left of the page is then their right. Always say it in words: ‘A sits 2nd left of B, so from our left the row is …’.",
+      howTo: [
+        "Note the facing. Facing north: person’s left = west. Facing south: person’s left = east.",
+        "Number seats 1…n from west to east (left to right on the page when north is up).",
+        "Place the end clues and any fixed seat first. Then place ‘second to the left of B’ as two seats toward B’s left.",
+        "Say the row out loud after each clue: ‘from our left: empty, A, C, B, …’.",
+        "Immediate neighbours fill both sides of a person without yet saying who is left. A later left/right clue locks the side.",
+        "If a clue fights the drawing, an earlier optional branch was wrong. Keep two sketches until one dies.",
+      ],
+      bullets: [
+        "Facing north: left = west = left of the page. Facing south: left = east.",
+        "‘A sits 2nd left of B’ = skip one seat in B’s left direction, then put A.",
+        "Never put two people in one seat. Ends are the cheapest clues.",
+      ],
+      examples: [
+        {
+          title: "Six facing north — speak the row",
+          prompt:
+            "A, B, C, D, E, F sit in a row facing north (their left is west). B sits third from the right end. A sits second to the left of B. C sits immediate right of A. F sits at the right end. D is not next to F. Who sits where from left to right?",
+          steps: [
+            {
+              do: "Seats 1–6 west to east, left to right on the page. Right end is seat 6. B is third from the right: seats 6,5,4 so B is at 4.",
+              why: "Facing north, right = east = toward seat 6. Third from that end is seat 4.",
+            },
+            {
+              do: "A sits 2nd left of B. B’s left is west. From seat 4, one left is 3, two left is 2. Put A at 2. From our left the row is: empty, A, empty, B, empty, empty.",
+              why: "‘2nd left’ skips one seat in the person’s left direction. It is not 2nd from our right.",
+            },
+            {
+              do: "C sits immediate right of A. A’s right is east = seat 3. Put C at 3. From our left: empty, A, C, B, empty, empty.",
+              why: "Immediate right is the next seat toward A’s right, not toward the left end.",
+            },
+            {
+              do: "F sits at the right end = seat 6. From our left: empty, A, C, B, empty, F.",
+              why: "East end is seat 6 when 1 is west.",
+            },
+            {
+              do: "Left are D and E for seats 1 and 5. D is not next to F. F at 6 is next to 5, so D cannot be at 5. D at 1, E at 5.",
+              why: "The negative clue kills one of the two leftover seats.",
+            },
+            {
+              do: "From our left (west to east): D, A, C, B, E, F. Check: A is two left of B; C is immediate right of A; F at right end; D not next to F.",
+              why: "Read the row in words once. Every clue should match this one line.",
+            },
+          ],
+          result: "From our left (west to east): D, A, C, B, E, F.",
+        },
+        {
+          title: "Five facing north — ends and a neighbour",
+          prompt:
+            "P, Q, R, S, T face north in a row. P sits at the west end. T sits second to the right of P. Q sits at the east end. S sits immediate left of Q. Who sits at seat 2, and who sits between T and Q?",
+          steps: [
+            {
+              do: "Seats 1–5 west to east. P at the west end ⇒ P at 1. From our left: P, empty, empty, empty, empty.",
+              why: "West end is seat 1 when we draw left = west.",
+            },
+            {
+              do: "T sits 2nd right of P. P’s right is east. From 1, first right is 2, second right is 3. T at 3. From our left: P, empty, T, empty, empty.",
+              why: "‘2nd right of P’ means two seats toward P’s right, so two seats east.",
+            },
+            {
+              do: "Q at the east end ⇒ Q at 5. From our left: P, empty, T, empty, Q.",
+              why: "East end is seat 5.",
+            },
+            {
+              do: "S sits immediate left of Q. Q’s left is west, so seat 4. S at 4. From our left: P, empty, T, S, Q.",
+              why: "Immediate left of Q is the neighbour toward Q’s left, not toward the east end.",
+            },
+            {
+              do: "Leftover seat 2, leftover person R. From our left: P, R, T, S, Q.",
+              why: "One seat, one person. No extra overlap of people.",
+            },
+            {
+              do: "Seat 2 is R. Between T (seat 3) and Q (seat 5) sits S.",
+              why: "People between 3 and 5 = one person (seat 4).",
+            },
+          ],
+          result: "From our left: P, R, T, S, Q. Seat 2 is R. S sits between T and Q.",
+        },
+        {
+          title: "Facing south flips left on the page",
+          prompt:
+            "Five people A, B, C, D, E sit in a row facing south (their left is east, their right is west). A sits at the west end. B sits second to the left of A. D sits immediate left of B. E sits at the east end. Who sits in the middle, and who sits at seat 2?",
+          steps: [
+            {
+              do: "Draw seats 1–5 west to east, left to right on the page. They face south, so each person’s left = east = toward seat 5, and each person’s right = west = toward seat 1.",
+              why: "The page did not flip. The person’s left did. Say that before you place anyone.",
+            },
+            {
+              do: "A sits at the west end = seat 1. From our left: A, empty, empty, empty, empty.",
+              why: "West end is still seat 1. Facing does not change what ‘west end’ means.",
+            },
+            {
+              do: "B sits 2nd left of A. A’s left is east. From seat 1, one left is 2, two left is 3. B at 3. From our left: A, empty, B, empty, empty.",
+              why: "From the person’s view, 2nd left of A is two seats toward the east — toward our right on the page. So from our left the row starts A, then a gap, then B."
+            },
+            {
+              do: "D sits immediate left of B. B’s left is east, so the next seat east of 3 is 4. D at 4. From our left: A, empty, B, D, empty.",
+              why: "Immediate left is one step in B’s left direction. Facing south, that step is toward the east end, not toward A.",
+            },
+            {
+              do: "E sits at the east end = seat 5. Leftover seat 2, leftover person C. From our left: A, C, B, D, E.",
+              why: "One seat, one person. Ends and left-counts already used four people.",
+            },
+            {
+              do: "Middle seat 3 is B. Seat 2 is C. Check: A at west; B is two seats east of A (A’s 2nd left); D is just east of B (B’s immediate left); E at east.",
+              why: "Facing south: left toward our right on the page. If you had used the north map you would have put B west of A, which has no seats. That is the trap.",
+            },
+          ],
+          result:
+            "From our left (west to east): A, C, B, D, E. The middle is B. Seat 2 is C. Facing south, A’s left runs toward the east end.",
+        },
+      ],
+    },
+    {
+      heading: "Circular seating — facing centre versus facing out",
+      body: "People around a table. Draw a clock and number seats 1, 2, 3… clockwise. If they face the centre, a person’s left is clockwise (from above) and a person’s right is anti-clockwise. If they face out, left and right swap: left is anti-clockwise, right is clockwise.\n\nThe trap is using the facing-centre map on an outward-facing table. ‘A sits 2nd left of B’ must name the facing first. Opposite exists only for an even count: in a hexagon, opposite is three seats away; in a square, two seats away. Five people have no unique opposite.",
+      howTo: [
+        "Write facing in the first line: centre or out. Pick a person, put them at seat 1, number the rest clockwise.",
+        "Facing centre: left = clockwise, right = anti-clockwise. Facing out: left = anti-clockwise, right = clockwise.",
+        "Place ‘second to the left of B’ as two seats in B’s left direction. Say it: ‘A is 2nd left of B, so skip one seat that way to A.’",
+        "Opposite in 6 seats = three steps. Opposite in 8 seats = four steps. Do not ask opposite in 5.",
+        "Neighbours of X are the two seats touching X. A left/right clue decides which neighbour is which.",
+        "If two drawings remain, the next left/right clue kills one. Do not seat two people in one chair.",
+      ],
+      bullets: [
+        "Facing centre: left = clockwise from above. Facing out: left = anti-clockwise.",
+        "‘2nd left of B’ = skip one seat in B’s left direction — direction depends on facing.",
+        "Opposite = n/2 seats away, only when n is even.",
+      ],
+      examples: [
+        {
+          title: "Six facing the centre",
+          prompt:
+            "A, B, C, D, E, F sit around a hexagon facing the centre. A sits second to the left of B. C sits immediate right of A. D sits opposite B. E sits immediate left of D. F sits immediate right of B. Who sits opposite C? Who are B’s neighbours?",
+          steps: [
+            {
+              do: "Facing centre: left = clockwise, right = anti-clockwise. Put B at seat 1. Number 1–6 clockwise.",
+              why: "One fixed person and a clockwise numbering make every later ‘left’ a higher seat number (until 6 wraps to 1).",
+            },
+            {
+              do: "A sits 2nd left of B: two seats clockwise from 1 is 3. A at 3. Say it: A is 2nd left of B, so from B skip one clockwise seat to A.",
+              why: "Left of someone facing in is clockwise from above.",
+            },
+            {
+              do: "C sits immediate right of A. Right = anti-clockwise, so from 3 that is seat 2. C at 2.",
+              why: "Immediate right is one step the other way from left.",
+            },
+            {
+              do: "D opposite B: in a hexagon, opposite is three seats. From 1 that is 4. D at 4. E immediate left of D: clockwise from 4 is 5. E at 5. F immediate right of B: anti-clockwise from 1 is 6. F at 6.",
+              why: "Each clue is one placement. Opposite first, then the cheap immediate neighbours.",
+            },
+            {
+              do: "Clockwise from B: B, C, A, D, E, F. Opposite C (seat 2) is seat 5 = E. B’s neighbours are C (clockwise / B’s left) and F (anti-clockwise / B’s right).",
+              why: "Read the ring in words. Opposite of 2 is 2+3=5.",
+            },
+            {
+              do: "Check: A two left of B, C right of A, D opposite B, E left of D, F right of B. All match.",
+              why: "One full pass over the clues. If one failed, a left/right was flipped.",
+            },
           ],
           result:
             "Clockwise from B: B, C, A, D, E, F. Opposite C is E. B’s neighbours are C and F.",
         },
         {
-          title: "Four facing centre — second left spoken out loud",
+          title: "Six facing out — left flips",
           prompt:
-            "Four people W, X, Y, Z sit around a square table facing the centre. W is second to the left of X. Y is immediate left of X. Who sits opposite W, and who is immediate right of X?",
+            "Same six people, but now they face out. A sits second to the left of B. C sits immediate right of A. Who sits at the other side of B from C if we only use these two clues plus ‘they sit around a circle’? Place B at 1 and fill A and C.",
           steps: [
-            "Four seats, facing centre, left = clockwise. Opposite = two seats away.",
-            "Place X at seat 1. Second to the left of X is two clockwise = seat 3. W at 3. (‘W is 2nd left of X so W sits opposite X on a square.’)",
-            "Y is immediate left of X: one clockwise from 1 is 2. Y at 2. The leftover seat 4 is Z.",
-            "Immediate right of X: right = anti-clockwise from 1, which is seat 4 = Z.",
-            "Opposite W (seat 3) is seat 1 = X. Clockwise: X, Y, W, Z. Neighbours of X are Y (left) and Z (right).",
+            {
+              do: "Facing out: left = anti-clockwise, right = clockwise. Put B at seat 1, number 1–6 clockwise as before.",
+              why: "Keep the same numbering so only the meaning of left/right changes. Do not also reverse the numbers.",
+            },
+            {
+              do: "A sits 2nd left of B. Left is anti-clockwise: from 1, one anti-clockwise is 6, two is 5. A at 5. Say it: A is 2nd left of B, so from B skip one anti-clockwise seat to A.",
+              why: "Facing out swaps the centre map. 2nd left is no longer seat 3.",
+            },
+            {
+              do: "C sits immediate right of A. Right is clockwise, so from 5 clockwise is 6. C at 6.",
+              why: "Immediate right is one step clockwise when they face out.",
+            },
+            {
+              do: "Clockwise from B: B (1), empty, empty, empty, A (5), C (6). C is immediate anti-clockwise of B, so C is B’s left-hand neighbour from B’s view? B faces out, B’s left is anti-clockwise = seat 6 = C. Yes C is immediate left of B.",
+              why: "Check consistency: A at 5 is two anti-clockwise from B, and C sits between A and B going clockwise from A.",
+            },
+            {
+              do: "If you had used the facing-centre map you would have put A at 3 and C at 2 — the opposite arc. That is the trap.",
+              why: "The first word of a circular item is facing. Centre and out are mirror left/right.",
+            },
+            {
+              do: "Partial ring, clockwise: B, _, _, _, A, C. B’s neighbours so far: C on one side (seat 6). The other side of B (seat 2) is still empty.",
+              why: "Two clues only place three people. Do not invent D, E, F.",
+            },
+          ],
+          result:
+            "Facing out, clockwise from B: B, empty, empty, empty, A, C. A is at seat 5, C at seat 6. Do not use the facing-centre map.",
+        },
+        {
+          title: "Four facing centre — second left is opposite",
+          prompt:
+            "W, X, Y, Z sit around a square table facing the centre. W sits second to the left of X. Y sits immediate left of X. Who sits opposite W, and who sits immediate right of X?",
+          steps: [
+            {
+              do: "Four seats, facing centre, left = clockwise. Opposite = two seats away. Put X at seat 1.",
+              why: "A square is an even ring. Opposite is n/2 = 2 steps.",
+            },
+            {
+              do: "W sits 2nd left of X: two clockwise from 1 is 3. W at 3. Say it: W is 2nd left of X, so W sits opposite X on a square.",
+              why: "On four seats, second left and opposite are the same step count.",
+            },
+            {
+              do: "Y sits immediate left of X: one clockwise from 1 is 2. Y at 2. Leftover seat 4 is Z.",
+              why: "One clue, one seat. Last person takes last chair.",
+            },
+            {
+              do: "Immediate right of X: right = anti-clockwise from 1, which is seat 4 = Z.",
+              why: "Right is the other way from left when they face in.",
+            },
+            {
+              do: "Opposite W (seat 3) is seat 1 = X. Clockwise: X, Y, W, Z. Neighbours of X are Y (left) and Z (right).",
+              why: "Read the ring in words: from our clockwise pass, Y is just after X, Z is just before X.",
+            },
+            {
+              do: "Answer: opposite W is X; immediate right of X is Z.",
+              why: "Facing centre on a square: 2nd left = opposite.",
+            },
           ],
           result:
             "W sits opposite X. Immediate right of X is Z. Clockwise: X, Y, W, Z.",
@@ -396,198 +1041,349 @@ export const notesReasoning: TopicNote = {
       ],
     },
     {
-      heading: "Order and ranking — from left, from right, and between",
-      body: "If A is 7th from the left and 12th from the right in a row, the total number of people is 7 + 12 − 1 = 18. You subtract one because A was counted in both ranks. Rank from the other end = total − rank_from_this_end + 1.\n\nPeople between two positions i and j (i < j) in a numbered row: j − i − 1. If A is 8th from left and B is 13th from left, people between them = 4. If ranks are given from opposite ends, convert one rank to the same end first using the total, or using total = l + r − 1 if one person supplies both.\n\nOver / under in a height queue: ‘A is taller than only two’ means A is 3rd shortest. ‘B is shorter than only one’ means B is 2nd tallest. Combine by writing a total order with slots, not by translating both into ‘greater than’ without the ‘only’.\n\nTwo rows facing each other use ranking plus seating: left of a person facing north is west, left of a person facing south is east. Convert before you count ‘second left’.",
+      heading: "Order and ranking — from left, from right, total = L + R − 1",
+      body: "If A is 7th from the left and 12th from the right, the total number of people is 7 + 12 − 1 = 18. You subtract one because A was counted in both ranks. Rank from the other end = total − this-end rank + 1. People sitting between two positions i and j (same end) = |j − i| − 1.\n\nThe trap is adding L + R with no −1 (that gives 19) or converting only one of two ranks before you count ‘between’. Height items: ‘taller than only two’ means 3rd shortest. ‘Shorter than only one’ means 2nd tallest.",
+      howTo: [
+        "If one person gives both a left rank and a right rank, total = L + R − 1.",
+        "To turn a left rank into a right rank: right = total − left + 1. The other way is the same formula.",
+        "Before counting people between A and B, put both ranks on the same end (both from the left, or both from the right).",
+        "Between = difference of those two positions, minus 1.",
+        "‘Taller than only k’ = (k+1)th from the shortest. ‘Shorter than only k’ = (k+1)th from the tallest. Write a numbered height line.",
+      ],
       bullets: [
         "Total = (from left) + (from right) − 1.",
         "Other-end rank = total − this-end rank + 1.",
-        "Between i and j = |j − i| − 1 after both ranks face the same end.",
-        "‘Taller than only k’ = (k+1)th from the shortest.",
+        "Between two same-end ranks = |j − i| − 1. ‘Taller than only k’ = k+1 from the bottom.",
       ],
       examples: [
         {
-          title: "7th left, 12th right — total",
+          title: "7th left and 12th right",
           prompt:
-            "A is 7th from the left and 12th from the right in a row. How many people are in the row? What is A’s rank from the right if you only knew total 18 and 7th from left?",
+            "A is 7th from the left and 12th from the right in a row. How many people are in the row? If you only knew total 18 and 7th from left, what is A’s rank from the right?",
           steps: [
-            "Total = 7 + 12 − 1 = 18. The −1 stops double-counting A.",
-            "Check: positions 1–6 left of A (6 people), A, 7–17? From the right: 12th means 11 people to A’s right. 6 + 1 + 11 = 18. Matches.",
-            "Reverse formula: rank from right = total − left-rank + 1 = 18 − 7 + 1 = 12. Recovers the given 12.",
-            "If an option is 19, that candidate added 7+12 with no −1. If 17, they subtracted 2.",
-            "Answer: 18 people; the reverse rank formula returns 12.",
+            {
+              do: "Total = 7 + 12 − 1 = 18.",
+              why: "A is in both counts. The −1 stops double-counting A.",
+            },
+            {
+              do: "Check by pieces: 6 people to A’s left, then A, then 11 people to A’s right. 6+1+11=18.",
+              why: "7th from left means 6 on the left. 12th from right means 11 on the right.",
+            },
+            {
+              do: "Reverse formula: rank from right = total − left-rank + 1 = 18 − 7 + 1 = 12.",
+              why: "This recovers the given 12, so the two formulae agree.",
+            },
+            {
+              do: "Reject 19 (that is 7+12 with no −1) and reject 17 (that subtracted 2).",
+              why: "Those two options are the usual arithmetic traps.",
+            },
+            {
+              do: "People to the left of A = 6. People to the right = 11. Do not call those the ranks.",
+              why: "Rank counts the person; ‘people to the side’ does not.",
+            },
+            {
+              do: "Answer: 18 people; the reverse rank is 12.",
+              why: "Total = L+R−1. Other end = total − this end + 1.",
+            },
           ],
-          result: "18 people. Rank-from-right = 18 − 7 + 1 = 12.",
+          result: "18 people. Rank from the right = 18 − 7 + 1 = 12.",
         },
         {
           title: "People between two left-ranks",
           prompt:
-            "In a row of 20, Gita is 8th from the left and Hari is 13th from the left. How many sit between them? How many to Hari’s right?",
+            "In a row of 20, Gita is 8th from the left and Hari is 13th from the left. How many sit between them? How many people sit to Hari’s right?",
           steps: [
-            "Both ranks from the left: Gita at 8, Hari at 13.",
-            "Between = 13 − 8 − 1 = 4 people (seats 9,10,11,12).",
-            "Hari’s rank from the right = 20 − 13 + 1 = 8, so people to Hari’s right = 7 (or 8th from right means 7 on his right).",
-            "If Hari had been 13th from the right, you would convert: left-rank of Hari = 20 − 13 + 1 = 8, then Hari and Gita would be at the same seat — a different question.",
-            "Answers: 4 between them; 7 people to Hari’s right.",
+            {
+              do: "Both ranks are from the left: Gita at 8, Hari at 13. Same end already — no conversion yet.",
+              why: "‘Between’ needs one number line. Here both numbers already face left.",
+            },
+            {
+              do: "Between = 13 − 8 − 1 = 4 people (seats 9, 10, 11, 12).",
+              why: "Subtract one so you do not count Gita or Hari.",
+            },
+            {
+              do: "Hari’s rank from the right = 20 − 13 + 1 = 8. People to Hari’s right = 7.",
+              why: "8th from the right means 7 people on that side. Rank includes Hari.",
+            },
+            {
+              do: "If Hari had been 13th from the right, you would first convert: left-rank of Hari = 20 − 13 + 1 = 8, and then Hari and Gita would share seat 8 — a different question.",
+              why: "Never subtract a left rank from a right rank until one of them is flipped.",
+            },
+            {
+              do: "Reject 5 between them (that forgot the −1) and reject 8 to Hari’s right (that used the rank as a side-count).",
+              why: "Between and side-count both need a minus one, but from different numbers.",
+            },
+            {
+              do: "Answers: 4 between them; 7 people to Hari’s right.",
+              why: "Same-end between formula, then other-end rank for the side.",
+            },
           ],
-          result: "4 between Gita and Hari; 7 people to Hari’s right.",
+          result: "4 between Gita and Hari. 7 people to Hari’s right.",
         },
         {
           title: "Taller than only two",
           prompt:
-            "Among six friends, Vani is taller than only two. Om is shorter than only one. Pia is taller than Vani but shorter than Om. Who is the shortest possible for Pia’s rank, and who can be tallest?",
+            "Among six friends, Vani is taller than only two. Om is shorter than only one. Pia is taller than Vani but shorter than Om. What is Pia’s height rank? Who can be tallest?",
           steps: [
-            "Six heights, 1 = shortest, 6 = tallest. Vani taller than only two ⇒ Vani is 3rd shortest (rank 3 from bottom).",
-            "Om shorter than only one ⇒ one person taller than Om ⇒ Om is 2nd tallest (rank 5 from bottom, 2 from top).",
-            "Pia is taller than Vani (so Pia’s rank > 3) and shorter than Om (so Pia’s rank < 5). The only integer slot is rank 4.",
-            "Tallest is rank 6, the unique person taller than Om. Shortest two are the two below Vani. Pia cannot be tallest or shortest.",
-            "Pia is 3rd tallest (rank 4 of 6). Tallest is the unnamed friend above Om. Vani is 4th tallest.",
+            {
+              do: "Six heights. Call 1 the shortest and 6 the tallest. Vani is taller than only two ⇒ two people shorter than Vani ⇒ Vani is 3rd shortest (rank 3).",
+              why: "‘Only two’ is a count below her, not a vague ‘quite short’.",
+            },
+            {
+              do: "Om is shorter than only one ⇒ one person taller than Om ⇒ Om is 2nd tallest (rank 5 from the bottom, 2 from the top).",
+              why: "‘Only one’ above him fixes his slot from the top.",
+            },
+            {
+              do: "Pia is taller than Vani (rank > 3) and shorter than Om (rank < 5). The only integer slot is rank 4.",
+              why: "There is no gap between 3 and 5 except 4. Pia is forced.",
+            },
+            {
+              do: "Tallest is rank 6 — the unique person taller than Om. Pia cannot be tallest. The two shortest are the two below Vani.",
+              why: "Slots 1 and 2 are unnamed. Slot 6 is unnamed. Pia is neither.",
+            },
+            {
+              do: "Pia is 3rd tallest (rank 4 of 6). Vani is 4th tallest. Om is 2nd tallest.",
+              why: "From the top: 6 = unknown, 5 = Om, 4 = Pia, 3 = Vani, then two unknowns.",
+            },
+            {
+              do: "Answer: Pia is exactly 4th from shortest. Tallest is the unnamed friend above Om.",
+              why: "Honour ‘only’. Do not translate both clues into loose ‘greater than’ without the count.",
+            },
           ],
-          result: "Pia is exactly 4th from shortest (3rd tallest). Om is 2nd tallest. Vani is 3rd shortest.",
-        },
-        {
-          title: "Two ranks, find who swapped",
-          prompt:
-            "In a queue of 15, Neel is 6th from the front. After two people immediately in front of him step out, what is Neel’s new position from the front, and from the back?",
-          steps: [
-            "Front = left of a facing-front queue. Neel is 6th, so 5 people in front.",
-            "Two of those in front leave. People in front of Neel become 3. Neel is now 4th from the front.",
-            "Total remaining = 15 − 2 = 13.",
-            "Rank from the back = 13 − 4 + 1 = 10. So 10th from the back.",
-            "If the two who left had been behind Neel, front rank would stay 6 and total 13, back rank 13 − 6 + 1 = 8. The stem said they were in front. Use 4th front, 10th back.",
-          ],
-          result: "4th from the front and 10th from the back in a queue of 13.",
+          result:
+            "Pia is 4th from shortest (3rd tallest). Om is 2nd tallest. Vani is 3rd shortest. Tallest is someone else.",
         },
       ],
     },
     {
-      heading: "Input–output — one machine, numbers left, words right",
-      body: "An input-output machine rearranges a line in steps by a fixed rule. The machine in this note does two placements per step: the smallest remaining number moves to the leftmost free ‘settled’ slot, and the alphabetically earliest remaining word moves to the rightmost free slot. Unarranged tokens keep their relative order in the middle.\n\nWrite the input, then rewrite the full line after every step. Do not jump to step IV from the input. When numbers are exhausted or words are exhausted, a later step may move only one token. The output is numbers in ascending order from the left and words in reverse alphabetical order from the left (equivalently, alphabetical from the right).\n\nQuestions ask: the line at step II; the position of a token at step III; how many steps to the output; which token is 4th from the left after step I. If a proposed step cannot be produced by the rule, it is not a step of this machine — that is the ‘which of the following is not a step’ item.\n\nOther machines (odd numbers +1 to the left, even −1, words reversed) exist in bank papers. Do not mix them into this example. Decode the rule from the first given step if a full working is printed in the question; here the rule is stated so you can see every placement.",
+      heading: "Input-output — one machine, one step pattern",
+      body: "An input-output machine rearranges a line by the same rule at every step. In this note the machine does two placements per step: the smallest remaining number moves to the leftmost free settled slot, and the alphabetically earliest remaining word moves to the rightmost free settled slot. The middle tokens keep their order.\n\nThe trap is jumping to step IV from the input, or moving two numbers in one step. Rewrite the full line after every step. The finished output has numbers ascending from the left and words alphabetical from the right.",
+      howTo: [
+        "Copy the input. List the numbers from small to large, and the words from A to Z. That is the target order.",
+        "Each step: park the next smallest leftover number at the left of the still-messy middle, and park the next earliest leftover word at the right of that middle.",
+        "Do not move any other token. The middle keeps its relative order.",
+        "Write the whole new line. That is step I. Repeat for step II, III, … until numbers on the left are sorted and words on the right are sorted.",
+        "Answer position questions from the line you actually wrote for that step, not from the input and not from the output.",
+      ],
       bullets: [
-        "One number to the left (ascending), one word to the right (alphabetical) per step.",
-        "Middle tokens keep order. Rewrite the whole line each step.",
-        "Output: numbers ASC on the left, words alpha from the right.",
-        "Count steps; do not assume four steps if 3 numbers and 3 words finish in three.",
+        "One number to the left (ascending) and one word to the right (alphabetical) per step.",
+        "Middle tokens keep order. Rewrite the whole line each time.",
+        "Output: numbers small-to-large on the left, words A-to-Z from the right.",
       ],
       examples: [
         {
           title: "Run the machine on 87 cat 23 ball 56 open 14 ten",
           prompt:
-            "Input: 87 cat 23 ball 56 open 14 ten. The machine each step parks the smallest leftover number at the left and the earliest leftover word at the right. Write steps I–IV.",
+            "Input: 87 cat 23 ball 56 open 14 ten. Each step parks the smallest leftover number at the left and the earliest leftover word at the right. Write steps I to III.",
           steps: [
-            "Numbers in play: 14, 23, 56, 87. Words: ball, cat, open, ten. Input order: 87, cat, 23, ball, 56, open, 14, ten.",
-            "Step I: smallest number 14 to the left; first word ball to the right. Remaining in order: 87 cat 23 56 open ten. Line: 14 87 cat 23 56 open ten ball.",
-            "Step II: next number 23 to the left (after 14); next word cat to the right (before ball). Remaining: 87 56 open ten. Line: 14 23 87 56 open ten cat ball.",
-            "Step III: next number 56 left; next word open right. Remaining: 87 ten. Line: 14 23 56 87 ten open cat ball.",
-            "Step IV: last number 87 is already at the left of the middle; last word ten to the right. Line: 14 23 56 87 ten open cat ball. That is also the output (numbers 14,23,56,87 then words ten, open, cat, ball — alphabetical from the right).",
+            {
+              do: "Numbers: 14, 23, 56, 87. Words: ball, cat, open, ten. Input order: 87, cat, 23, ball, 56, open, 14, ten.",
+              why: "The lists tell you what will move, in which order. The input tells you the middle’s starting order.",
+            },
+            {
+              do: "Step I: smallest number 14 to the left; first word ball to the right. Remaining in order: 87 cat 23 56 open ten. Line: 14 87 cat 23 56 open ten ball.",
+              why: "Only those two tokens move. 87 stays left of cat, and so on.",
+            },
+            {
+              do: "Step II: next number 23 to the left (after 14); next word cat to the right (before ball). Remaining: 87 56 open ten. Line: 14 23 87 56 open ten cat ball.",
+              why: "14 and ball are already settled and do not move again.",
+            },
+            {
+              do: "Step III: next number 56 left; next word open right. Remaining: 87 ten. Line: 14 23 56 87 ten open cat ball.",
+              why: "After three pair-moves the numbers 14,23,56,87 are in order on the left and the words ten, open, cat, ball read alphabetical from the right. That is the output.",
+            },
+            {
+              do: "Step IV would look the same. Output is first reached at step III.",
+              why: "Four numbers and four words, but the last number and last word are already in the last middle slots. Do not force a fake extra shuffle.",
+            },
+            {
+              do: "Keep these three lines for the next two examples. Do not recompute from memory.",
+              why: "Position questions are just reading the line you already wrote.",
+            },
           ],
           result:
-            "I: 14 87 cat 23 56 open ten ball. II: 14 23 87 56 open ten cat ball. III: 14 23 56 87 ten open cat ball. IV = output: 14 23 56 87 ten open cat ball.",
+            "I: 14 87 cat 23 56 open ten ball. II: 14 23 87 56 open ten cat ball. III (output): 14 23 56 87 ten open cat ball.",
         },
         {
-          title: "Position question at step II",
+          title: "Position at step II",
           prompt:
             "On the same input, which token is 4th from the left in step II, and which is 2nd from the right?",
           steps: [
-            "Step II from the previous working: 14 23 87 56 open ten cat ball.",
-            "Left ranks: 1=14, 2=23, 3=87, 4=56. Fourth from the left is 56.",
-            "Right ranks: 1st from right = ball, 2nd from right = cat.",
-            "Do not use step I (14 87 cat 23 56 open ten ball) where 4th from left is 23. The question named step II.",
-            "Answers: 56, and cat.",
+            {
+              do: "Copy step II: 14 23 87 56 open ten cat ball.",
+              why: "Use the line from the previous working. Do not start from the input.",
+            },
+            {
+              do: "Left ranks: 1=14, 2=23, 3=87, 4=56. Fourth from the left is 56.",
+              why: "Count from the left end of that line only.",
+            },
+            {
+              do: "Right ranks: 1st from right = ball, 2nd from right = cat.",
+              why: "Count from the right end. Words parked from the right in order ball, then cat.",
+            },
+            {
+              do: "Do not use step I (14 87 cat 23 56 open ten ball), where 4th from left is 23.",
+              why: "The question named step II. One step off is a designed trap.",
+            },
+            {
+              do: "Do not use the output, where 4th from left is 87.",
+              why: "Same trap on the other side of step II.",
+            },
+            {
+              do: "Answers: 56, and cat.",
+              why: "Read step II only.",
+            },
           ],
           result: "Step II: 4th from left = 56; 2nd from right = cat.",
         },
         {
-          title: "How many steps, and a false step",
+          title: "New input, only step I",
           prompt:
-            "How many steps are required to reach the output? Is ‘14 23 56 87 open ten cat ball’ a step of this machine?",
+            "Input: 42 mango 15 egg 8 zest 27. Same machine. What is step I, and where is zest after step I? What would step II be?",
           steps: [
-            "Step IV already equals the output, so four steps are required (three pair-moves plus the last number/word lock). After step III the line was already 14 23 56 87 ten open cat ball, which is the output — so the output appears at step III, and step IV is identical.",
-            "Count of pair-moves needed = max(count of numbers, count of words) if both move each step, but here after three pair-moves the line is already sorted: 14,23,56 parked, 87 already in the remaining slot, words open,cat,ball parked with ten in the remaining inner slot which is its final place. So the output is first reached at step III.",
-            "The proposed line 14 23 56 87 open ten cat ball would have open immediately after 87, but the rule parks words from the right in order ball, then cat, then open, so open cannot sit left of ten in a genuine step: after step III ten is left of open. That proposed line is not a step.",
-            "If the question asks ‘which is not a step’, pick any line that breaks ascending-left or alpha-from-right partial settlement.",
-            "Answers: output first appears at step III; the open-ten swapped line is not a step.",
+            {
+              do: "Numbers: 8, 15, 27, 42. Words: egg, mango, zest. Smallest number 8; first word egg.",
+              why: "New input, same rule. Rebuild the two lists from scratch.",
+            },
+            {
+              do: "Remove 8 and egg from the input, keeping the order of the rest: 42 mango 15 zest 27.",
+              why: "Middle keeps relative order. egg sat between 15 and 8; once egg leaves, 15 is followed by zest in the middle.",
+            },
+            {
+              do: "Step I: 8 42 mango 15 zest 27 egg.",
+              why: "8 parked left, egg parked right, middle unchanged in order.",
+            },
+            {
+              do: "zest is 5th from the left in that line (8, 42, mango, 15, zest, 27, egg).",
+              why: "Count: 1=8, 2=42, 3=mango, 4=15, 5=zest.",
+            },
+            {
+              do: "Step II would park 15 left and mango right: 8 15 42 zest 27 mango egg.",
+              why: "One number and one word per step. Do not also move 27 in step I or II until its turn.",
+            },
+            {
+              do: "Answer step I as 8 42 mango 15 zest 27 egg, with zest 5th from the left.",
+              why: "The question asked step I first. Step II is the check that you did not double-move.",
+            },
           ],
           result:
-            "Output at step III (step IV identical). ‘14 23 56 87 open ten cat ball’ is not a step of this machine.",
-        },
-        {
-          title: "New input, only step I demanded",
-          prompt:
-            "Input: 42 mango 15 egg 8 zest 27. Same machine. What is step I, and where is zest after step I?",
-          steps: [
-            "Numbers: 8, 15, 27, 42. Words: egg, mango, zest. Smallest number 8; first word egg.",
-            "Remove 8 and egg from 42 mango 15 egg 8 zest 27, keeping order of the rest: 42 mango 15 zest 27.",
-            "Step I: 8 42 mango 15 zest 27 egg.",
-            "zest is 5th from the left in that line (8, 42, mango, 15, zest, 27, egg).",
-            "Do not also move 15 in step I — one number per step. Step II would park 15 left and mango right: 8 15 42 zest 27 mango egg.",
-          ],
-          result: "Step I: 8 42 mango 15 zest 27 egg. zest is 5th from the left.",
+            "Step I: 8 42 mango 15 zest 27 egg. zest is 5th from the left. Step II: 8 15 42 zest 27 mango egg.",
         },
       ],
     },
     {
-      heading: "One-question puzzle — five floors, five people, five cities",
-      body: "A one-question puzzle packs a 5×1 building (or five slots) with two attribute lists. The method is a grid: people down the side, floors 1–5 across, and a second pass for the city (or colour, or department). Place the only-clue first (the person on floor 5, the one who is immediately above). Then use ‘two floors above’ as a gap of one. Never let two people share a floor.\n\nWrite ‘immediately above’ as floor n+1 if 1 is the ground. Some papers number 1 as the top; the stem will say ‘ground floor numbered 1’. Stick to that. ‘A lives on an odd-numbered floor’ leaves 1,3,5 until killed.\n\nWhen only one question is asked (‘who lives on floor 3?’), you may not need the full assignment, but filling the full assignment is still faster than branching. The worked puzzle below asks one question after five clues; the steps fill every floor so you can see there is no leftover permutation.\n\nIf two sketches survive until the last clue, the last clue’s job is to kill one. If both survive, the question is under-determined — that is not how Paper 1 keys work; you missed a ‘only’ or an ‘immediate’.",
+      heading: "Floor or box puzzle — place one clue at a time",
+      body: "A floor puzzle stacks people on floors 1 (ground) to 5 (top), unless the stem numbers the top as 1. A box puzzle is the same drawing with boxes in a stack. Make a single column of five slots. Place the unique clues first (who is on 5, who is on the ground). Then place ‘immediately above’ as the next integer up.\n\nThe trap is filling two people into one floor, or treating ‘two floors above’ as next door. Two floors above K is a gap of one. Odd floors are 1, 3, 5. If two sketches survive, the last clue’s job is to kill one. Paper-1 keys are unique; if both sketches live, you missed an ‘only’ or an ‘immediate’.",
+      howTo: [
+        "Draw five slots in a column. Label 1 at the bottom if the stem says ground = 1.",
+        "Place every clue that names a floor number or an end (top / ground) first.",
+        "Place ‘immediately above X’ in the slot next to X. Place ‘two above X’ with one empty slot between.",
+        "Use ‘odd floor’ / ‘even floor’ to cut the leftover slots. One person per slot.",
+        "When a second attribute (colour, city) appears, fill it on the same column after the people are locked — or lock a colour when it is tied to a known floor.",
+        "Read the asked question. If it is already a premise (‘L lives immediately above K’), tick L, then still check the tower so no option contradicts it.",
+      ],
       bullets: [
-        "Ground = 1 unless the stem numbers the top as 1.",
-        "Immediately above = next integer floor. Two above = +2.",
-        "Odd floors 1,3,5. One person per floor.",
-        "Place unique clues first; use the last clue to kill the leftover sketch.",
+        "Ground = 1 unless the stem numbers the top as 1. One person (or box) per floor.",
+        "Immediately above = next floor. Two above = skip one floor.",
+        "Place unique clues first. The last clue kills the leftover sketch.",
       ],
       examples: [
         {
           title: "Five floors — who is on 3?",
           prompt:
-            "Five people — J, K, L, M, N — live on five floors, ground = 1, top = 5. (1) N lives on floor 5. (2) K lives on an odd-numbered floor other than 5. (3) L lives immediately above K. (4) J lives on the ground floor. (5) M lives immediately above J. Who lives on floor 3?",
+            "Five people J, K, L, M, N live on five floors, ground = 1, top = 5. (1) N lives on floor 5. (2) K lives on an odd-numbered floor other than 5. (3) L lives immediately above K. (4) J lives on the ground floor. (5) M lives immediately above J. Who lives on floor 3?",
           steps: [
-            "N is on 5 (clue 1). J is on 1 (clue 4). M lives immediately above J, so M is on 2 (clue 5).",
-            "K lives on an odd floor other than 5. Odd floors are 1, 3, 5. Floor 5 is N and floor 1 is J, so K must be on 3.",
-            "L lives immediately above K, so L is on 4. Every floor is filled once: J=1, M=2, K=3, L=4, N=5.",
-            "K cannot be 1 (J is there) and cannot be 5 (N is there). The odd-not-top clue plus the occupied ends force K=3.",
-            "Floor 3 is K. Check: L on 4 is immediately above K; M on 2 is immediately above J; N on top. No double booking.",
+            {
+              do: "Column 1–5, bottom to top. Clue 1: N on 5. Clue 4: J on 1. Write those two first.",
+              why: "Named floors are unique. They cost nothing and shrink the rest.",
+            },
+            {
+              do: "Clue 5: M lives immediately above J, so M is on 2.",
+              why: "Immediately above ground is floor 2. No gap.",
+            },
+            {
+              do: "Clue 2: K lives on an odd floor other than 5. Odds are 1, 3, 5. Floor 5 is N and floor 1 is J, so K must be on 3.",
+              why: "The occupied ends kill two of the three odd slots. One slot left.",
+            },
+            {
+              do: "Clue 3: L lives immediately above K, so L is on 4. Tower ground to top: J, M, K, L, N.",
+              why: "Each clue placed one person. No two share a floor.",
+            },
+            {
+              do: "Floor 3 is K. Check: L on 4 is immediately above K; M on 2 is immediately above J; N on top.",
+              why: "A full pass. If K had been forced onto 1 or 5, a clue would already have broken.",
+            },
+            {
+              do: "Answer K. Do not leave floor 3 empty ‘because the question only asked who is on 3’ — filling the tower is faster than branching.",
+              why: "One-question puzzles still want a unique grid. The leftover person always has a leftover floor.",
+            },
           ],
-          result: "K lives on floor 3. Ground-to-top: J, M, K, L, N.",
+          result: "K lives on floor 3. Ground to top: J, M, K, L, N.",
         },
         {
-          title: "Same building — a between-gap that fits",
+          title: "Five boxes in a stack",
           prompt:
-            "Keep J=1, M=2, K=3, L=4, N=5. How many floors are between J and K? Between M and L? Between J and N? Which pairs have exactly one floor between them?",
+            "Five boxes A, B, C, D, E are stacked, 1 at the bottom, 5 at the top. (1) A is on the top. (2) C is immediately above D. (3) D is on an even-numbered position. (4) B is immediately above C. (5) E is on the bottom. Which box is on 1, and which is on 3?",
           steps: [
-            "J on 1 and K on 3: floors between them = 3 − 1 − 1 = 1 (only floor 2). Pair J–K has exactly one floor between.",
-            "M on 2 and L on 4: 4 − 2 − 1 = 1 (floor 3). Pair M–L also has exactly one floor between.",
-            "J on 1 and N on 5: 5 − 1 − 1 = 3 floors between (2, 3 and 4).",
-            "K on 3 and N on 5: 5 − 3 − 1 = 1 (floor 4). Pair K–N also has exactly one between.",
-            "The three pairs with exactly one floor between are J–K, M–L and K–N. Adjacent pairs (J–M, M–K, K–L, L–N) have zero between. Do not confuse ‘immediately above’ (zero between) with ‘one between’.",
+            {
+              do: "Slot 5 is A (top). Slot 1 is E (bottom). Remaining floors 2, 3, 4 for B, C, D.",
+              why: "Place the named ends first. A box stack is the same drawing as a floor tower.",
+            },
+            {
+              do: "C is immediately above D, and B is immediately above C, so the block B / C / D occupies three consecutive slots with B on top of that block.",
+              why: "Two ‘immediately above’ clues glue a triple. Treat B-C-D as one moving piece.",
+            },
+            {
+              do: "The only three consecutive free slots are 2, 3, 4. So D on 2, C on 3, B on 4.",
+              why: "The triple cannot sit on 3-4-5 because 5 is already A. It cannot sit on 1-2-3 because 1 is already E.",
+            },
+            {
+              do: "Clue 3 is a check: D is on an even position. D is on 2, which is even. If someone had put D on 4, C would need 5, which is A — already illegal.",
+              why: "Even-position clues cut leftover slots. Here they confirm D=2 rather than invent a new place.",
+            },
+            {
+              do: "Box on 1 is E. Box on 3 is C. Stack bottom to top: E, D, C, B, A.",
+              why: "One box per slot. The glued triple fills the middle.",
+            },
+            {
+              do: "Check: C immediately above D, B immediately above C, D even (2), A on top, E on bottom. All match.",
+              why: "A full pass. ‘Two above D’ would have been B (floor 4 is two above 2) — that is a gap of one, not next door.",
+            },
           ],
           result:
-            "Exactly one floor between J and K, between M and L, and between K and N. J and N have three floors between them.",
+            "Bottom to top: E, D, C, B, A. Floor 1 is E. Floor 3 is C.",
         },
         {
-          title: "Colour overlay on the same five floors",
+          title: "Same five floors, add colours",
           prompt:
-            "Using J=1, M=2, K=3, L=4, N=5, add colours Red, Blue, Green, Yellow, White. (1) N likes Blue. (2) J likes Green. (3) Red is immediately above Green. (4) Yellow is on an even-numbered floor. (5) K likes White. Who likes Red, and who likes Yellow?",
+            "Keep J=1, M=2, K=3, L=4, N=5. Colours Red, Blue, Green, Yellow, White. (1) N likes Blue. (2) J likes Green. (3) Red is immediately above Green. (4) Yellow is on an even-numbered floor. (5) K likes White. Who likes Red, and who likes Yellow?",
           steps: [
-            "J on 1 likes Green. Red immediately above Green ⇒ Red on floor 2. Floor 2 is M, so M likes Red.",
-            "N on 5 likes Blue. K on 3 likes White (clue 5).",
-            "The leftover colour is Yellow and the leftover person is L on floor 4.",
-            "Check clue 4: Yellow on an even floor. Floor 4 is even, and floor 2 is already Red, so Yellow on 4 matches.",
-            "Colours ground-to-top: Green (J), Red (M), White (K), Yellow (L), Blue (N). Red = M; Yellow = L.",
+            {
+              do: "People are already locked. Write colours in the same column. J on 1 likes Green. N on 5 likes Blue.",
+              why: "A second attribute is a second pass on the same tower, not a new tower.",
+            },
+            {
+              do: "Red is immediately above Green. Green is on 1, so Red is on 2. Floor 2 is M, so M likes Red.",
+              why: "Immediately above a known colour is a known floor.",
+            },
+            {
+              do: "K on 3 likes White (clue 5).",
+              why: "Named person, named colour. Place it at once.",
+            },
+            {
+              do: "Leftover colour Yellow, leftover person L on floor 4. Check clue 4: Yellow on an even floor. Floor 4 is even (floor 2 is already Red), so Yellow on 4 matches.",
+              why: "The even clue is a check, not a second choice. Floor 2 was taken by Red.",
+            },
+            {
+              do: "Colours ground to top: Green (J), Red (M), White (K), Yellow (L), Blue (N).",
+              why: "One colour per floor. Read the column once.",
+            },
+            {
+              do: "Red = M. Yellow = L.",
+              why: "The asked pair. White = K, Blue = N, Green = J as leftover facts.",
+            },
           ],
           result: "Red = M (floor 2). Yellow = L (floor 4). White = K; Blue = N; Green = J.",
-        },
-        {
-          title: "One question, stop when it is forced",
-          prompt:
-            "The paper asks only ‘who lives immediately above K?’ given: N on 5, J on 1, M immediately above J, K on an odd floor other than 5, L immediately above K. Answer that one question, then note which clues you did not need for it.",
-          steps: [
-            "The clue ‘L lives immediately above K’ names the person: L.",
-            "Consistency check: K is on 3 (the only odd floor left after 1=J and 5=N), so immediately above K is floor 4, occupied by L — the same person.",
-            "M immediately above J only tells you floor 2 is M. That does not change who is above K.",
-            "Under time pressure, if the stem already says L lives immediately above K, tick L and move. Rebuild the tower only if an option tries to put M or N above K against that clue.",
-            "Answer: L. The unused-for-this-question clue is M’s placement, except as a check that floor 2 is not claiming to be above K.",
-          ],
-          result:
-            "L lives immediately above K (floor 4 above K on 3). If that is already a premise, do not rebuild the whole tower unless an option contradicts it.",
         },
       ],
     },

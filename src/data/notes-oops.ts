@@ -2,21 +2,29 @@ import type { TopicNote } from "@/data/notes";
 
 export const notesOops: TopicNote = {
   topic: "oops",
-  title: "OOP — worked notes",
+  title: "OOP — techniques (beginner)",
   blurb:
-    "SEBI Grade A OOP questions mix definitions with short Java and C++ traces. The four pillars: abstraction (show the essential interface), encapsulation (bundle state with methods and hide it), inheritance (IS-A reuse/extension), polymorphism (one name, many behaviours — overload at compile time, override at run time). Access specifiers differ by language: C++ public/protected/private; Java adds package-private default and a package-inclusive protected; Python uses convention (_ / __ mangling), not the compiler. Abstract class vs interface is “can I keep fields and concrete methods, and can I inherit several?” Constructor chaining is super()/this() first in Java and base-then-derived in C++. The diamond problem is two copies of a grand-base unless C++ virtual inheritance (or Java/Python single class inheritance plus interfaces). IS-A is inheritance; HAS-A is composition.",
+    "Four pillars, one sentence each. Abstraction shows the useful face and hides the rest. Encapsulation keeps data private and changes it with methods. Inheritance means a child is a parent and reuses its tools. Polymorphism means one name, many behaviours: overload at compile time, override at run time.",
   blocks: [
     {
-      heading: "Abstraction",
-      body: "Abstraction is the design act of exposing what a client may do and hiding how it is done. A payment API’s charge(amount) is the abstraction; card-network bytes are the implementation. In code this is a well-chosen class/interface, not a comment. Abstract classes and interfaces are language tools for abstraction; a concrete class with all fields public is a weak one.\n\nExam wording: “which concept hides internal details and shows only functionality?” → abstraction (sometimes they say encapsulation for hiding state — see the next section for the distinction they actually mark). Abstraction is about the interface you publish; encapsulation is about locking the representation behind that interface.\n\nA dry-run still matters: if a reference is typed as an abstract Shape and the object is a Circle, a virtual area() call is polymorphism using an abstract type. The abstract type cannot be instantiated.\n\nIf the question is “cannot create an object of”, look for abstract / interface / pure virtual. If it is “hides how, shows what”, pick abstraction and then check they did not want encapsulation for the private-field wording.",
+      heading: "Four pillars — one sentence each",
+      body: "Abstraction: show only what a user needs, hide how it is done. Encapsulation: keep data private; change it only with methods. Inheritance: a child class is a parent class, so it gets the parent’s fields and methods. Polymorphism: one name can do different work — overload at compile time, override at run time.\n\nA public field is not encapsulated even if getters exist. You cannot new an abstract class or a Java interface. Child c = new Child() is IS-A Parent, so Parent p = c is legal. A Car that has an Engine field is HAS-A, not IS-A.",
+      howTo: [
+        "Read the question word: hide-how → abstraction; private field → encapsulation; is-a / extends → inheritance; same name different work → polymorphism.",
+        "If the code says new AbstractType(), that is a compile error (abstraction tool).",
+        "If a subclass reads a private parent field, that is a compile error (encapsulation).",
+        "If Parent p = new Child() compiles, that is inheritance (IS-A).",
+      ],
       bullets: [
-        "Cannot new an abstract class / interface (Java). C++: cannot instantiate a class with a pure virtual that is still unimplemented.",
-        "Abstraction ≠ data hiding word-for-word, but MCQs sometimes treat them as a pair.",
+        "Abstraction: show what, hide how. You cannot construct the abstract type.",
+        "Encapsulation: private data + methods. A public field breaks it.",
+        "Inheritance: Child IS-A Parent. Composition (a field) is HAS-A.",
+        "Polymorphism: overload = compile time. override = run time.",
       ],
       examples: [
         {
-          title: "Cannot construct the abstract type — Java",
-          prompt: "What is the result?",
+          title: "Abstraction: Shape reference, Square object",
+          prompt: "What is printed? Would new Shape() compile?",
           language: "java",
           code: `abstract class Shape {
   abstract int area();
@@ -33,101 +41,27 @@ class Main {
   }
 }`,
           steps: [
-            "Shape is abstract; new Shape() would be a compile error. new Square() is legal.",
-            "x has compile-time type Shape, runtime Square.",
-            "x.area() is abstract in Shape, implemented in Square. Dynamic dispatch → 3*3=9.",
-            "x.tag() is a concrete method inherited from Shape → 1. Not abstract, still callable on a Shape ref.",
-            "print 9+1 with no space → 10. The program compiles and runs.",
+            {
+              do: "Shape is abstract. new Shape() would not compile. new Square() is legal.",
+              why: "Abstraction lets you name the type Shape without building a bare Shape.",
+            },
+            {
+              do: "x has type Shape. The object is Square.",
+              why: "You program to the abstract face. The real object fills in area().",
+            },
+            {
+              do: "x.area() runs Square’s 3*3 = 9. x.tag() runs the inherited 1. print 10.",
+              why: "The abstract method is implemented in the child. The concrete method is reused.",
+            },
+            {
+              do: "new Shape() is a compile error, not a runtime crash.",
+              why: "The compiler forbids constructing the abstract type.",
+            },
           ],
-          result: "10",
+          result: "10  (new Shape() would be a compile error)",
         },
         {
-          title: "new on the abstract name — Java compile error",
-          prompt: "What is the result of compiling this main?",
-          language: "java",
-          code: `abstract class Shape {
-  abstract int area();
-}
-class Main {
-  public static void main(String[] args) {
-    Shape s = new Shape();
-  }
-}`,
-          steps: [
-            "Shape is declared abstract.",
-            "new Shape() is forbidden even if you later meant to assign a subclass.",
-            "There is no anonymous implementation here.",
-            "javac reports that Shape is abstract; cannot be instantiated.",
-            "Result is a compile error, not a runtime exception.",
-          ],
-          result: "compile error",
-        },
-        {
-          title: "C++ pure virtual",
-          prompt: "What is printed?",
-          language: "cpp",
-          code: `#include <iostream>
-struct Shape {
-  virtual int area() const = 0;
-  int tag() const { return 1; }
-};
-struct Square : Shape {
-  int s = 3;
-  int area() const override { return s * s; }
-};
-int main() {
-  Square q;
-  Shape& r = q;
-  std::cout << r.area() << r.tag();
-}`,
-          steps: [
-            "Shape is abstract because area is pure virtual (=0). Shape s; would not compile.",
-            "Square implements area, so Square q is allowed. Construction: Shape subobject then Square.",
-            "r is a Shape& bound to q. r.area() is virtual → Square::area → 9.",
-            "r.tag() is non-virtual concrete → 1.",
-            "cout 91.",
-          ],
-          result: "91",
-        },
-        {
-          title: "Abstract type as a parameter — Java",
-          prompt: "What is printed?",
-          language: "java",
-          code: `abstract class Animal {
-  abstract String speak();
-}
-class Dog extends Animal {
-  String speak() { return "woof"; }
-}
-class Main {
-  static void play(Animal a) {
-    System.out.print(a.speak());
-  }
-  public static void main(String[] args) {
-    play(new Dog());
-  }
-}`,
-          steps: [
-            "play expects Animal, an abstract type. That is the abstraction: any Animal.",
-            "new Dog() is an Animal (IS-A). Passed by value of the reference.",
-            "a.speak() dispatched to Dog.speak → woof.",
-            "If Cat also extends Animal, play works without changing play — that is the point of the abstract parameter.",
-            "print woof.",
-          ],
-          result: "woof",
-        },
-      ],
-    },
-    {
-      heading: "Encapsulation and access specifiers",
-      body: "Encapsulation puts data and the methods that maintain it in one unit and restricts direct access. The usual Java pattern is private fields with getters/setters (or none — better invariants). A public field breaks encapsulation even if the class “looks OOP”.\n\nC++: public (everyone), protected (class + derived), private (class + friends). Default for class is private; for struct is public. Java: public, protected (package + subclasses, including subclasses in other packages), default package-private (no modifier: same package only), private (the class only). A Java subclass in another package cannot see a package-private member; it can see protected.\n\nPython: name_ is a convention (“internal”). __name inside class C is mangled to _C__name, which stops accidental subclass clashes, not a determined debugger. There is no public keyword. Trace Java/C++ access errors as compile errors; Python attribute access usually succeeds unless you rely on mangling.\n\nA public field is not encapsulated even if getters exist. Java protected is visible in the package; C++ protected is not. That single difference decides many “does this compile?” items.",
-      bullets: [
-        "Java protected ≠ C++ protected (Java protected is also package-visible).",
-        "friend in C++ is an encapsulation escape hatch; Java has no friend.",
-      ],
-      examples: [
-        {
-          title: "Java private field is invisible in the subclass",
+          title: "Encapsulation: private field is invisible in the child",
           prompt: "What is the result?",
           language: "java",
           code: `class P {
@@ -138,100 +72,33 @@ class C extends P {
   int leak() { return x; }
 }`,
           steps: [
-            "P.x is private. Only P’s body (and nested classes) may name x.",
-            "C.leak() tries to read x. C is a subclass but private is not protected.",
-            "get() would compile (inherited public/package method reading x inside P).",
-            "leak() does not compile.",
-            "Result: compile error.",
+            {
+              do: "P.x is private. Only P’s own body may name x.",
+              why: "Encapsulation hides the representation. private is the lock.",
+            },
+            {
+              do: "C.leak() writes return x. C is a child, but private is not inherited as a usable name.",
+              why: "A subclass does not get a key to private fields. It may call get().",
+            },
+            {
+              do: "get() would compile: it reads x inside P.",
+              why: "Methods of P are allowed to see P’s private data.",
+            },
+            {
+              do: "leak() does not compile. Result: compile error.",
+              why: "The child’s direct use of x breaks encapsulation, so javac stops it.",
+            },
           ],
           result: "compile error",
         },
         {
-          title: "Java protected through a subclass in the same package",
-          prompt: "What is printed? (same package)",
-          language: "java",
-          code: `class P {
-  protected int x = 4;
-}
-class C extends P {
-  int f() { return x + 1; }
-}
-class Main {
-  public static void main(String[] args) {
-    System.out.print(new C().f());
-  }
-}`,
-          steps: [
-            "C inherits protected x. In C.f, bare x is P.x = 4.",
-            "return 4+1=5.",
-            "main prints 5.",
-            "If C were in another package, C.f could still use x (protected + subclass). A non-subclass in that other package could not.",
-            "Output 5.",
-          ],
-          result: "5",
-        },
-        {
-          title: "C++ private vs public struct/class",
-          prompt: "Which line fails, and what does the valid program print?",
-          language: "cpp",
-          code: `#include <iostream>
-class A {
-  int x = 1;
- public:
-  int get() const { return x; }
-};
-struct B {
-  int y = 2;
-};
-int main() {
-  A a; B b;
-  std::cout << a.get() << b.y;
-}`,
-          steps: [
-            "class A: members are private by default. int x is private. a.x would be a compile error.",
-            "get() is public and runs inside A, so it may read x. Returns 1.",
-            "struct B: members public by default. b.y is legal (2).",
-            "The program as written never names a.x. It compiles.",
-            "cout 12.",
-          ],
-          result: "12",
-        },
-        {
-          title: "Python mangling is not privacy",
-          prompt: "What is printed?",
-          language: "python",
-          code: `class C:
-    def __init__(self):
-        self._ok = 1
-        self.__hid = 2
-c = C()
-print(c._ok, c._C__hid)
-print(hasattr(c, "__hid"))`,
-          steps: [
-            "_ok is a plain attribute. c._ok is 1. Convention only.",
-            "__hid in class C is stored as _C__hid. Direct c.__hid would typically miss (and name-mangle on the access side inside the class only).",
-            "c._C__hid reaches 2. Encapsulation is not enforced.",
-            "hasattr(c, '__hid') is False because the attribute’s real name is _C__hid.",
-            "print 1 2 then False.",
-          ],
-          result: "1 2\nFalse",
-        },
-      ],
-    },
-    {
-      heading: "Inheritance (IS-A) vs composition (HAS-A)",
-      body: "Inheritance says Child is a Parent: it can be used where a Parent is required (Liskov). Java extends one class, implements many interfaces. C++ may inherit several classes (multiple inheritance). Python class C(A, B) is multiple inheritance with C3 MRO.\n\nHAS-A is composition: Car has an Engine field. Prefer composition when you want to reuse without advertising IS-A (a Stack should not extend ArrayList just to steal methods — it has a list). MCQs: “reusability by creating an object of another class” → composition; “reusability by acquiring properties of a parent” → inheritance.\n\nInherited members: public/protected methods and fields (language rules above). Constructors are not inherited. Private members are inherited as storage in C++/Java but are not named in the child. The child may add fields; that is still IS-A, not HAS-A, unless those fields are the point of a separate type you are modelling.\n\ninstanceof / a Base* = &derived success means IS-A. A field of another type is HAS-A. Prefer composition when you are not willing to advertise substitutability.",
-      bullets: [
-        "extends / : public Base → IS-A. A field of type Engine → HAS-A.",
-        "instanceof / dynamic_cast success is evidence of IS-A.",
-      ],
-      examples: [
-        {
-          title: "IS-A assignment — Java",
-          prompt: "What is printed?",
+          title: "Inheritance IS-A vs composition HAS-A",
+          prompt: "What is printed? Does Engine e = c compile?",
           language: "java",
           code: `class Animal {}
 class Dog extends Animal {}
+class Engine { int rpm = 800; }
+class Car { Engine e = new Engine(); }
 class Main {
   public static void main(String[] args) {
     Animal a = new Dog();
@@ -239,97 +106,78 @@ class Main {
   }
 }`,
           steps: [
-            "Dog extends Animal: Dog IS-A Animal. Animal a = new Dog() is legal.",
-            "Runtime object is Dog. a instanceof Dog is true.",
-            "a instanceof Animal is true (every Dog is an Animal).",
-            "The reverse Dog d = new Animal() would not compile.",
-            "print true true.",
+            {
+              do: "Dog extends Animal, so Dog IS-A Animal. Animal a = new Dog() is legal.",
+              why: "Inheritance is the IS-A link. A child may be stored in a parent variable.",
+            },
+            {
+              do: "Runtime object is Dog. a instanceof Dog is true. a instanceof Animal is true. print true true.",
+              why: "Every Dog is an Animal. instanceof follows IS-A.",
+            },
+            {
+              do: "Car HAS-A Engine (a field). Engine e = c does not compile.",
+              why: "A field is composition, not inheritance. Car is not an Engine.",
+            },
+            {
+              do: "Dog d = new Animal() would also not compile.",
+              why: "IS-A goes child → parent, not parent → child.",
+            },
           ],
-          result: "true true",
-        },
-        {
-          title: "HAS-A does not make an Engine an IS-A Car — Java",
-          prompt: "What is the result of compiling the marked line?",
-          language: "java",
-          code: `class Engine {
-  int rpm = 800;
-}
-class Car {
-  Engine e = new Engine();
-}
-class Main {
-  public static void main(String[] args) {
-    Car c = new Car();
-    Engine e = c;
-  }
-}`,
-          steps: [
-            "Car HAS-A Engine (field e). There is no extends relationship.",
-            "c’s type is Car. Engine e = c needs Car IS-A Engine, which is false.",
-            "javac: incompatible types: Car cannot be converted to Engine.",
-            "c.e would be the valid way to get the Engine.",
-            "compile error.",
-          ],
-          result: "compile error",
-        },
-        {
-          title: "C++ public inheritance is IS-A",
-          prompt: "What is printed?",
-          language: "cpp",
-          code: `#include <iostream>
-struct Engine { int rpm = 800; };
-struct Car : Engine {};
-int main() {
-  Car c;
-  Engine* p = &c;
-  std::cout << p->rpm;
-}`,
-          steps: [
-            "struct Car : Engine means public inheritance (struct default). Car IS-A Engine.",
-            "Engine* p = &c is allowed. p->rpm is 800.",
-            "This models “Car is an Engine”, which is usually a bad domain model, but it is valid C++ IS-A.",
-            "If the exam wanted HAS-A they would write Engine e; inside Car, not : Engine.",
-            "print 800.",
-          ],
-          result: "800",
-        },
-        {
-          title: "Composition call-through — Java",
-          prompt: "What is printed?",
-          language: "java",
-          code: `class Engine {
-  String go() { return "vroom"; }
-}
-class Car {
-  private Engine e = new Engine();
-  String go() { return e.go(); }
-}
-class Main {
-  public static void main(String[] args) {
-    System.out.print(new Car().go());
-  }
-}`,
-          steps: [
-            "Car does not extend Engine. It holds a private Engine (HAS-A, encapsulated).",
-            "Car.go() delegates to e.go() — a wrapping method, not inheritance.",
-            "new Car() constructs Car, which constructs Engine.",
-            "go() returns vroom.",
-            "print vroom.",
-          ],
-          result: "vroom",
+          result: "true true  (Engine e = car is a compile error)",
         },
       ],
     },
     {
-      heading: "Polymorphism, override vs overload",
-      body: "Polymorphism: the same message, different behaviour. Compile-time (static) polymorphism is overloading — and C++ templates / operator overloading. Run-time (dynamic) polymorphism is overriding virtual instance methods. Java: all instance methods are virtual unless final/private/static. C++: only methods declared virtual (and their overrides).\n\nOverride: same signature in a subclass, replacing dispatch. Annotate @Override in Java to make a mismatch a compile error. Overload: same name, different parameter list, resolved with the compile-time types of the arguments (and the compile-time type of the receiver for Java).\n\nA Parent reference to a Child object: the overload is chosen from Parent’s methods, then that signature is dispatched to Child if overridden. Extra overloads only in Child are invisible. That mixed question is the highest-yield OOP trace on the paper.\n\nSame name + different parameter lists → overload (compile-time). Same name + same parameters in a subclass → override (run-time if virtual). C++ without virtual is hiding, not overriding.",
+      heading: "Compile-time vs runtime polymorphism",
+      body: "Compile-time polymorphism is overloading. Several methods share a name and differ by parameters. The compiler picks one using the types it can see: the variable’s type and the argument types.\n\nRuntime polymorphism is overriding. A child rewrites a parent instance method with the same signature. Java instance methods are virtual. The object’s real class wins. C++ needs the word virtual. static, private, and fields are always compile-time. Extra overloads that exist only in the child are invisible through a parent variable.",
+      howTo: [
+        "Write two labels: variable type (compile time) and object type (run time).",
+        "Different parameter lists → overload. Search only the variable’s type. That is compile time.",
+        "Same signature in a child → override. If the method is virtual, use the object’s type. That is run time.",
+        "Fields, static, and private: ignore the object. Use the variable’s type.",
+      ],
       bullets: [
-        "Same name + different params → overload (compile-time).",
-        "Same name + same params + subclass → override (run-time, if virtual).",
+        "Same name + different params → overload (compile time).",
+        "Same name + same params in a subclass → override (run time, if virtual).",
+        "C++ without virtual is hiding, not runtime polymorphism.",
       ],
       examples: [
         {
-          title: "Java override through a base reference",
+          title: "Overload is compile time — exact match wins",
+          prompt: "What is printed?",
+          language: "java",
+          code: `class P {
+  String f(int n) { return "Pi"; }
+  String f(double n) { return "Pd"; }
+}
+class Main {
+  public static void main(String[] args) {
+    P p = new P();
+    System.out.print(p.f(1) + p.f(1.0));
+  }
+}`,
+          steps: [
+            {
+              do: "Two methods named f. No child class. This is overload only.",
+              why: "Compile-time polymorphism lives in one class as different parameter lists.",
+            },
+            {
+              do: "p.f(1): argument is int → exact match f(int) → Pi.",
+              why: "The compiler sees 1 as int. It does not wait for run time.",
+            },
+            {
+              do: "p.f(1.0): argument is double → f(double) → Pd.",
+              why: "1.0 is a double literal. A different overload is chosen.",
+            },
+            {
+              do: "print PiPd.",
+              why: "Both picks were frozen before the program ran.",
+            },
+          ],
+          result: "PiPd",
+        },
+        {
+          title: "Override is run time — the object wins",
           prompt: "What is printed?",
           language: "java",
           code: `class P {
@@ -345,65 +193,27 @@ class Main {
   }
 }`,
           steps: [
-            "x compile-time P, runtime C.",
-            "f() is an instance method with the same signature — override.",
-            "Dispatch uses C.f → C.",
-            "If f were static, P.f would run instead.",
-            "print C.",
+            {
+              do: "x’s variable type is P. The object is C.",
+              why: "This is the standard exam picture for runtime polymorphism.",
+            },
+            {
+              do: "f() has the same signature in C. That is override, not overload.",
+              why: "Same name and same empty parameter list in a child.",
+            },
+            {
+              do: "Java instance methods are virtual. x.f() runs C.f → C.",
+              why: "Runtime polymorphism reads the object, not the variable.",
+            },
+            {
+              do: "If f were static, P.f would run instead. print C.",
+              why: "static binds at compile time. Instance override binds at run time.",
+            },
           ],
           result: "C",
         },
         {
-          title: "Java overload is compile-time on the reference",
-          prompt: "What is printed?",
-          language: "java",
-          code: `class P {
-  String f(int n) { return "Pi"; }
-  String f(double n) { return "Pd"; }
-}
-class Main {
-  public static void main(String[] args) {
-    P p = new P();
-    System.out.print(p.f(1) + p.f(1.0));
-  }
-}`,
-          steps: [
-            "Two overloads in the same class. No subclass.",
-            "p.f(1): argument int → exact match f(int) → Pi. Not f(double) (would require widening, worse than exact).",
-            "p.f(1.0): double literal → f(double) → Pd.",
-            "Concatenation PiPd.",
-            "print PiPd.",
-          ],
-          result: "PiPd",
-        },
-        {
-          title: "C++ non-virtual is not runtime polymorphism",
-          prompt: "What is printed?",
-          language: "cpp",
-          code: `#include <iostream>
-struct P {
-  void f() { std::cout << "P"; }
-};
-struct C : P {
-  void f() { std::cout << "C"; }
-};
-int main() {
-  C obj;
-  P* p = &obj;
-  p->f();
-  obj.f();
-}`,
-          steps: [
-            "f is not virtual. C::f hides P::f rather than overriding it in the vtable sense.",
-            "p->f(): static type P* → P::f prints P.",
-            "obj.f(): static type C → C::f prints C.",
-            "Same object, two different functions selected by the static type.",
-            "Output PC.",
-          ],
-          result: "PC",
-        },
-        {
-          title: "Override + extra overload in the child — Java",
+          title: "Mix: overload on the variable, then override on the object",
           prompt: "What is printed?",
           language: "java",
           code: `class P {
@@ -421,214 +231,132 @@ class Main {
   }
 }`,
           steps: [
-            "p.f(\"x\"): compile-time receiver P, so only f(Object) is considered. Signature f(Object) chosen. Runtime C overrides it → Cobj.",
-            "c.f(\"x\"): compile-time receiver C. Overloads f(Object) and f(String). String is more specific → Cstr.",
-            "Same runtime class, different compile-time types, different overload sets.",
-            "Concatenation CobjCstr.",
-            "print CobjCstr.",
+            {
+              do: "p.f(\"x\"): variable type P, so only f(Object) is visible. Signature f(Object) is chosen at compile time.",
+              why: "Overload cannot see Child-only methods through a Parent variable.",
+            },
+            {
+              do: "The object is C, so C.f(Object) runs → Cobj.",
+              why: "After the signature is chosen, override still uses the real object.",
+            },
+            {
+              do: "c.f(\"x\"): variable type C. Overloads f(Object) and f(String). String is a better match → Cstr.",
+              why: "The same object with a Child variable has a bigger overload set.",
+            },
+            {
+              do: "print CobjCstr.",
+              why: "Compile time picked the signature. Run time picked the body. Extra child overloads need a child variable.",
+            },
           ],
           result: "CobjCstr",
         },
       ],
     },
     {
-      heading: "Abstract class vs interface",
-      body: "Java abstract class: 0..n abstract methods, can have constructors, instance fields, concrete methods, private members. A class extends at most one abstract (or concrete) class. Java interface: all implementations are multiple. Historically interface methods were public abstract and fields public static final. Modern Java allows default and static methods on interfaces; SEBI still often treats “interface = 100% abstract, public, multiple inheritance of type”.\n\nC++ has no interface keyword: a class with only pure virtuals is an interface in style. Multiple inheritance of such classes is how C++ models several interfaces. Python abc.ABC / @abstractmethod is the analogue; you can still multiply inherit.\n\nPick abstract class when you want shared fields or a partial implementation and a single lineage. Pick interface when you want a capability (Comparable, Runnable) mixed into unrelated classes.\n\nJava: extends one class, implements many interfaces. C++ models an interface as a class of pure virtuals and may inherit several. Classic Java interface fields are public static final.",
+      heading: "Access specifiers — who may touch the field",
+      body: "private: only this class. public: everyone. protected: this class and its children (Java also lets the same package in).\n\nPython uses a name convention (_hidden, __mangled). It is not a compiler lock. The exam still asks what Java/C++ would forbid.",
+      howTo: [
+        "Name the field’s specifier: private, protected, or public.",
+        "Name the place that wants to read it: same class, child class, or stranger.",
+        "If the place is not allowed, the program does not compile.",
+        "Remember: a public getter is the legal door into a private field.",
+      ],
       bullets: [
-        "Java: extends one, implements many. C++: inherit many, possibly virtual bases.",
-        "Interface fields in classic Java: public static final only.",
+        "private = this class only. public = anyone. protected = family (and Java package).",
+        "Child code cannot write parent.privateField.",
+        "Python _x is a hint, not a lock.",
       ],
       examples: [
         {
-          title: "Java class implements two interfaces",
-          prompt: "What is printed?",
+          title: "Private vs public getter",
+          prompt: "Which line compiles: System.out.print(p.x); or System.out.print(p.getX()); if x is private?",
           language: "java",
-          code: `interface Fly { String fly(); }
-interface Swim { String swim(); }
-class Duck implements Fly, Swim {
-  public String fly() { return "F"; }
-  public String swim() { return "S"; }
-}
-class Main {
-  public static void main(String[] args) {
-    Fly f = new Duck();
-    Swim s = (Swim) f;
-    System.out.print(f.fly() + s.swim());
-  }
-}`,
+          code: `class P { private int x = 7; int getX() { return x; } }`,
           steps: [
-            "Duck implements Fly and Swim — multiple types, one class. Legal.",
-            "Fly f = new Duck(): f’s compile-time type only sees fly().",
-            "f is also a Swim at runtime. Cast (Swim) f succeeds. s.swim() → S.",
-            "f.fly() → F. Concatenation FS.",
-            "print FS.",
+            { do: "x is private. Other classes may not write p.x.", why: "private is a compiler lock." },
+            { do: "getX() is package/public enough to call. It runs inside P, so it may read x.", why: "The getter is the door." },
+            { do: "p.x does not compile. p.getX() prints 7.", why: "Same data, different legal path." },
+            { do: "A child class still cannot name x if it is private.", why: "private is not for children. protected would be." },
+            { do: "Exam pick: use the getter.", why: "That is encapsulation in one line." },
           ],
-          result: "FS",
+          result: "p.getX() compiles and prints 7. p.x does not compile.",
         },
         {
-          title: "Java cannot extend two classes",
-          prompt: "What is the result?",
-          language: "java",
-          code: `class A {}
-class B {}
-class C extends A, B {}`,
+          title: "Protected in a child",
+          prompt: "Parent has protected int k. Child method returns k. Legal?",
           steps: [
-            "Java allows at most one extends clause for classes.",
-            "class C extends A, B is a syntax/semantic error.",
-            "C could extend A and implement an interface that B would have been.",
-            "This is the language-level reason Java uses interfaces for multiple IS-A of API.",
-            "compile error.",
+            { do: "protected allows the child to name k.", why: "That is the point of protected." },
+            { do: "A stranger class still cannot write parent.k.", why: "protected is not public." },
+            { do: "If k were private, the child method would not compile.", why: "private stops even family." },
+            { do: "So return k inside Child is legal when k is protected.", why: "Specifier matches the place." },
+            { do: "Java extra: same-package classes also see protected. C++ does not use packages.", why: "If the paper is Java, remember the package door." },
           ],
-          result: "compile error",
+          result: "Yes — a child may read a protected parent field. A stranger may not.",
         },
         {
-          title: "Abstract class may keep state — Java",
-          prompt: "What is printed?",
-          language: "java",
-          code: `abstract class Acc {
-  int n;
-  Acc(int n) { this.n = n; }
-  abstract int bump();
-}
-class A2 extends Acc {
-  A2() { super(3); }
-  int bump() { return ++n; }
-}
-class Main {
-  public static void main(String[] args) {
-    System.out.print(new A2().bump());
-  }
-}`,
+          title: "Public field is not encapsulated",
+          prompt: "class Box { public int n; }  Is this encapsulation?",
           steps: [
-            "Abstract Acc has a field and a constructor — allowed (unlike a classic interface).",
-            "A2() must call super(3). Acc stores n=3.",
-            "bump is implemented in A2: ++n → n=4, return 4.",
-            "Interfaces could not (classically) hold this per-object n.",
-            "print 4.",
+            { do: "Anyone can write box.n = −99.", why: "public means no door and no lock." },
+            { do: "There is no hidden representation.", why: "Encapsulation needs private (or protected) data." },
+            { do: "Adding a getter later does not fix the public field.", why: "The field is still an open window." },
+            { do: "Exam answer: this is not encapsulation.", why: "The pillar failed at the specifier." },
+            { do: "Fix: private int n; plus get/set if needed.", why: "Methods become the only door." },
           ],
-          result: "4",
-        },
-        {
-          title: "C++ two “interfaces” via pure virtual bases",
-          prompt: "What is printed?",
-          language: "cpp",
-          code: `#include <iostream>
-struct Fly { virtual const char* fly() = 0; };
-struct Swim { virtual const char* swim() = 0; };
-struct Duck : Fly, Swim {
-  const char* fly() override { return "F"; }
-  const char* swim() override { return "S"; }
-};
-int main() {
-  Duck d;
-  Fly* f = &d;
-  Swim* s = &d;
-  std::cout << f->fly() << s->swim();
-}`,
-          steps: [
-            "Fly and Swim are interface-like (pure virtuals). Duck inherits both — multiple inheritance.",
-            "Fly* f = &d; f->fly() virtual → Duck::fly → F.",
-            "Swim* s = &d; s->swim() → S.",
-            "This is legal C++. The next block covers what happens if Fly and Swim themselves share a grand-base (diamond).",
-            "Output FS.",
-          ],
-          result: "FS",
+          result: "No. A public field is not encapsulation.",
         },
       ],
     },
     {
-      heading: "Constructor chaining and the diamond problem",
-      body: "Java constructors chain: this() or super() first. The Object constructor runs at the top of the extends chain, then each subclass initialisers and body on the way down. C++: bases in the order they appear in the class-head (not the order in your mem-initialiser list, except that the list chooses which constructor), then members, then the body.\n\nThe diamond: D inherits B and C, both inherit A. Without help, D contains two A subobjects (B’s A and C’s A). Calling a method of A through D is ambiguous. C++ virtual inheritance: class B : virtual public A, class C : virtual public A collapses to one A, constructed by the most derived class D. Java has no class diamond because of single class inheritance; default methods on two interfaces can still clash and must be overridden.\n\nExam line: “virtual base class in C++ solves” → diamond / duplicate grand-base. Not the same as a virtual function, though both use the word virtual.\n\nConstruction prints base then derived; destruction is the reverse. Two A subobjects (no virtual inheritance) make d.x ambiguous. One shared A (virtual inheritance) is constructed by the most derived class.",
+      heading: "IS-A vs HAS-A — extends vs a field",
+      body: "IS-A: Child extends Parent. A Square is a Shape. You may write Shape s = new Square().\n\nHAS-A: a field. A Car has an Engine. Car does not extend Engine. You write Engine e inside Car. The trap is calling every ‘uses’ relationship inheritance.",
+      howTo: [
+        "Say the English sentence: ‘X is a Y’ or ‘X has a Y’.",
+        "is-a → extends / inheritance. has-a → a field (composition).",
+        "If you can legally write Y ref = new X(), it is IS-A.",
+        "If X only stores a Y, it is HAS-A.",
+      ],
       bullets: [
-        "virtual function → runtime method. virtual inheritance → one shared base subobject.",
-        "Most derived class constructs the virtual base.",
+        "IS-A = inheritance. HAS-A = a field.",
+        "Square is a Shape. Car has an Engine.",
+        "Do not extend just to reuse a helper. Prefer a field.",
       ],
       examples: [
         {
-          title: "Java constructor chain prints",
-          prompt: "What is printed?",
-          language: "java",
-          code: `class A {
-  A() { System.out.print("A"); }
-}
-class B extends A {
-  B() { System.out.print("B"); }
-  B(int n) { this(); System.out.print(n); }
-}
-class Main {
-  public static void main(String[] args) {
-    new B(1);
-  }
-}`,
+          title: "Legal assignment",
+          prompt: "Square extends Shape. Is Shape s = new Square(); legal? Is Engine e = new Car(); legal if Car has an Engine field?",
           steps: [
-            "new B(1) enters B(int). First statement this() → B().",
-            "B() has implicit super() → A(). A prints A.",
-            "B() body prints B. Buffer AB.",
-            "B(int) body prints 1. Buffer AB1.",
-            "print AB1.",
+            { do: "Square is a Shape. Shape s = new Square() is legal IS-A.", why: "A child object may be stored in a parent variable." },
+            { do: "Car has an Engine. Car is not an Engine.", why: "HAS-A is not inheritance." },
+            { do: "Engine e = new Car() does not compile.", why: "Those types are not in an is-a line." },
+            { do: "Car may hold Engine eng; and call eng.start().", why: "That is composition." },
+            { do: "Exam: pick IS-A only for extends.", why: "‘Uses’ is not ‘is’." },
           ],
-          result: "AB1",
+          result: "Shape s = new Square() yes. Engine e = new Car() no.",
         },
         {
-          title: "C++ two A subobjects without virtual inheritance",
-          prompt: "This layout is the diamond. What happens at d.x?",
-          language: "cpp",
-          code: `struct A { int x = 1; };
-struct B : A {};
-struct C : A {};
-struct D : B, C {};
-int main() {
-  D d;
-  d.x = 2;
-}`,
+          title: "Why not extend Engine",
+          prompt: "A coder writes class Car extends Engine. What goes wrong in the model?",
           steps: [
-            "B contains an A. C contains an A. D contains both. Two x members.",
-            "d.x is ambiguous: B::x or C::x? The compiler rejects the access.",
-            "d.B::x = 2 would compile and leave C::x at 1.",
-            "This is the diamond problem (duplicate grand-base), not a virtual-function issue.",
-            "compile error.",
+            { do: "That claims every Car is an Engine.", why: "extends always means IS-A." },
+            { do: "A function void tune(Engine e) could then receive a Car.", why: "IS-A lets a Car stand where an Engine was expected." },
+            { do: "That is the wrong model. Cars are not engines.", why: "Reuse should have been a field." },
+            { do: "Write class Car { Engine e; } instead.", why: "HAS-A keeps the types honest." },
+            { do: "Exam phrase: prefer composition over inheritance when there is no is-a.", why: "A standard OOP MCQ." },
           ],
-          result: "compile error",
+          result: "Car extends Engine is a false IS-A. Use a field.",
         },
         {
-          title: "C++ virtual inheritance shares A",
-          prompt: "What is printed?",
-          language: "cpp",
-          code: `#include <iostream>
-struct A { int x; A() { x = 1; } };
-struct B : virtual A {};
-struct C : virtual A {};
-struct D : B, C {
-  D() { x = 7; }
-};
-int main() {
-  D d;
-  std::cout << d.x << d.B::x << d.C::x;
-}`,
+          title: "Stack of IS-A",
+          prompt: "C extends B, B extends A. Is A x = new C(); legal?",
           steps: [
-            "B and C virtually inherit A. D has one A subobject.",
-            "D() is the most derived; it constructs A (A() sets x=1) then B, C, then body x=7.",
-            "d.x, d.B::x, d.C::x all name that one x. All 7.",
-            "No ambiguity. cout 777.",
-            "If virtual were omitted this would not compile (previous example).",
+            { do: "C is a B, and B is an A, so C is an A.", why: "IS-A chains." },
+            { do: "A x = new C() compiles.", why: "A parent variable may hold any descendant." },
+            { do: "C y = new A() does not compile.", why: "You cannot put a parent object in a child variable without a cast, and the object still is not a C." },
+            { do: "Methods overridden in C still run if they were declared on A and the object is C.", why: "Runtime polymorphism follows the object." },
+            { do: "Legal assignment is A x = new C().", why: "Up the tree is always safe." },
           ],
-          result: "777",
-        },
-        {
-          title: "Java default-method clash must be overridden",
-          prompt: "What is the result of compiling I3 without overriding n?",
-          language: "java",
-          code: `interface I1 { default int n() { return 1; } }
-interface I2 { default int n() { return 2; } }
-interface I3 extends I1, I2 {}`,
-          steps: [
-            "I3 inherits two default n() implementations. Java does not pick one.",
-            "I3 must override n() and may pick I1.super.n() or I2.super.n() or new code.",
-            "As written, I3 is a compile error.",
-            "This is the interface analogue of a diamond, without duplicate fields (interfaces do not hold per-object fields classically).",
-            "compile error.",
-          ],
-          result: "compile error",
+          result: "Yes. C is-a A through B.",
         },
       ],
     },

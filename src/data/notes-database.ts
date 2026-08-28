@@ -2,584 +2,648 @@ import type { TopicNote } from "@/data/notes";
 
 export const notesDatabase: TopicNote = {
   topic: "database",
-  title: "Database Concepts — worked notes",
+  title: "Database — techniques (beginner)",
   blurb:
-    "GATE / SEBI Grade A IT traces for the ER model, keys, normalisation with full FD closures, relational algebra versus tuple calculus, indexes, and concurrency. Copy every numbered dry-run onto paper before you look at the answer line.",
+    "A database is a careful filing cabinet for facts. These notes walk keys, 1NF to BCNF, indexes, ACID, and 2PL in school English. Read the first sentence of each block, then copy the three examples onto paper.",
   blocks: [
     {
-      heading: "ER model: entity, relationship, cardinality, weak entity",
-      body: "An entity type is a set of distinguishable real-world objects that share the same attributes. A strong (regular) entity has its own key attribute; a weak entity has no key of its own and is identified only through an identifying relationship with an owner plus a partial key (discriminator). On an ER diagram the weak entity is drawn with a double rectangle, the identifying relationship with a double diamond, and total participation of the weak side is mandatory: every weak instance must belong to exactly one owner.\n\nA relationship type associates entity types. Cardinality on a binary relationship is one of 1:1, 1:N or M:N and is read from the mini-world, not from wishful table design. Participation is total if every entity must appear in at least one relationship instance, otherwise partial. Mapping to tables is mechanical: a strong entity becomes a relation whose primary key is the entity key; a 1:N relationship is stored as a foreign key on the N-side; an M:N relationship becomes its own relation whose key is the pair of participant keys; a weak entity becomes a relation whose primary key is (owner key, partial key).\n\nTernary relationships are not the same as three binary ones. If a SEBI inspection involves (officer, intermediary, circular) as a single fact — this officer inspected this intermediary against this circular — you cannot reconstruct that fact from the three pairwise tables. Always ask whether the association is inherently three-way before you split it.\n\nAttribute types that trip MCQs: simple versus composite (address = {city, pin}), single-valued versus multi-valued (a broker with many SEBI registration numbers needs a separate table), and derived (age from date of birth is not stored). A multi-valued attribute of a strong entity maps to its own relation with key (entity key, multi-valued attribute).",
+      heading: "ER model: boxes, links, and weak entities",
+      body: "An entity is a real thing we store, like a student or a broker. A relationship is a link between things, like “studies in” or “lives in”. Cardinality says how many: one city can hold many brokers (1:N), or many circulars can apply to many firms (M:N).\n\nA weak entity is a thing with no ID of its own — a school locker only makes sense inside one school. We draw it with a double box. Its full name is “owner’s key + a small local name” (the partial key).",
+      howTo: [
+        "Circle every real-world thing (entity) and every link (relationship).",
+        "Ask: does this thing have its own ID? If no, it is weak — copy the owner’s key down.",
+        "Read 1:1, 1:N, or M:N from the English, not from how you wish the tables looked.",
+        "Map: strong entity → table; 1:N → extra column on the many side; M:N → a third table.",
+      ],
       bullets: [
-        "Weak entity PK = owner PK + partial key; identifying relationship is 1:N from owner to weak, total on the weak side.",
-        "1:N → FK on the N-side; M:N → separate relation; 1:1 → FK on the total-participation side (or either side if both partial).",
-        "Cardinality is a constraint on relationship instances, not a count of attributes.",
+        "Weak entity primary key = owner key + partial key.",
+        "1:N puts a foreign key on the N-side. M:N needs its own table.",
+        "“Exactly one” means total participation (the column cannot be empty).",
       ],
       examples: [
         {
-          title: "Identify the weak entity and write its primary key",
+          title: "Weak schedule under a DP",
           prompt:
-            "A depository participant (DP) is identified by dp_id. Each DP maintains many demat-account schedules. A schedule is not unique by date alone: two DPs may both have a schedule dated 2026-04-01. A schedule line-item (isin, qty) exists only as part of a schedule. Draw the identifying chain and state the primary key of LINE_ITEM.",
+            "A depository participant (DP) has dp_id. Each DP has schedules by date. Two DPs may both have a schedule on 2026-04-01. A line-item (isin, qty) lives only inside a schedule. What is the primary key of LINE_ITEM?",
           steps: [
-            "Mark DP as a strong entity: it has its own key dp_id.",
-            "Schedule has no global key. Date distinguishes schedules only within one DP, so date is a partial key and Schedule is weak, identified by DP through an identifying relationship Maintains.",
-            "Primary key of SCHEDULE after mapping is (dp_id, date).",
-            "LINE_ITEM is weak under Schedule. Its discriminator is isin (one ISIN appears at most once on a given schedule). qty is a descriptive attribute, not part of the key.",
-            "The identifying chain is DP → Schedule → Line_item. Copy the owner key down at each step.",
-            "Therefore LINE_ITEM maps to a relation with primary key (dp_id, date, isin) and a non-key attribute qty, plus a foreign key (dp_id, date) referencing SCHEDULE.",
+            {
+              do: "Mark DP as strong: it already has dp_id.",
+              why: "A strong entity is like a student with a roll number — it can stand alone.",
+            },
+            {
+              do: "Mark Schedule as weak. Date is only unique inside one DP.",
+              why: "Two schools can both have “Locker 12”. Date is a partial key, not a global ID.",
+            },
+            {
+              do: "Write SCHEDULE’s key as (dp_id, date). Copy that down into LINE_ITEM and add isin.",
+              why: "A weak child inherits the parent’s ID, the way a locker number is written “School A / 12”.",
+            },
           ],
           result:
-            "LINE_ITEM primary key is (dp_id, date, isin); Schedule is weak under DP, Line_item is weak under Schedule.",
+            "LINE_ITEM primary key is (dp_id, date, isin). qty is just a number on the line, not part of the key.",
         },
         {
-          title: "Map a 1:N relationship with partial participation",
+          title: "Put the foreign key on the many side",
           prompt:
-            "Entity BROKER(broker_id, name) and entity CITY(city_code, city_name). Mini-world: a broker is headquartered in at most one city; a city may host many brokers; some cities host none; every broker must have a headquarters city. Map to relations and place the foreign key.",
-          code: "BROKER(broker_id, name, hq_city)\nCITY(city_code, city_name)\n-- hq_city references CITY.city_code, NOT NULL",
+            "A broker has one headquarters city. A city may have many brokers, or none. Every broker must have a city. Where does the foreign key go?",
+          code: "BROKER(broker_id, name, hq_city NOT NULL)\nCITY(city_code, city_name)",
           language: "sql",
           steps: [
-            "Read cardinality: many brokers to one city, so BROKER—N:1—CITY.",
-            "Participation: brokers are total (every broker has a city); cities are partial (a city may have zero brokers).",
-            "The 1:N rule puts the foreign key on the N-side, which is BROKER. Add attribute hq_city referencing CITY.city_code.",
-            "Total participation of BROKER forces hq_city NOT NULL (entity-integrity analogue for the relationship).",
-            "Do not put a broker_id column on CITY: that would force a city to have at most one broker and would break the N-side.",
-            "CITY stays (city_code, city_name) with no broker attributes. Optional city-with-no-broker rows exist because participation of CITY is partial.",
+            {
+              do: "Say the shape: many brokers → one city, so N:1.",
+              why: "Cardinality is “how many arrows”, not “how many columns”.",
+            },
+            {
+              do: "Put hq_city on BROKER, pointing at CITY. Make it NOT NULL.",
+              why: "The many side holds the “which one?” note. NOT NULL means every broker must have a city.",
+            },
+            {
+              do: "Do not put broker_id on CITY.",
+              why: "That would force a city to have at most one broker, which is the wrong story.",
+            },
           ],
           result:
-            "BROKER(broker_id, name, hq_city NOT NULL FK→CITY); CITY unchanged. FK lives on the N-side.",
+            "BROKER(broker_id, name, hq_city NOT NULL). CITY stays a city list. The N-side holds the key.",
         },
         {
-          title: "M:N mapping for circulars and intermediaries",
+          title: "M:N needs a third table",
           prompt:
-            "A SEBI circular applies to many intermediaries; an intermediary is subject to many circulars. The date on which the intermediary acknowledged the circular is an attribute of the relationship, not of either entity. Write the mapped relations and the key of the relationship table.",
-          code: "CIRCULAR(circ_id, title)\nINTERMEDIARY(int_id, legal_name)\nACK(circ_id, int_id, ack_date)\n-- ACK.circ_id → CIRCULAR, ACK.int_id → INTERMEDIARY\n-- PRIMARY KEY (circ_id, int_id)",
+            "A circular applies to many firms; a firm follows many circulars. ack_date is “when this firm ticked this circular”. How many tables, and what is the key of the middle one?",
+          code: "CIRCULAR(circ_id, title)\nFIRM(firm_id, name)\nACK(circ_id, firm_id, ack_date)",
           language: "sql",
           steps: [
-            "Entities CIRCULAR and INTERMEDIARY are both strong; give each its own key relation.",
-            "The association is M:N, so it cannot be stored as a single foreign key on either side without losing history of multiple partners.",
-            "Create relationship relation ACK with two foreign keys circ_id and int_id.",
-            "Relationship attribute ack_date sits on ACK, not on CIRCULAR (a circular is not acknowledged on one global date) and not on INTERMEDIARY (an intermediary acknowledges many circulars on different dates).",
-            "The default primary key of an M:N relationship relation is the pair of participant keys (circ_id, int_id), assuming one acknowledgement per pair.",
-            "If the mini-world allowed a pair to acknowledge twice, ACK would become a weak-style table with a discriminator such as ack_seq, and the key would be (circ_id, int_id, ack_seq).",
+            {
+              do: "Keep CIRCULAR and FIRM as two strong tables.",
+              why: "Each already has its own ID, like two class lists.",
+            },
+            {
+              do: "Make ACK with both IDs plus ack_date. Key = (circ_id, firm_id).",
+              why: "A many-to-many link is a sign-up sheet: one row per pair. The date belongs to the pair, not to the circular alone.",
+            },
+            {
+              do: "Do not store ack_date on CIRCULAR or on FIRM.",
+              why: "One circular is not acknowledged on a single global day; one firm acknowledges many circulars on different days.",
+            },
           ],
           result:
-            "Three relations; ACK(circ_id, int_id, ack_date) with PK (circ_id, int_id) holds the relationship attribute.",
-        },
-        {
-          title: "Cardinality from a constraint sentence",
-          prompt:
-            "Constraint: “Each trade is executed by exactly one trading member. A trading member executes zero or more trades. A trade may be cleared by at most one clearing member; a clearing member may clear many trades.” For relationships Executes and Clears, write cardinality and participation of each side.",
-          steps: [
-            "Executes involves TRADE and TRADING_MEMBER. “Each trade is executed by exactly one trading member” means TRADE participates totally with cardinality 1 toward TRADING_MEMBER.",
-            "“A trading member executes zero or more trades” means TRADING_MEMBER participates partially (zero is allowed) with cardinality N toward TRADE.",
-            "So Executes is N:1 from TRADE to TRADING_MEMBER, total on TRADE, partial on TRADING_MEMBER.",
-            "Clears involves TRADE and CLEARING_MEMBER. “At most one clearing member” is cardinality 1 on the clearing side, but “at most” (not “exactly”) means TRADE participates only partially in Clears — some trades may still be unmatched.",
-            "“A clearing member may clear many trades” is cardinality N on the clearing-member side, and “may” keeps participation partial.",
-            "Mapping check: Executes puts a NOT NULL FK trading_member_id on TRADE. Clears puts a nullable FK clearing_member_id on TRADE. Two different columns; do not merge them.",
-          ],
-          result:
-            "Executes is N:1 total on TRADE; Clears is N:1 partial on TRADE (nullable FK). Both are 1:N from the member side.",
+            "Three tables. ACK’s primary key is (circ_id, firm_id). That row holds ack_date.",
         },
       ],
     },
     {
-      heading: "Relational model, keys, and integrity",
-      body: "The relational model stores data as relations (tables) of tuples over a fixed heading of attributes. A superkey is any set of attributes whose values uniquely identify a tuple: no two distinct tuples agree on all superkey attributes. A candidate key is a minimal superkey: drop any attribute and uniqueness is lost. One candidate key is chosen as the primary key; the others are alternate keys. A foreign key is a (possibly composite) set of attributes in one relation whose values must match a candidate key of another relation, or be null if the schema allows.\n\nEntity integrity: no primary-key attribute may be null, because a null cannot identify a tuple. Referential integrity: every non-null foreign-key value must equal some existing candidate-key value in the referenced relation. Domain integrity restricts each attribute to its declared domain. User-defined integrity covers CHECK constraints and assertions (for example qty > 0).\n\nCounting superkeys is a standard GATE move. If a relation has n attributes and a single candidate key of size k, every superset of that candidate key is a superkey, so there are 2^{n−k} superkeys. If several candidate keys exist, take the union of their supersets and do not double-count sets that contain two different candidates.\n\nA foreign key may reference the same relation (supervisor_id in EMPLOYEE). On delete/update, the engine may NO ACTION / RESTRICT (reject the parent change), CASCADE (propagate), SET NULL, or SET DEFAULT. CASCADE on a self-referential FK can wipe a whole reporting tree; SEBI-style schemas usually RESTRICT deletes of a member that still has trades.",
+      heading: "Keys: superkey, candidate, primary, foreign",
+      body: "A key is a name-tag that picks out one row. A superkey is any set of columns that never repeats across two rows — even if it is bigger than needed. A candidate key is a superkey with no spare column; drop any piece and two rows could clash. We pick one candidate as the primary key (the official roll number). The others are alternate keys.\n\nA foreign key is a copy of someone else’s key, like writing a friend’s roll number on a form. Entity integrity: the primary key may not be empty. Referential integrity: a non-empty foreign key must match a real parent row.",
+      howTo: [
+        "List every column. Find which sets uniquely name a row (closures if you have FDs).",
+        "Throw away any unique set that still works after you drop a column — those are candidate keys.",
+        "Count superkeys: if one candidate has k columns and the table has n, there are 2^{n−k} superkeys.",
+        "Primary key ≠ NULL. Foreign key is NULL or a live parent value.",
+      ],
       bullets: [
-        "Superkey ⊇ candidate key; primary key is one chosen candidate; alternate keys are the rest.",
-        "Entity integrity: PK ≠ NULL. Referential integrity: FK is NULL or matches a live parent key.",
-        "Number of superkeys for one CK of size k in n attributes: 2^{n−k}.",
+        "Superkey ⊇ candidate key. Primary key = the chosen candidate.",
+        "One candidate of size k in n columns → 2^{n−k} superkeys.",
+        "SQL UNIQUE allows extra NULLs; a true candidate key does not.",
       ],
       examples: [
         {
-          title: "Count superkeys of ALERT(rule, desk, city, severity)",
+          title: "Count superkeys",
           prompt:
-            "Relation ALERT(rule, desk, city, severity) with the only non-trivial FDs rule → desk city severity. How many superkeys does ALERT have? List them.",
+            "ALERT(rule, desk, city, severity) with only rule → desk city severity. How many superkeys? List the candidate key.",
           steps: [
-            "Attributes: {rule, desk, city, severity}; n = 4.",
-            "Closure: rule+ = {rule, desk, city, severity} = all attributes, so {rule} is a candidate key.",
-            "No other singleton works: desk+ = {desk}, city+ = {city}, severity+ = {severity}.",
-            "There is exactly one candidate key, of size k = 1. Superkeys are all supersets of {rule}. Count = 2^{4−1} = 8.",
-            "List: {rule}, {rule,desk}, {rule,city}, {rule,severity}, {rule,desk,city}, {rule,desk,severity}, {rule,city,severity}, {rule,desk,city,severity}.",
-            "Sets that omit rule, such as {desk,city,severity}, are not superkeys because two alerts of different rules could share the same desk, city and severity.",
+            {
+              do: "Close {rule}: it gives desk, city, severity — the whole table. So {rule} is a candidate key.",
+              why: "If the rule name already tells you every other column, the rule name is a unique roll number.",
+            },
+            {
+              do: "Check the others: desk, city, or severity alone do not name a full row.",
+              why: "Two alerts can share a desk. Only a candidate key must never clash.",
+            },
+            {
+              do: "n = 4, k = 1, so 2^{3} = 8 superkeys: every set that still contains rule.",
+              why: "You may add spare columns (desk, city, severity) and uniqueness stays. That is what “super” means — extra baggage is allowed.",
+            },
           ],
           result:
-            "Eight superkeys: every subset that contains rule. The only candidate key is {rule}.",
+            "Eight superkeys, all containing rule. The only candidate key is {rule}.",
         },
         {
-          title: "Find all candidate keys of TRADE(isin, member, day, venue, qty)",
+          title: "Two candidate keys",
           prompt:
-            "FDs: isin member day → venue qty, and venue → member. Work out every candidate key.",
+            "TRADE(isin, member, day, venue, qty) with isin member day → venue qty and venue → member. Find every candidate key.",
           steps: [
-            "Attributes U = {isin, member, day, venue, qty}.",
-            "Compute closures of likely left-hand sides. venue+ = {venue, member}. That is not U.",
-            "(isin, member, day)+ = {isin, member, day, venue, qty} = U, so {isin, member, day} is a superkey.",
-            "Is it minimal? Drop isin: (member, day)+ does not get isin. Drop member: (isin, day)+ gets nothing extra from the given FDs. Drop day: (isin, member)+ does not get day. So {isin, member, day} is a candidate key.",
-            "Because venue → member, replace member by venue in that key: (isin, venue, day)+ = {isin, venue, day, member, qty} = U. Minimality: drop isin or day and you lose uniqueness; drop venue and you have {isin, day} which does not determine member. So {isin, venue, day} is a second candidate key.",
-            "No other candidates: qty is never on a left-hand side, so it cannot appear in a minimal key. {isin, member, venue, day} is a superkey but not a candidate (it properly contains both CKs).",
+            {
+              do: "Close (isin, member, day): you get venue and qty, so the whole heading. It is a candidate (drop any one piece and it fails).",
+              why: "That triple is like “which stock, which broker, which day” — enough to name one trade line.",
+            },
+            {
+              do: "Swap member for venue, because venue → member. Close (isin, venue, day): also the whole table.",
+              why: "If the venue already tells you the member, you can use venue as the stand-in in the key.",
+            },
+            {
+              do: "qty is never on the left of an FD, so it is not in any candidate key.",
+              why: "qty is a measured number, not an ID. Prime attributes here are isin, member, day, venue.",
+            },
           ],
           result:
-            "Candidate keys are {isin, member, day} and {isin, venue, day}. Prime attributes: isin, member, day, venue. qty is non-prime.",
+            "Candidate keys: {isin, member, day} and {isin, venue, day}. qty is non-prime.",
         },
         {
-          title: "Entity integrity versus a nullable unique column",
+          title: "NULL on UNIQUE is not a candidate key",
           prompt:
-            "Table MEMBER(member_id PK, sebi_reg UNIQUE, legal_name). Can sebi_reg be NULL for a newly licensed member awaiting a number? Can member_id be NULL? What happens if two rows have sebi_reg NULL under SQL UNIQUE?",
-          code: "CREATE TABLE member (\n  member_id  CHAR(8) PRIMARY KEY,\n  sebi_reg   VARCHAR(16) UNIQUE,\n  legal_name VARCHAR(80) NOT NULL\n);",
+            "MEMBER(member_id PRIMARY KEY, sebi_reg UNIQUE, name). Can sebi_reg be NULL? Can member_id? What if two rows have sebi_reg NULL?",
+          code: "CREATE TABLE member (\n  member_id CHAR(8) PRIMARY KEY,\n  sebi_reg VARCHAR(16) UNIQUE,\n  name VARCHAR(80) NOT NULL\n);",
           language: "sql",
           steps: [
-            "member_id is the primary key. Entity integrity forbids NULL in any PK attribute, so member_id cannot be NULL.",
-            "sebi_reg is an alternate key in the textbook sense only if it is unique and not null. SQL UNIQUE allows multiple NULLs in most engines because NULL is not equal to NULL, so two unreadied members can both sit with sebi_reg NULL.",
-            "That SQL behaviour is weaker than the relational alternate-key rule. If the exam asks “candidate key”, the column must be unique and non-null.",
-            "A newly licensed member can therefore be inserted with sebi_reg NULL without violating the SQL UNIQUE constraint, but that row is identified only by member_id.",
-            "Inserting a second member with an already used non-null sebi_reg fails UNIQUE. Inserting a second NULL sebi_reg typically succeeds.",
-            "Exam takeaway: PRIMARY KEY implies UNIQUE + NOT NULL; UNIQUE alone does not imply NOT NULL and is not automatically a candidate key.",
+            {
+              do: "member_id cannot be NULL — that is entity integrity.",
+              why: "A roll number that is blank cannot pick out a student.",
+            },
+            {
+              do: "SQL UNIQUE still allows several NULLs, because NULL is not “equal” to NULL.",
+              why: "The exam’s candidate-key idea is stricter: unique and not null. UNIQUE alone is a weaker sticker.",
+            },
+            {
+              do: "Two new members can both sit with sebi_reg NULL; a second copy of a real number is rejected.",
+              why: "PRIMARY KEY = UNIQUE + NOT NULL. Remember that pair for MCQs.",
+            },
           ],
           result:
-            "member_id cannot be NULL; sebi_reg may be NULL under SQL UNIQUE; UNIQUE+NULL is not a candidate key.",
-        },
-        {
-          title: "Referential integrity on delete of a parent trade venue",
-          prompt:
-            "VENUE(venue_id PK, name). TRADE(trade_id PK, venue_id FK → VENUE, qty). VENUE contains {BSE, NSE}. TRADE contains (T1, NSE, 100) and (T2, BSE, 50). What happens under ON DELETE RESTRICT versus ON DELETE CASCADE versus ON DELETE SET NULL if we delete the NSE parent row?",
-          code: "ALTER TABLE trade\n  ADD CONSTRAINT fk_venue\n  FOREIGN KEY (venue_id) REFERENCES venue(venue_id)\n  ON DELETE RESTRICT;",
-          language: "sql",
-          steps: [
-            "Child T1 references NSE, so the NSE parent is not a dangling-free delete.",
-            "ON DELETE RESTRICT (or NO ACTION at commit): the DELETE FROM venue WHERE venue_id = 'NSE' is rejected; both venue rows and both trades remain.",
-            "ON DELETE CASCADE: deleting NSE also deletes T1. Remaining: VENUE{BSE}, TRADE{(T2,BSE,50)}.",
-            "ON DELETE SET NULL: deleting NSE sets T1.venue_id to NULL. This is legal only if TRADE.venue_id is nullable. Remaining trades: (T1, NULL, 100), (T2, BSE, 50).",
-            "Entity integrity is not violated by a NULL foreign key; referential integrity requires only that non-null FKs match. A NULL venue means “venue unknown”, not “venue NSE”.",
-            "SEBI-style ledgers almost always RESTRICT deletes of a venue that still has trades, so history is not silently cascaded away.",
-          ],
-          result:
-            "RESTRICT rejects the delete; CASCADE removes T1; SET NULL keeps T1 with venue_id NULL (if the column allows NULL).",
+            "member_id never NULL. sebi_reg may be NULL in SQL. UNIQUE + NULL is not a candidate key.",
         },
       ],
     },
     {
-      heading: "Functional dependencies, 1NF and 2NF",
-      body: "A functional dependency X → Y holds on relation R if whenever two tuples agree on X they agree on Y. Trivial FDs have Y ⊆ X. Armstrong’s axioms (reflexivity, augmentation, transitivity) plus union and decomposition let you derive the closure F+ of a set of FDs. The attribute closure X+ under F is the set of attributes determined by X; the standard algorithm seeds X+ with X and repeatedly adds the right-hand side of any FD whose left-hand side is already inside X+.\n\nFirst normal form (1NF) requires a single atomic value at every row-column intersection: no repeating groups, no nested relations, no “isin1, isin2” packed into one cell. A composite attribute that has been flattened into separate columns (city, pin) is still 1NF. Exam traps that look like 1NF violations are often multi-valued facts stuffed into one cell.\n\nSecond normal form (2NF) applies only when a candidate key is composite. A relation in 1NF is in 2NF if no non-prime attribute is partially dependent on a candidate key, i.e. there is no non-trivial FD X → A with A non-prime, X a proper subset of some candidate key, and A not in X. If every candidate key is a single attribute, 2NF is automatic.\n\nWhen you test a schema on paper, never skip the closures. You cannot classify prime versus non-prime until every candidate key is known, and you cannot see a partial dependency until you know the keys. The worked examples below always list attributes, close FDs, find keys, then test 1NF and 2NF.",
+      heading: "1NF and 2NF (no lists, no partial extras)",
+      body: "A functional dependency X → Y means: if two rows agree on X, they must agree on Y. Like “roll number → name”: one roll number, one name.\n\nFirst normal form (1NF) means each cell holds one atomic value — one number, one word — not a list. A cell “INE001, INE002” is like stuffing three names into one locker.\n\nSecond normal form (2NF) means: if the key has several columns, no extra (non-key) column may depend on only a piece of that key. If every key is a single column, 2NF is automatic.",
+      howTo: [
+        "List columns. Compute closures. Find every candidate key. Mark prime vs non-prime.",
+        "1NF: is every cell one value? Split lists into extra rows.",
+        "2NF: look for a non-prime column that follows a proper subset of a composite key. That is a partial dependency.",
+        "Fix 2NF by splitting: key-piece + its extras in their own table.",
+      ],
       bullets: [
-        "X+ algorithm: start with X; add RHS whenever LHS ⊆ current closure; repeat to a fixpoint.",
-        "1NF: atomic cells. Repeating groups fail 1NF even if the rest of the design is tidy.",
-        "2NF: no non-prime attribute depends on a proper subset of a candidate key.",
+        "X+ : start with X; add any right-hand side whose left side you already have; repeat.",
+        "1NF: atomic cells. Repeating groups fail 1NF.",
+        "2NF: no non-prime column depends on only part of a candidate key.",
       ],
       examples: [
         {
-          title: "Attribute closure A+ with a chain and a blocker",
+          title: "Close A+ on a chain",
           prompt:
-            "F = {A → B, B → C, CD → E, E → C, G → A}. Compute A+ and AG+. Which attributes are missing from A+ and why?",
+            "F = {A → B, B → C, CD → E, E → C, G → A}. Compute A+ and AG+.",
           steps: [
-            "Seed A+ with {A}.",
-            "A → B applies, so add B. Now {A, B}.",
-            "B → C applies, so add C. Now {A, B, C}.",
-            "CD → E does not apply: D is not in the set. E → C does not add anything new. G → A is irrelevant because G is not in A+. Fixpoint: A+ = {A, B, C}.",
-            "Missing D, E, G. D never appears on a right-hand side reachable from A; without D you cannot fire CD → E, so E stays out; G is a determinant of A, not a dependent of A.",
-            "Now AG+: seed {A, G}. G → A is already satisfied. Same chain gives B and C. Still no D, so still no E. AG+ = {A, B, C, G}. Adding G does not unlock D or E.",
+            {
+              do: "Start A+ = {A}. Fire A → B, then B → C. Stop at {A, B, C}.",
+              why: "You only add a right-hand side when you already hold the whole left-hand side. D is missing, so CD → E never fires.",
+            },
+            {
+              do: "AG+ starts {A, G}. Same chain gives B and C. Still no D, still no E. AG+ = {A, B, C, G}.",
+              why: "G tells you A, but A does not tell you G’s friends D and E. Extra letters on the left only help if they unlock a new FD.",
+            },
+            {
+              do: "Write the missing letters: D, E (and G from A+).",
+              why: "Exam closures are a flood-fill. If a gate needs a key you do not have, that room stays shut.",
+            },
           ],
-          result: "A+ = ABC; AG+ = ABCG. D and E are not determined by A or by AG.",
+          result: "A+ = ABC. AG+ = ABCG. D and E are not determined by A or AG.",
         },
         {
-          title: "1NF violation in a holdings cell",
+          title: "A list in a cell fails 1NF",
           prompt:
-            "A junior dumps portfolio rows as HOLD(pan, isins) with one row ('AAAPA1111A', 'INE001A,INE002B,INE003C'). Is HOLD in 1NF? How do you rewrite it, and what becomes the key?",
-          code: "-- bad: repeating group in one cell\n-- HOLD(pan, isins)\n\n-- 1NF rewrite:\nCREATE TABLE hold (\n  pan  CHAR(10),\n  isin CHAR(12),\n  PRIMARY KEY (pan, isin)\n);",
+            "HOLD(pan, isins) has one row ('AAAPA1111A', 'INE001A,INE002B'). Is it 1NF? Rewrite it.",
+          code: "CREATE TABLE hold (\n  pan CHAR(10),\n  isin CHAR(12),\n  PRIMARY KEY (pan, isin)\n);",
           language: "sql",
           steps: [
-            "1NF demands atomic values. The isins cell contains a list, which is a repeating group, so HOLD is not in 1NF.",
-            "Splitting the list in the application layer without changing the schema does not create 1NF; the column type still allows a list.",
-            "Rewrite as one row per (pan, isin) pair. Each cell is now atomic.",
-            "A PAN can hold many ISINs and an ISIN can be held by many PANs, so the key of the 1NF relation is composite (pan, isin).",
-            "Do not keep a qty in the same cell as isin. If quantity exists it is a separate atomic attribute: HOLD(pan, isin, qty) still with PK (pan, isin).",
-            "After the rewrite the schema is in 1NF. Whether it is in 2NF depends on FDs among pan, isin and any extra attributes — there is no extra non-prime attribute here, so 2NF holds vacuously.",
+            {
+              do: "Spot the comma list in isins. Mark “not 1NF”.",
+              why: "1NF is “one fact per cell”, like one name per form box.",
+            },
+            {
+              do: "Rewrite as one row per (pan, isin).",
+              why: "Now each cell is a single code. That is atomic.",
+            },
+            {
+              do: "Key becomes (pan, isin).",
+              why: "One person can hold many stocks; one stock can be held by many people. The pair is the ID.",
+            },
           ],
           result:
-            "Original HOLD is not in 1NF; rewrite to HOLD(pan, isin) with PK (pan, isin).",
+            "Original HOLD is not 1NF. New HOLD(pan, isin) with primary key (pan, isin) is 1NF.",
         },
         {
-          title: "Partial dependency kills 2NF",
+          title: "Partial dependency fails 2NF",
           prompt:
-            "Relation FILL(order_id, isin, trader, isin_name, qty) with FDs: order_id isin → trader qty, isin → isin_name, order_id → trader. Assume those are all. Find candidate keys and test 2NF.",
+            "FILL(order_id, isin, trader, isin_name, qty) with order_id isin → trader qty, isin → isin_name, order_id → trader. Test 2NF.",
           steps: [
-            "Attributes: {order_id, isin, trader, isin_name, qty}.",
-            "Closures: isin+ = {isin, isin_name}. order_id+ = {order_id, trader}. (order_id, isin)+ = {order_id, isin, trader, qty, isin_name} = U.",
-            "(order_id, isin) is a superkey. Drop order_id: isin+ is not U. Drop isin: order_id+ is not U. So {order_id, isin} is a candidate key. No other candidate appears (trader and qty and isin_name are determined, never needed in a key).",
-            "Prime attributes: order_id, isin. Non-prime: trader, isin_name, qty.",
-            "1NF assumed (atomic columns). 2NF test: isin → isin_name has left-hand side a proper subset of the candidate key and right-hand side non-prime. That is a partial dependency.",
-            "A second partial: order_id → trader, again a proper subset determining a non-prime. qty depends on the full key, which is allowed in 2NF. Conclusion: not in 2NF. Decompose to ISIN_DIM(isin, isin_name), ORDER_TRADER(order_id, trader), FILL_QTY(order_id, isin, qty).",
+            {
+              do: "Close (order_id, isin): whole table. Neither piece alone is a key. Candidate key = {order_id, isin}.",
+              why: "You need both “which order” and “which stock” to name a fill line.",
+            },
+            {
+              do: "isin → isin_name and order_id → trader are extras that follow only a piece of the key.",
+              why: "isin_name is a stock’s nickname — it should live on a stock card, not be copied onto every fill. That is a partial dependency.",
+            },
+            {
+              do: "Split: ISIN(isin, isin_name), ORDER_TRADER(order_id, trader), FILL(order_id, isin, qty).",
+              why: "2NF puts “facts about a part of the key” in their own table.",
+            },
           ],
           result:
-            "Only CK is {order_id, isin}; partial FDs isin → isin_name and order_id → trader violate 2NF.",
-        },
-        {
-          title: "Singleton key: 2NF holds even with a transitive FD",
-          prompt:
-            "Relation CIRC(circ_id, topic, dept, floor) with circ_id → topic dept, dept → floor. Candidate keys and highest of {1NF, 2NF} that is guaranteed? (Do not decide 3NF yet.)",
-          steps: [
-            "circ_id+ = {circ_id, topic, dept, floor} = U, so {circ_id} is a candidate key.",
-            "dept+ = {dept, floor} ≠ U. topic+ and floor+ are singletons. No other candidate key.",
-            "Prime: circ_id. Non-prime: topic, dept, floor.",
-            "1NF: treat each column as atomic; 1NF holds.",
-            "2NF: the only candidate key is a singleton, so it has no proper nonempty subset that could be a partial determinant of a non-prime. 2NF holds automatically.",
-            "There is a transitive dependency circ_id → dept → floor, which is a 3NF issue, not a 2NF issue. Do not mark 2NF as failed because you spotted transitivity.",
-          ],
-          result:
-            "CK = {circ_id}; 1NF and 2NF both hold. Transitivity of floor is postponed to the 3NF test.",
+            "Not 2NF. Partial FDs isin → isin_name and order_id → trader. qty may stay with the full key.",
         },
       ],
     },
     {
-      heading: "3NF and BCNF with full FD traces",
-      body: "A 1NF relation is in third normal form when every non-trivial FD X → A satisfies: X is a superkey, or A is prime. Equivalently, there is no non-prime attribute transitively dependent on a candidate key. Boyce–Codd normal form is stricter: every non-trivial FD X → A has X as a superkey. The only extra BCNF failures are FDs whose right-hand side is prime but whose left-hand side is not a superkey.\n\nThe paper procedure never changes. (1) List attributes. (2) Compute closures and F+. (3) List candidate keys and classify prime / non-prime. (4) Confirm 1NF. (5) Test partial dependencies (2NF). (6) Test each non-trivial FD against the 3NF rule. (7) Test each non-trivial FD against the BCNF rule. Stop at the first failure when the question asks for the highest form that holds.\n\nA BCNF decomposition on a violating FD X → Y (X not a superkey) is R1 = X ∪ Y and R2 = (R − Y) ∪ X, equivalently R − (Y − X). The join is lossless because R1 ∩ R2 = X and X → R1. It need not be dependency-preserving; the classic city-street-zip example loses a dependency that spanned both pieces.\n\nSEBI papers love the schema that is in 3NF but not BCNF: two overlapping candidate keys and an FD from a proper subset of one key into a prime attribute of the other. If every attribute is prime, 3NF is automatic; BCNF may still fail.",
+      heading: "3NF and BCNF",
+      body: "Third normal form (3NF) says: for every real dependency X → A, either X is a superkey, or A is prime (part of some candidate key). In school words: no extra column should follow another extra column (no “class → classroom → floor” chain hanging off the roll number).\n\nBoyce–Codd normal form (BCNF) is stricter: every real X → A must have a superkey on the left. If every column is prime, 3NF is automatic, but BCNF can still fail. That “3NF but not BCNF” pattern is a favourite exam trap.",
+      howTo: [
+        "Keys first, then 1NF, then 2NF, then 3NF, then BCNF. Stop at the first fail if they ask “highest form”.",
+        "3NF test: left superkey, or right-hand column prime.",
+        "BCNF test: left must be a superkey. No escape hatch.",
+        "To split a BCNF violation X → Y: one table XY, one table (rest + X). The join is lossless.",
+      ],
       bullets: [
-        "3NF: for every non-trivial X → A, X is a superkey or A is prime.",
-        "BCNF: for every non-trivial X → A, X is a superkey.",
-        "If all attributes are prime, the schema is in 3NF; it may still miss BCNF.",
+        "3NF: X → A is OK if X is a superkey or A is prime.",
+        "BCNF: X → A is OK only if X is a superkey.",
+        "All-prime attributes ⇒ 3NF, maybe not BCNF.",
       ],
       examples: [
         {
-          title: "Full trace: 3NF but not BCNF",
+          title: "3NF but not BCNF",
           prompt:
-            "Relation DESK(officer, window, shift) with FDs officer window → shift and shift → window. Determine candidate keys, primes, and the highest normal form.",
+            "DESK(officer, window, shift) with officer window → shift and shift → window. Highest normal form?",
           steps: [
-            "Attributes: {officer, window, shift}.",
-            "Closures: (officer, window)+ = {officer, window, shift} = U. shift+ = {shift, window} ≠ U. (officer, shift)+ = {officer, shift, window} = U. window+ = {window}. officer+ = {officer}.",
-            "Candidate keys: {officer, window} is minimal (neither singleton works from those two attributes). {officer, shift} is also minimal. {window, shift} is not a key: (window, shift)+ = {window, shift}.",
-            "Prime attributes: officer, window, shift (every attribute sits in some candidate key). Non-prime: none.",
-            "1NF holds. 2NF: non-prime partial dependency cannot occur because there are no non-primes. 2NF holds.",
-            "3NF: inspect shift → window. Left side shift is not a superkey. Right side window is prime. The 3NF escape clause applies. officer window → shift has a superkey on the left, so it is fine. 3NF holds.",
-            "BCNF: shift → window is non-trivial and shift is not a superkey, so BCNF fails. Highest form is 3NF.",
+            {
+              do: "Close (officer, window) and (officer, shift): both give the whole table. Keys: those two pairs. Every column is prime.",
+              why: "Each attribute sits in some candidate key, like every child being “part of some team name”.",
+            },
+            {
+              do: "shift → window: left is not a superkey, but window is prime. 3NF allows this. 2NF is fine (no non-primes).",
+              why: "3NF’s escape hatch is “the right-hand side is already part of a key”.",
+            },
+            {
+              do: "BCNF forbids shift → window because shift is not a superkey. Highest form is 3NF.",
+              why: "BCNF has no escape hatch. Overlapping keys plus an FD into a prime column is the classic picture.",
+            },
           ],
           result:
-            "CKs {officer, window} and {officer, shift}; in 3NF but not BCNF because shift → window.",
+            "Keys {officer, window} and {officer, shift}. In 3NF, not BCNF, because shift → window.",
         },
         {
-          title: "Full trace: stops at 2NF (transitive non-prime)",
+          title: "Stops at 2NF (transitive extra)",
           prompt:
-            "Relation ALLOT(app, cat, city, quota) with app → cat city and city → quota. Highest normal form?",
+            "ALLOT(app, cat, city, quota) with app → cat city and city → quota. Highest form?",
           steps: [
-            "Attributes: {app, cat, city, quota}.",
-            "Closures: app+ = {app, cat, city, quota} = U (city → quota fires after city is obtained). city+ = {city, quota}. cat+ = {cat}. quota+ = {quota}.",
-            "Only candidate key: {app}. Superkeys are the four supersets of {app} that add any subset of {cat, city, quota} — actually 2^{3} = 8 superkeys, but only one candidate.",
-            "Prime: app. Non-prime: cat, city, quota.",
-            "1NF holds. 2NF: candidate key is a singleton, so no partial dependency. 2NF holds.",
-            "3NF: city → quota is non-trivial, city is not a superkey, quota is non-prime. Violation. Equivalently app → city → quota is a transitive dependence of a non-prime on the key.",
-            "BCNF also fails on the same FD. Highest form that holds is 2NF.",
+            {
+              do: "app+ is the whole table. Only candidate key is {app}. Non-primes: cat, city, quota.",
+              why: "A single application number already names the row, like one form ID.",
+            },
+            {
+              do: "Singleton key ⇒ 2NF holds (no partial key to hang extras on).",
+              why: "2NF only complains about pieces of a composite key.",
+            },
+            {
+              do: "city → quota: city is not a superkey, quota is not prime. 3NF fails. Highest form is 2NF.",
+              why: "quota follows city, and city follows app — a transitive extra. That is a 3NF issue, not 2NF.",
+            },
           ],
-          result: "CK = {app}; highest form is 2NF (city → quota violates 3NF and BCNF).",
+          result: "CK = {app}. Highest form is 2NF (city → quota breaks 3NF and BCNF).",
         },
         {
-          title: "Full trace: already in BCNF",
+          title: "Already in BCNF",
           prompt:
-            "Relation TRADE(trade_id, isin, qty) with only trade_id → isin qty (and trivials). Confirm BCNF and count the FDs you must check.",
+            "TRADE(trade_id, isin, qty) with only trade_id → isin qty. Confirm BCNF.",
           steps: [
-            "Attributes: {trade_id, isin, qty}. trade_id+ = U. isin+ = {isin}, qty+ = {qty}.",
-            "Candidate key: {trade_id} only. Prime: trade_id. Non-prime: isin, qty.",
-            "Non-trivial FDs implied by the given set include trade_id → isin, trade_id → qty, trade_id → isin qty. Each has a superkey on the left.",
-            "There is no FD with isin or qty on the left that determines anything else, so no BCNF counterexample exists.",
-            "1NF, 2NF (singleton key), 3NF (every non-trivial FD has a superkey determinant), BCNF all hold.",
-            "Exam shortcut: a relation with a single candidate key and all given FDs of the form CK → rest, with no other determinants, is in BCNF.",
-          ],
-          result:
-            "TRADE is in BCNF. The only candidate key is {trade_id}; every non-trivial FD has that superkey on the left.",
-        },
-        {
-          title: "Lossless BCNF split that drops a dependency",
-          prompt:
-            "R(street, city, zip) with street city → zip and zip → city. This is the classic 3NF-not-BCNF schema. Decompose on zip → city into BCNF and check lossless join and dependency preservation.",
-          steps: [
-            "Keys of R: {street, city} and {street, zip} (same overlapping-key pattern as DESK). zip → city violates BCNF.",
-            "Decompose on zip → city: R1(zip, city) and R2(zip, street). (R2 = (R − {city}) ∪ {zip}.)",
-            "Lossless test: R1 ∩ R2 = {zip}, and zip → city so zip → R1. The join is lossless.",
-            "Dependencies in R1: zip → city. Dependencies in R2: only trivials (zip does not determine street; street does not determine zip).",
-            "The original FD street city → zip is not implied by {zip → city} alone. It is not a local FD of R1 or of R2, so the decomposition is not dependency-preserving.",
-            "You can still check the lost FD as a constraint at the application level after joining R1 and R2, but the decomposed schema does not enforce it with local keys. That is the standard BCNF versus 3NF trade-off.",
+            {
+              do: "trade_id+ is the whole table. Only candidate key {trade_id}.",
+              why: "One trade ID, one row — a simple roll number.",
+            },
+            {
+              do: "Every non-trivial FD has trade_id (a superkey) on the left.",
+              why: "Nothing else determines anything else. No hidden city→floor chain.",
+            },
+            {
+              do: "Tick 1NF, 2NF, 3NF, BCNF.",
+              why: "Shortcut: one key, and all given FDs are “key → rest”, with no other determinants.",
+            },
           ],
           result:
-            "R1(zip, city), R2(zip, street): lossless BCNF, not dependency-preserving (street city → zip is lost).",
+            "TRADE is in BCNF. Only candidate key {trade_id}; every real FD has that superkey on the left.",
         },
       ],
     },
     {
       heading: "Relational algebra versus tuple calculus",
-      body: "Relational algebra is a procedural language. The operators SEBI/GATE expect by symbol are select σ (restrict rows by a predicate), project π (restrict columns and then duplicate-eliminate), union ∪, set difference −, cartesian product ×, and join ⋈ (theta, equi, or natural). Rename ρ is used when a product would otherwise clash on attribute names. Division r ÷ s expresses “for all”: the X-values in r(X,Y) that appear with every Y-value of s(Y).\n\nA natural join is equivalent to σ_{agree on common names}(r × s) followed by a projection that drops the duplicate copy of each common attribute. An equi-join keeps both copies. Always push σ as far down as possible in an exam simplification: σ_{c}(r ⋈ s) = σ_{c}(r) ⋈ s when c mentions only r-attributes.\n\nTuple relational calculus is declarative. A query is { t | P(t) } where P is a formula built from atoms s ∈ r, comparisons of fields, ∧ ∨ ¬, and quantifiers ∃ ∀. A formula is safe when every value that appears in the result comes from the active domain of the database; unsafe queries such as { t | ¬(t ∈ r) } are rejected. Domain calculus binds individual attributes rather than whole tuples; you will not need it beyond recognising the difference.\n\nAlgebra can express exactly the safe queries of calculus (Codd’s theorem, without aggregation). When a question gives English “members who traded every ISIN in set S”, write division or the calculus universal quantifier, not a single inner join.",
+      body: "Relational algebra is a recipe language: you say how to cook. Select σ keeps rows, project π keeps columns (and drops duplicate rows), join ⋈ glues tables on matching values, minus − is “in the first list but not the second”. Division r ÷ s means “X-values that appear with every Y in s” — like “students who took every course on a list”.\n\nTuple calculus is a wish list: { t | P(t) } means “the tuples t that pass test P”. It must be safe: answers must come from values already in the database, not from an infinite sea of made-up names.",
+      howTo: [
+        "English first: which tables, which filter, which columns, set or bag.",
+        "If the filter uses a column from another table, you must join (or product + select).",
+        "“But never” → project then minus. “Every / all of a list” → division or ∀ in calculus.",
+        "Push σ down onto the table that actually holds that column.",
+      ],
       bullets: [
-        "σ rows, π columns (set semantics), × then σ then π implements a join.",
-        "r ÷ s: X-values associated with every Y in s.",
-        "Calculus { t | P(t) } must be safe; ¬(t ∈ r) is the standard unsafe example.",
+        "σ rows, π columns (set). Join = match then keep.",
+        "r ÷ s: X that pair with every Y in s.",
+        "{ t | ¬(t ∈ r) } is the classic unsafe calculus query.",
       ],
       examples: [
         {
-          title: "Select-project versus a join they did not ask for",
+          title: "Join, then project",
           prompt:
-            "TRADE(tid, member, isin, qty) and MEMBER(member, city). English: “ISINs traded by members based in Mumbai, with duplicate ISINs shown once.” Write algebra, then a wrong-but-tempting join-free attempt, and fix it.",
+            "TRADE(tid, member, isin, qty), MEMBER(member, city). “ISINs traded by Mumbai members, each ISIN once.” Write algebra.",
           steps: [
-            "Need city, which is not in TRADE, so a join (or product plus select) is mandatory. Tempting π_isin(σ_{city='Mumbai'}(TRADE)) is illegal: TRADE has no city.",
-            "Correct skeleton: join TRADE with MEMBER on member, select city = Mumbai, project isin.",
-            "Natural-join form: π_isin(σ_{city='Mumbai'}(TRADE ⋈ MEMBER)).",
-            "Product form, to show you know the definition: π_isin(σ_{TRADE.member=MEMBER.member ∧ city='Mumbai'}(TRADE × MEMBER)).",
-            "Push the city predicate to MEMBER before the join: π_isin(TRADE ⋈ σ_{city='Mumbai'}(MEMBER)). This is equivalent and cheaper.",
-            "π eliminates duplicate ISINs. If the exam wanted bag semantics or counts, algebra-as-taught in GATE would still duplicate-eliminate unless it explicitly uses a bag variant.",
+            {
+              do: "City is not in TRADE, so join TRADE with MEMBER on member, then keep city = Mumbai, then π_isin.",
+              why: "You cannot filter a column that is not on the table — like asking a maths marksheet for “home city” without the student card.",
+            },
+            {
+              do: "Better: π_isin(TRADE ⋈ σ_{city='Mumbai'}(MEMBER)).",
+              why: "Filter the small MEMBER table first. Same answer, less work.",
+            },
+            {
+              do: "π drops duplicate ISINs.",
+              why: "Algebra as taught in exams is set-based unless they say otherwise.",
+            },
           ],
           result:
-            "π_isin(TRADE ⋈ σ_{city='Mumbai'}(MEMBER)). You cannot select on city inside TRADE alone.",
+            "π_isin(TRADE ⋈ σ_{city='Mumbai'}(MEMBER)). You cannot σ on city inside TRADE alone.",
         },
         {
-          title: "Set difference for “traded equity but never debt”",
+          title: "Minus for “equity but never debt”",
           prompt:
-            "TRADE(member, asset_class, qty) with asset_class in {EQ, DEBT}. Members who have at least one EQ trade and zero DEBT trades. Write algebra using projection and difference, not a nested English sentence.",
+            "TRADE(member, asset_class, qty) with EQ or DEBT. Members with at least one EQ trade and zero DEBT trades.",
           steps: [
-            "EQ members: E = π_member(σ_{asset_class='EQ'}(TRADE)).",
-            "DEBT members: D = π_member(σ_{asset_class='DEBT'}(TRADE)).",
-            "“EQ but never DEBT” is set difference E − D, not E ∪ D and not E ∩ D.",
-            "Intersection E ∩ D would be members who traded both classes. Union would be members who traded either.",
-            "Do not subtract raw TRADE tuples: TRADE − TRADE is empty and still has asset_class in the heading. Project to member first so the headings match for ∪ − ∩.",
-            "If qty were kept in the projection, two EQ rows of the same member with different qty would look like different values and difference would be wrong. Project only member.",
+            {
+              do: "E = π_member(σ_{asset_class='EQ'}(TRADE)). D = π_member(σ_{asset_class='DEBT'}(TRADE)). Answer E − D.",
+              why: "Minus is the word “but never”. Project to member first so both sides have the same heading.",
+            },
+            {
+              do: "Do not use ∩ (that is “both”) or ∪ (that is “either”).",
+              why: "Those are different English sentences.",
+            },
+            {
+              do: "Do not subtract raw TRADE rows.",
+              why: "Headings would still include asset_class; two EQ lots of the same member would look different.",
+            },
           ],
           result:
             "π_member(σ_{asset_class='EQ'}(TRADE)) − π_member(σ_{asset_class='DEBT'}(TRADE)).",
         },
         {
-          title: "Division: members who traded every ISIN in a watchlist",
+          title: "Division: traded every ISIN on a watchlist",
           prompt:
-            "TRADE(member, isin) and WATCH(isin) with WATCH = {INEA, INEB}. Compute TRADE ÷ WATCH on paper from TRADE rows (M1,INEA), (M1,INEB), (M1,INEC), (M2,INEA), (M3,INEA), (M3,INEB).",
+            "TRADE(member, isin) rows: (M1,INEA), (M1,INEB), (M1,INEC), (M2,INEA), (M3,INEA), (M3,INEB). WATCH = {INEA, INEB}. TRADE ÷ WATCH?",
           steps: [
-            "Division heading is the attributes in TRADE that are not in WATCH, i.e. {member}.",
-            "Candidate members are the distinct member values in TRADE: M1, M2, M3.",
-            "M1’s ISIN set is {INEA, INEB, INEC}, which is a superset of WATCH {INEA, INEB}. Keep M1.",
-            "M2’s ISIN set is {INEA}, missing INEB. Drop M2.",
-            "M3’s ISIN set is {INEA, INEB}, equal to WATCH. Keep M3. Extra ISINs are allowed; missing ones are not.",
-            "Algebra identity to remember: r ÷ s = π_X(r) − π_X((π_X(r) × s) − r), with X = heading(r) − heading(s). Use it if the question asks you to expand division.",
+            {
+              do: "Division heading is {member}. Check each member’s ISIN set against WATCH.",
+              why: "Division is “for all on the list”. Extra ISINs are allowed; missing ones are not.",
+            },
+            {
+              do: "M1 has {INEA, INEB, INEC} ⊇ WATCH — keep. M3 has exactly WATCH — keep. M2 is missing INEB — drop.",
+              why: "Think: who ticked every box on the homework list?",
+            },
+            {
+              do: "If asked, expand: r ÷ s = π_X(r) − π_X((π_X(r) × s) − r).",
+              why: "That identity is the algebraic spelling of “remove anyone who misses a pair”.",
+            },
           ],
-          result: "TRADE ÷ WATCH = {M1, M3}. M2 is excluded for missing INEB.",
-        },
-        {
-          title: "Tuple calculus for the same watchlist query",
-          prompt:
-            "Write a safe tuple-calculus expression for members who traded every ISIN in WATCH. Use range variables t over TRADE and w over WATCH. Then explain why { t | ¬(t ∈ TRADE) } is unsafe.",
-          steps: [
-            "Result tuples are one-field tuples u with attribute member. Schema of u is (member).",
-            "English “for every watch ISIN there exists a trade of that member in that ISIN” becomes a universal quantifier over w and an existential over t.",
-            "Formula: { u | ∃ t ∈ TRADE (t.member = u.member ∧ ∀ w ∈ WATCH ∃ s ∈ TRADE (s.member = u.member ∧ s.isin = w.isin)) }.",
-            "Safety: every u.member is taken from TRADE, and every compared isin is taken from WATCH or TRADE, so values come from the active domain.",
-            "The query { t | ¬(t ∈ TRADE) } would have to return every tuple not in TRADE, including tuples over an infinite domain of unused member names. That is unsafe and not equivalent to any algebra expression.",
-            "Existential-only queries such as { t | t ∈ TRADE ∧ t.isin = 'INEA' } are the calculus form of σ_{isin='INEA'}(TRADE) and are safe.",
-          ],
-          result:
-            "Universal quantifier over WATCH plus a TRADE witness for each ISIN; { t | ¬(t ∈ TRADE) } is the canonical unsafe query.",
+          result: "TRADE ÷ WATCH = {M1, M3}. M2 is out for missing INEB.",
         },
       ],
     },
     {
-      heading: "File organisation, dense versus sparse index, B-tree versus B+",
-      body: "Heap (pile) files dump records in insertion order: insert is cheap, equality search is a full scan. A sorted (sequential) file keeps records ordered on a search key: range queries become a scan from the first match, but inserts require sliding records or an overflow chain. A hash file maps a key to a bucket: equality is O(1) expected, range queries are hopeless because hash order is not key order.\n\nAn index is a (key, pointer) file. A dense index stores one index entry per data record (or per search-key occurrence). A sparse index stores one entry per data block, usually the first key of that block, and therefore requires the data file to be sorted on the search key. Sparse indexes are smaller; dense indexes can be built on unsorted files and can answer “does this key exist?” without touching the data file.\n\nA B-tree of order m stores up to m children and m−1 keys in every internal node, and it also stores record pointers in internal nodes. A B+ tree stores record pointers only in the leaves; internal nodes hold copies of keys used as routers. Leaves of a B+ tree are linked, so a range scan walks the leaf chain. Definitions of “order” vary by book: some use order = maximum children, others use order = maximum keys. Read the question’s definition before you compute occupancy.\n\nMinimum occupancy (except the root) is typically ⌈m/2⌉ children for an internal B+ node. Height grows only when the root splits, which is why B+ trees stay shallow on disk. Clustered versus unclustered is a separate axis: a clustered index has the data file in the same order as the index; a table can have at most one clustered index.",
+      heading: "Indexes and B+ trees (the dictionary picture)",
+      body: "An index is a contents page for a file: (key, pointer). A dense index has one line per record. A sparse index has one line per disk block, and the data file must already be sorted — otherwise the page numbers lie.\n\nA B+ tree is like a printed dictionary: the real words (records) sit in order at the back, on linked leaf pages; the middle pages only store guide words and page numbers so you can jump. A B-tree also keeps some records in the middle pages. Hash files are great for “exactly this key”, bad for “keys from 1000 to 1099”.",
+      howTo: [
+        "Sorted file? Sparse index is legal. Heap (unsorted pile)? Need dense or hash.",
+        "Dense count = number of records. Sparse count = number of data blocks.",
+        "B+: data pointers only at linked leaves. Range query = find first leaf, walk the chain.",
+        "Read the question’s definition of “order m” before you count keys versus children.",
+      ],
       bullets: [
-        "Dense: one index entry per record. Sparse: one per block, data file must be sorted.",
-        "B-tree: keys+pointers in internal nodes. B+: data pointers only at linked leaves.",
-        "Hash for equality; sorted file or B+ leaf chain for ranges.",
+        "Dense: one index entry per record. Sparse: one per block, data must be sorted.",
+        "B+ = dictionary: words at the back, page numbers in the middle. Leaves are linked.",
+        "Hash for equality; B+ leaf chain for ranges.",
       ],
       examples: [
         {
-          title: "Count dense versus sparse entries on a sorted trade file",
+          title: "Dense versus sparse count",
           prompt:
-            "A sorted file of 10_000 trade records fills 500 blocks (20 records per block). Search key is trade_id (unique). How many entries in a dense primary index? In a sparse primary index with one entry per block? If the index itself packs 100 entries per index block, how many index blocks does each design need (one level)?",
+            "10_000 sorted trades, 500 blocks (20 per block), unique trade_id. Index packs 100 entries per index block. Dense vs sparse: how many entries and index blocks (one level)?",
           steps: [
-            "Dense primary index: one entry per record = 10_000 entries.",
-            "Sparse primary index on a sorted file: one entry per data block = 500 entries.",
-            "Index blocking factor 100. Dense index blocks = ceil(10_000 / 100) = 100.",
-            "Sparse index blocks = ceil(500 / 100) = 5.",
-            "A unique search key does not change the dense count: uniqueness means one record per key, still 10_000 dense entries. Sparse remains one per block, not one per distinct key.",
-            "If the question had a secondary index on a non-unique city column, a dense secondary index would still typically store one pointer per record, because two trades in Mumbai live in different data blocks.",
+            {
+              do: "Dense: 10_000 entries, ceil(10000/100) = 100 index blocks.",
+              why: "One contents-line per trade, even though the key is unique.",
+            },
+            {
+              do: "Sparse: 500 entries (one per data block), ceil(500/100) = 5 index blocks.",
+              why: "Sparse only stores “first key of this page”, like a thumb index on a dictionary.",
+            },
+            {
+              do: "Uniqueness does not shrink the dense count.",
+              why: "Dense is per record, not per distinct key. Sparse is per block, not per key either.",
+            },
           ],
-          result:
-            "Dense 10_000 entries (100 index blocks); sparse 500 entries (5 index blocks).",
+          result: "Dense 10_000 entries (100 blocks). Sparse 500 entries (5 blocks).",
         },
         {
-          title: "Why a sparse index cannot sit on an unsorted heap",
+          title: "Sparse index on a heap can miss",
           prompt:
-            "TRADE is a heap. Someone proposes a sparse index with one (trade_id, block-id) entry per data block, using the minimum trade_id found in that block as the key. Show that an equality search for trade_id = 500 can miss.",
+            "TRADE is an unsorted heap. Someone stores one sparse entry per block using the first trade_id on that block. Why can a search for 500 miss?",
           steps: [
-            "Heap blocks are unordered. Suppose block 7 happens to contain trade_ids {900, 12, 500} and the sparse entry stored for block 7 is the first record on the block, say 900, or the minimum 12 — pick the scheme the proposer named: “first record of the block”.",
-            "Let the first record of block 7 be 900. The sparse index therefore has an entry (900, block 7), not (500, block 7).",
-            "A search for 500 looks at index keys. 500 is not equal to 900 and need not fall into a range that points at block 7, because neighbouring blocks are also unordered.",
-            "The searcher never reads block 7, so trade 500 is missed even though it is on disk.",
-            "If instead the sparse key were min(ids in the block) = 12, the index key 12 still does not tell you that 500 lives there; range reasoning on the index fails because block maxima and minima overlap wildly across the heap.",
-            "Conclusion: sparse indexes require a sorted (or otherwise partitioned) data file so that a block’s key-range is disjoint from other blocks. Heaps need a dense index or a hash index.",
+            {
+              do: "Picture a block whose first record is 900 but 500 also sits on that block.",
+              why: "A heap is a junk drawer. Min and max on neighbouring blocks overlap.",
+            },
+            {
+              do: "The index only has (900, that block). A search for 500 never goes there.",
+              why: "Sparse search assumes each block owns a clean key range, like sorted dictionary pages.",
+            },
+            {
+              do: "Conclude: sparse needs a sorted data file. Heaps need dense or hash.",
+              why: "The contents page only works if the book is in order.",
+            },
           ],
           result:
-            "Sparse index on a heap can skip the block that holds the target key. Sparse requires a sorted data file.",
+            "Sparse on a heap can skip the block that holds the key. Sparse requires sorted data.",
         },
         {
-          title: "B+ tree order 4: minimum keys in a non-root internal node",
+          title: "B+ order 4: minimum keys",
           prompt:
-            "A B+ tree of order m = 4 means an internal node has at most 4 child pointers (hence at most 3 keys). Nodes except the root are at least half full. What is the minimum number of keys in a non-root internal node? In a leaf, if a leaf may hold at most 3 search-key values?",
+            "B+ tree, order m = 4 means at most 4 child pointers (at most 3 keys) in an internal node. Half-full rule except the root. Minimum keys in a non-root internal node? In a leaf that holds at most 3 keys?",
           steps: [
-            "Internal node: maximum children = m = 4. Minimum children = ceil(m / 2) = 2.",
-            "Number of keys in an internal node is (number of children) − 1. Minimum keys = 2 − 1 = 1.",
-            "The root is allowed to have as few as 2 children (1 key) when it is internal, or even 0 keys when the tree is a single empty leaf; the question excluded the root.",
-            "Leaf occupancy: if a leaf stores at most 3 keys, half-full means ceil(3 / 2) = 2 keys minimum (common GATE convention unless the prompt uses a different leaf formula).",
-            "Data pointers: in a B+ tree those 3 leaf keys each have a pointer to a data record (or to a bucket of records for non-unique keys). Internal keys do not point to data records.",
-            "If the question had said “B-tree of order 4” instead, internal nodes would also carry data pointers, and a range scan could not simply walk a leaf linked list.",
+            {
+              do: "Internal: max children 4, min children ceil(4/2) = 2, so min keys = 1.",
+              why: "Keys in the middle are separators: children = keys + 1.",
+            },
+            {
+              do: "Leaf max 3 keys → min ceil(3/2) = 2 under the usual half-full rule.",
+              why: "Leaves hold the real words. They still must stay at least half full, like packed dictionary pages.",
+            },
+            {
+              do: "Data pointers live only at leaves in a B+ tree.",
+              why: "That is the dictionary analogy: middle pages are only page numbers; the words are at the back, chained for a range scan.",
+            },
           ],
           result:
-            "Non-root internal node: minimum 1 key (2 children). Leaf with max 3 keys: minimum 2 keys under the half-full rule.",
-        },
-        {
-          title: "Height comparison: why B+ leaves are linked",
-          prompt:
-            "A primary B+ index on trade_id has height 3 (root → internal → leaf). A range query wants all trade_id in [1000, 1099], and 40 qualifying keys sit in two adjacent leaves. Count node reads for the B+ tree versus a B-tree of the same height that stores matching keys in an internal node and a leaf, with no leaf links.",
-          steps: [
-            "B+ : walk root, one internal, first qualifying leaf: 3 reads to the first match.",
-            "Then follow the sibling pointer to the next leaf: +1 read. Total 4 node reads. No need to return to the parent.",
-            "B-tree without leaf links: some keys in [1000, 1099] may live in an internal node. After reading a leaf you must climb back to the parent to find the next key, then possibly descend again.",
-            "A conservative B-tree range walk therefore re-reads the internal node and may read extra siblings. You cannot bound it at 4; it is at least the 3-level descent plus a climb and a second descent (5+).",
-            "Internal B-tree nodes are also fatter because they store data pointers, so fanout is smaller and height may be larger than the B+ tree for the same file. The question already fixed height, so the extra cost is the missing leaf chain.",
-            "Exam line: B+ trees win on range queries because all records sit in a linked sorted leaf sequence; B-trees win slightly on an equality that hits an internal key (one less disk read), which is why primary indexes in practice are B+.",
-          ],
-          result:
-            "B+ range uses 4 node reads (3 down, 1 sibling). A B-tree without leaf links must climb and re-descend, so it costs more I/O for the same range.",
+            "Non-root internal: minimum 1 key (2 children). Leaf with max 3 keys: minimum 2 keys.",
         },
       ],
     },
     {
-      heading: "ACID and the four classic anomalies",
-      body: "A transaction is a program unit that must satisfy ACID. Atomicity: all of its writes install, or none do (undo on abort). Consistency: it takes the database from one valid state to another with respect to declared constraints. Isolation: concurrent transactions do not observe each other’s incomplete work; the gold standard is serialisability. Durability: after commit, writes survive a crash (typically via the WAL / redo log).\n\nThe ANSI-style phenomena are the exam’s isolation vocabulary. Dirty read: T1 reads a value T2 wrote but has not committed; T2 may abort. Non-repeatable read: T1 reads a row twice and sees two committed values because T2 updated (or deleted) that row and committed in between. Phantom: T1’s predicate (a range or a SELECT COUNT) sees a new row that T2 inserted and committed. Lost update: two transactions read the same value and both write a new value; the second write overwrites the first without incorporating it.\n\nIsolation levels (classic ANSI table): READ UNCOMMITTED allows dirty reads; READ COMMITTED forbids dirty reads but allows non-repeatable reads and phantoms; REPEATABLE READ forbids dirty and non-repeatable reads but, in the original ANSI draft, still allows phantoms; SERIALIZABLE forbids all three. Real engines (next-key locking in InnoDB, snapshot isolation) do not match the table exactly; answer with the ANSI table unless the question names an engine.\n\nLost update is not always listed as a fourth ANSI phenomenon, but SEBI papers treat it as a concurrency bug of its own. Cursor stability and column-level COMPARE-AND-SET are application-level defences; 2PL and snapshot isolation are engine-level defences.",
+      heading: "ACID and the four mix-up bugs",
+      body: "A transaction is one unit of work that should look all-or-nothing. ACID: Atomicity — all writes land, or none (undo on abort). Consistency — rules stay true. Isolation — two people at the counter do not see each other’s half-done work. Durability — after commit, a power cut does not eat the write (redo log).\n\nFour classic mix-ups: dirty read (you read ink that was not committed). Non-repeatable read (same row, two committed values). Phantom (a new row appears in a count). Lost update (two people add to a score; the last write wipes the first).",
+      howTo: [
+        "Name the bug from the trace: uncommitted value? same row twice? extra row in a range? two writers based on the same old number?",
+        "Map ANSI levels: READ COMMITTED stops dirty; REPEATABLE READ stops non-repeatable; SERIALIZABLE stops phantoms.",
+        "Atomicity = undo. Durability = redo. Do not swap them.",
+        "Prefer one SQL UPDATE qty = qty + :d instead of read–compute–write.",
+      ],
       bullets: [
-        "Dirty: read uncommitted. Non-repeatable: same row, two committed values. Phantom: new row in a predicate. Lost update: last writer silently wins.",
-        "READ COMMITTED stops dirty reads; REPEATABLE READ stops non-repeatable; SERIALIZABLE stops phantoms (ANSI table).",
-        "Atomicity is undo; durability is redo. Do not swap them in a crash-recovery MCQ.",
+        "Dirty = uncommitted. Non-repeatable = same row, two committed values. Phantom = new row in a filter. Lost update = last writer silently wins.",
+        "READ COMMITTED ⊂ REPEATABLE READ ⊂ SERIALIZABLE in the ANSI table.",
+        "Undo is atomicity; redo is durability.",
       ],
       examples: [
         {
-          title: "Name the anomaly from a two-transaction trace",
+          title: "Dirty read",
           prompt:
-            "Initial qty = 100. T1: read qty (100); T2: write qty = 40; T2: abort (qty restored to 100); T1: uses the 40 it already read to authorise a sale. Which anomaly, and which isolation level is the weakest that forbids it?",
+            "qty starts 100. T1 reads qty. T2 writes 40 then aborts (back to 100). T1 still uses 40. Name the bug and the weakest ANSI level that forbids it.",
           steps: [
-            "T1 read a value that T2 had written and not committed. That is the definition of a dirty read.",
-            "It is not a non-repeatable read: T1 did not read the same committed row twice. T2 never committed the 40.",
-            "It is not a phantom: no new row entered a range. The row identity was fixed.",
-            "It is not a lost update: T1 never wrote qty. Lost update needs two writers.",
-            "READ UNCOMMITTED allows dirty reads. READ COMMITTED already forbids them (a reader only sees committed data).",
-            "REPEATABLE READ and SERIALIZABLE also forbid dirty reads, but the weakest (least locking) level that is sufficient is READ COMMITTED.",
+            {
+              do: "T1 read a value T2 had not committed. Call it a dirty read.",
+              why: "Like reading a draft someone then tore up.",
+            },
+            {
+              do: "Not non-repeatable (T2 never committed 40). Not a phantom (no new row). Not lost update (T1 did not write).",
+              why: "Match the definition, not the vibes.",
+            },
+            {
+              do: "Weakest fix: READ COMMITTED.",
+              why: "That level only shows committed ink. Stronger levels also work, but the exam asks for the weakest.",
+            },
           ],
-          result:
-            "Dirty read. Weakest ANSI level that forbids it: READ COMMITTED.",
+          result: "Dirty read. Weakest ANSI level that forbids it: READ COMMITTED.",
         },
         {
-          title: "Non-repeatable read of a margin row",
+          title: "Non-repeatable versus phantom",
           prompt:
-            "T1: SELECT margin FROM member WHERE id = 'M1' → 8 crore. T2: UPDATE member SET margin = 2 WHERE id = 'M1'; COMMIT. T1: SELECT margin again → 2 crore. T1 then raises an alert using the first figure. Classify, and say whether REPEATABLE READ stops it.",
+            "T1 counts trades of INEA today → 4. T2 inserts a fifth INEA trade and commits. T1 counts again → 5. Classify versus “same member row, margin 8 then 2”.",
           steps: [
-            "T1 read the same primary-key row twice and saw two different values. Both values were committed (T2 committed before the second read).",
-            "That is a non-repeatable read, also called a fuzzy read.",
-            "Not dirty: T2 had committed. Not a phantom: the row M1 existed throughout; it was updated, not inserted.",
-            "READ COMMITTED allows this (each statement sees the latest committed version). REPEATABLE READ keeps T1’s first snapshot of M1, so the second SELECT still returns 8 crore.",
-            "SERIALIZABLE also prevents it. Snapshot isolation (not ANSI) would likewise show T1 a stable snapshot.",
-            "If T2 had INSERTed a new member instead of updating M1, T1’s second “SELECT … WHERE margin < 5” might see a new row — that would be a phantom, a different phenomenon.",
+            {
+              do: "The count changed because a new row entered the filter. Call it a phantom.",
+              why: "A phantom is a ghost row in a range, not a change to a row you already held by primary key.",
+            },
+            {
+              do: "Margin 8 then 2 on the same id is a non-repeatable read.",
+              why: "Same locker, two different committed numbers.",
+            },
+            {
+              do: "SERIALIZABLE (predicate / next-key locks) stops the phantom. REPEATABLE READ may still allow it in the ANSI table.",
+              why: "Locking the rows you saw does not lock the empty gaps where a new trade can slip in.",
+            },
           ],
           result:
-            "Non-repeatable read of M1. REPEATABLE READ (and SERIALIZABLE) forbid it; READ COMMITTED does not.",
+            "Insert into a COUNT is a phantom. Same-row two values is non-repeatable. SERIALIZABLE stops phantoms.",
         },
         {
-          title: "Phantom in a surveillance count",
+          title: "Lost update",
           prompt:
-            "T1: SELECT COUNT(*) FROM trade WHERE isin = 'INEA' AND day = '2026-04-01' → 4. T2 inserts a fifth trade of INEA that day and commits. T1 repeats the COUNT → 5. T1’s two counts disagree. Classify versus a non-repeatable read.",
+            "qty = 10. T1 reads 10, T2 reads 10, T1 writes 15 (add 5), T2 writes 7 (subtract 3). Final 7. What was lost? Would strict 2PL allow this?",
           steps: [
-            "T1’s predicate is a range (all trades of one ISIN on one day), not a single row identified by primary key.",
-            "The extra row did not exist at the first count. A new row matching the predicate is a phantom.",
-            "A non-repeatable read would be an existing trade row whose qty changed between the two scans. Here no existing row changed; a new one appeared.",
-            "ANSI REPEATABLE READ locks the rows that were found, but not the “gaps” where a new trade could be inserted, so phantoms can remain. SERIALIZABLE (predicate/next-key locks) forbids them.",
-            "COUNT(*) is the exam’s favourite phantom vehicle because the result changes even though every previously seen trade_id is unchanged.",
-            "If T2 had deleted one of the original four trades, some textbooks still call that a phantom (predicate result set changed); others call a delete of a previously read row a non-repeatable read. For an insert into a range, the name is unambiguously phantom.",
+            {
+              do: "Net should be 10+5−3 = 12. T2’s write of 7 based on stale 10 wiped T1’s +5. Lost update.",
+              why: "Two people edit the same scoreboard from the same photo.",
+            },
+            {
+              do: "Under strict 2PL, T1 keeps an exclusive lock until commit, so T2 waits, then computes 15−3 = 12.",
+              why: "Locks force a turn. Blind last-write-wins is not a turn.",
+            },
+            {
+              do: "Exam fix: UPDATE position SET qty = qty + :delta in one statement.",
+              why: "Let the engine add atomically instead of read–think–write.",
+            },
           ],
           result:
-            "Phantom insert into T1’s ISIN-day predicate. SERIALIZABLE is the ANSI level that forbids it.",
-        },
-        {
-          title: "Lost update on a position qty",
-          prompt:
-            "Position qty starts at 10. T1 reads 10, T2 reads 10, T1 writes 10+5 = 15 and commits, T2 writes 10−3 = 7 and commits. Final qty is 7. What was lost, and would the same schedule under SERIALIZABLE 2PL be allowed?",
-          steps: [
-            "Both transactions based their write on the same original 10. T1’s +5 is overwritten by T2’s write of 7. The net should have been 10+5−3 = 12. That is a lost update.",
-            "T2 did not read T1’s 15, so this is not a dirty read. T2 never re-read, so it is not a non-repeatable read from T2’s point of view. No extra row appeared, so not a phantom.",
-            "Under strict 2PL, T1 would hold an exclusive lock on the row from its write until commit. T2’s write would block until T1 commits, then T2 would re-read (or be aborted/restarted) and compute 15−3 = 12.",
-            "A serial order T1 then T2 yields 12; T2 then T1 yields 10−3+5 = 12 as well in this additive case. The concurrent last-write-wins schedule is not equivalent to either serial order if T2 blindly writes 7 based on the stale 10.",
-            "Snapshot isolation can still lose updates of this form unless the engine adds first-committer-wins checks on the same row (write-write detection).",
-            "Exam fix: UPDATE position SET qty = qty + :delta (one atomic statement) rather than read-compute-write in two statements.",
-          ],
-          result:
-            "Lost update: final 7 instead of 12. Strict 2PL would serialise the two writes; a blind write of 7 is not conflict-serialisable with T1’s write of 15.",
+            "Lost update: 7 instead of 12. Strict 2PL would serialise the writes. Prefer qty = qty + :delta.",
         },
       ],
     },
     {
-      heading: "Conflict serialisability, 2PL versus strict 2PL, OCC",
-      body: "Two operations conflict if they belong to different transactions, touch the same object, and at least one is a write. A schedule is conflict serialisable (CSR) when its conflict graph (precedence graph) is acyclic: put an edge Ti → Tj if an operation of Ti precedes a conflicting operation of Tj. Any topological order of an acyclic graph is an equivalent serial order. View serialisability is strictly weaker and is NP-complete to test; GATE almost always wants the conflict graph.\n\nTwo-phase locking (2PL): a transaction has a growing phase (locks only) and then a shrinking phase (unlocks only). Once it has unlocked anything it may not lock again. 2PL guarantees CSR, but it still allows cascading aborts: T2 may read a value T1 wrote, then T1 may abort after T2 unlocked something else. Strict 2PL holds all exclusive locks until commit or abort, which prevents cascading aborts and produces a recoverable, cascadeless, strict schedule. Rigorous 2PL holds both shared and exclusive locks until the end.\n\n2PL can deadlock. Wait-die and wound-wait are timestamp deadlock-prevention schemes; detection uses a waits-for graph. Timestamp ordering and Thomas’ write rule are lock-free alternatives that GATE still asks.\n\nOptimistic concurrency control (OCC, Kung–Robinson) runs three phases: read (work on private copies), validate (check that no conflicting committed transaction overlapped in a dangerous way), write (publish copies if validation passes). OCC shines when conflicts are rare; under contention it aborts a lot. Validation can be backward (compare with already committed transactions) or forward (compare with currently running ones).",
+      heading: "Conflict serialisability and 2PL",
+      body: "Two operations conflict if they are from different transactions, touch the same cell, and at least one writes. Draw a conflict graph: arrow Ti → Tj if Ti’s conflicting op happens first. If the graph has no cycle, the schedule is conflict serialisable (CSR) — it matches some one-at-a-time order.\n\nTwo-phase locking (2PL) is “grow then shrink”: take locks, then (later) release them; never lock again after the first unlock. 2PL guarantees CSR. Strict 2PL keeps write locks until commit, so nobody reads ink that might be undone. Optimistic control (OCC) works on a private copy, then checks; if someone else committed a clash, you abort and retry.",
+      howTo: [
+        "List every pair of ops on the same object where one is a write. Draw Ti → Tj for “i first”.",
+        "Cycle ⇒ not CSR. No cycle ⇒ any topological order is an equivalent serial order.",
+        "2PL check: any lock after an unlock? If yes, not 2PL. Strict: any write-unlock before commit? If yes, not strict.",
+        "OCC: abort if a committed writer touched something you read.",
+      ],
       bullets: [
-        "CSR ⇔ acyclic conflict graph. Edge Ti → Tj when Ti’s conflicting op precedes Tj’s.",
-        "2PL ⇒ CSR. Strict 2PL: hold X-locks until commit (no cascading abort).",
-        "OCC: read → validate → write; abort on failed validation instead of blocking.",
+        "CSR ⇔ acyclic conflict graph.",
+        "2PL ⇒ CSR. Strict 2PL: hold X-locks until commit (no cascade abort).",
+        "OCC: read → validate → write; abort on overlap instead of waiting.",
       ],
       examples: [
         {
-          title: "Precedence graph of r1(A) w2(A) w1(A) c1 c2",
-          prompt:
-            "Schedule S: r1(A); w2(A); w1(A); c1; c2. Build the conflict graph, decide CSR, and name a serial order if one exists.",
+          title: "A two-cycle is not CSR",
+          prompt: "S: r1(A); w2(A); w1(A); c1; c2. CSR or not?",
           steps: [
-            "Operations on A: r1, w2, w1. Pairs that conflict: r1 with w2 (rw), r1 with w1 is the same transaction so ignore, w2 with w1 (ww).",
-            "r1(A) precedes w2(A) and they conflict ⇒ edge T1 → T2.",
-            "w2(A) precedes w1(A) and they conflict ⇒ edge T2 → T1.",
-            "The graph is T1 ⇄ T2, a two-cycle. Cyclic ⇒ S is not conflict serialisable.",
-            "There is therefore no serial order T1;T2 or T2;T1 that is conflict-equivalent to S. (T1;T2 would have both of T1’s ops before T2’s write; S interleaves them.)",
-            "Commits at the end do not remove conflict edges. Recoverability is a different question: T2 writes A and later T1 overwrites A; T2’s write is never read by T1, so dirty-read recoverability is not the issue here — CSR already failed.",
+            {
+              do: "Conflicts: r1 with w2 (T1 → T2), and w2 with w1 (T2 → T1).",
+              why: "Read-write and write-write on A both count. Same-transaction pairs do not.",
+            },
+            {
+              do: "Graph is a two-cycle. Not CSR.",
+              why: "A cycle means “T1 before T2 and T2 before T1” — no one-at-a-time story matches.",
+            },
+            {
+              do: "Commits at the end do not erase conflict arrows.",
+              why: "CSR is about the order of reads and writes, not about who said “done” last.",
+            },
           ],
-          result:
-            "Cycle T1 → T2 → T1 from the rw and ww pairs on A; S is not conflict serialisable.",
+          result: "Cycle T1 ⇄ T2. S is not conflict serialisable.",
         },
         {
-          title: "An acyclic graph and its serial order",
+          title: "2PL versus strict 2PL",
           prompt:
-            "S: r1(A); w1(A); r2(A); w2(B); r3(B); c1; c2; c3. Draw the conflict graph and give every serial equivalent.",
+            "T1: lock-X(A); w(A); unlock(A); lock-X(B); w(B); unlock(B); commit. Is this 2PL? Strict? Can T2 dirty-read A?",
           steps: [
-            "List conflicting pairs across transactions. On A: w1(A) precedes r2(A) (wr) ⇒ edge T1 → T2. r1(A) with r2(A) is read-read, not a conflict.",
-            "On B: w2(B) precedes r3(B) (wr) ⇒ edge T2 → T3. No other B operations exist.",
-            "There is no pair of conflicting operations that would draw T2 → T1, T3 → T2, T3 → T1, or T1 → T3 directly. The graph is the chain T1 → T2 → T3.",
-            "The graph is acyclic, so S is conflict serialisable. The only topological order is T1 then T2 then T3.",
-            "Serial equivalent: T1; T2; T3. T2; T1; T3 is illegal because of T1 → T2. T1; T3; T2 is illegal because of T2 → T3.",
-            "Always scan every object. A second object can add a reverse edge and kill CSR even when the first object looked serial; here B only lengthens the same chain.",
+            {
+              do: "T1 unlocked A then locked B. That is not two-phase at all.",
+              why: "2PL is one growing phase then one shrinking phase — like putting all padlocks on before you start taking any off.",
+            },
+            {
+              do: "Rewrite: lock A and B first, write, then unlock. That is 2PL. Unlocking A before commit is still not strict 2PL.",
+              why: "Strict means write-locks stay until the stamp of commit, so nobody copies ink that might be rubbed out.",
+            },
+            {
+              do: "After an early unlock of A, T2 can read uncommitted A and may have to abort if T1 aborts (cascade).",
+              why: "That is why exams pair “2PL ⇒ CSR” with “strict 2PL ⇒ no cascading abort”.",
+            },
           ],
           result:
-            "Acyclic chain T1 → T2 → T3; S is conflict-equivalent only to the serial order T1; T2; T3.",
+            "Lock after unlock is not 2PL. Unlock-X before commit is 2PL but not strict; T2 can dirty-read A.",
         },
         {
-          title: "2PL allowed versus strict 2PL rejected",
+          title: "OCC validation fails",
           prompt:
-            "T1: lock-X(A); w(A); unlock(A); lock-X(B); w(B); unlock(B); commit. Is this 2PL? Is it strict 2PL? Can T2 dirty-read A after the first unlock?",
+            "T1 and T2 both OCC-read margin=8. T1 validates, writes 12, commits. T2 then validates. Does T2 commit?",
           steps: [
-            "2PL growing/shrinking: T1 unlocked A and then locked B. A lock after an unlock violates the two-phase rule. So this is not 2PL at all.",
-            "Rewrite as T1': lock-X(A); lock-X(B); w(A); w(B); unlock(A); unlock(B); commit. Now all locks precede all unlocks: 2PL holds.",
-            "Strict 2PL additionally forbids releasing an X-lock before commit. T1' unlocks A before commit, so T1' is 2PL but not strict 2PL.",
-            "After T1' unlocks A, T2 can lock-S(A) and read the uncommitted write. If T1' then aborts, T2 has dirty-read and may have to cascade-abort.",
-            "Strict 2PL keeps X-locks until commit: T2 cannot read A until T1' commits (or aborts and restores A). Cascading aborts disappear.",
-            "Exam pair: 2PL ⇒ conflict serialisable; strict 2PL ⇒ 2PL + cascadeless + recoverable. Rigorous 2PL also holds S-locks until the end.",
+            {
+              do: "T1 had no committed rival, so T1 writes 12.",
+              why: "OCC does not lock during the read; it bets that clashes are rare.",
+            },
+            {
+              do: "T2’s read-set includes M1, T1’s write-set includes M1, and T1 committed in T2’s window. Validation fails. T2 aborts.",
+              why: "RS(T2) ∩ WS(T1) ≠ ∅. Same lost-update pattern, caught at check time instead of with locks.",
+            },
+            {
+              do: "T2 may restart and now read 12.",
+              why: "Retry is the OCC “wait” — you throw away the private copy.",
+            },
           ],
           result:
-            "Lock after unlock is not 2PL. Unlock-X before commit is 2PL but not strict; T2 can dirty-read A and cascade.",
-        },
-        {
-          title: "OCC validation on two overlapping margin updates",
-          prompt:
-            "Both T1 and T2 run OCC on member M1. Timeline: T1-read (margin=8), T2-read (margin=8), T1-validate-write (sets 12, commits), T2-validate. Backward-validate T2 against committed T1. Does T2 commit?",
-          steps: [
-            "OCC read phase: each transaction copies M1 into private storage and computes a new margin. No locks during read.",
-            "T1 validates first. No overlapping committed writer on M1, so T1 writes 12 and commits. T1’s write-set = {M1}.",
-            "T2 now validates. Backward validation asks: did any transaction that committed during T2’s read phase write an object T2 read? Yes: T1 committed, wrote M1, and M1 is in T2’s read-set.",
-            "Validation fails. T2 aborts, discards its private copy, and may restart, this time reading margin=12.",
-            "If T2 had been allowed to write 8+3=11, T1’s 12 would be lost — the same lost-update pattern OCC is designed to catch at validate time rather than with locks.",
-            "Forward validation would instead check T2 against still-running transactions; the exam usually wants the read-set/write-set overlap rule: RS(T2) ∩ WS(T1) ≠ ∅ with T1 committed in T2’s window ⇒ abort T2.",
-          ],
-          result:
-            "T2 fails validation (RS(T2) ∩ WS(T1) = {M1}) and aborts; T1’s committed write of 12 stands.",
+            "T2 fails validation (overlap on M1) and aborts. T1’s 12 stands.",
         },
       ],
     },

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { CodeBlock } from "@/components/practice-session";
 import { Button } from "@/components/ui/button";
 import type { TopicNote } from "@/data/notes";
-import { noteStats } from "@/data/notes";
+import { noteStats, stepDo, stepWhy } from "@/data/notes";
 
 function Paragraphs({ text }: { text: string }) {
   const parts = text.split(/\n\n+/).map((p) => p.trim()).filter(Boolean);
@@ -34,7 +34,7 @@ export function NoteArticle({
           {note.blurb}
         </p>
         <p className="mt-2 text-xs text-muted-foreground">
-          {stats.sections} sections · {stats.examples} worked examples
+          {stats.sections} techniques · {stats.examples} worked examples
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Button asChild>
@@ -51,12 +51,29 @@ export function NoteArticle({
           <div className="mt-3">
             <Paragraphs text={b.body} />
           </div>
+          {b.howTo?.length ? (
+            <div className="mt-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
+              <p className="text-xs tracking-wide text-primary uppercase">
+                How to solve — do this every time
+              </p>
+              <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed">
+                {b.howTo.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ol>
+            </div>
+          ) : null}
           {b.bullets?.length ? (
-            <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-relaxed">
-              {b.bullets.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
+            <div className="mt-3">
+              <p className="text-xs tracking-wide text-muted-foreground uppercase">
+                Remember
+              </p>
+              <ul className="mt-1.5 list-disc space-y-1.5 pl-5 text-sm leading-relaxed">
+                {b.bullets.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
           ) : null}
           {b.examples?.map((ex, ei) => (
             <div
@@ -64,22 +81,46 @@ export function NoteArticle({
               className="mt-5 rounded-lg border bg-background p-4"
             >
               <p className="text-xs tracking-wide text-muted-foreground uppercase">
-                Example {ei + 1}
+                Example {ei + 1} of {b.examples?.length ?? 0}
               </p>
               <h3 className="mt-1 font-heading text-lg">{ex.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed">{ex.prompt}</p>
+              <p className="mt-2 text-sm leading-relaxed">
+                <span className="font-medium">Question. </span>
+                {ex.prompt}
+              </p>
               {ex.code ? (
                 <div className="mt-3">
                   <CodeBlock code={ex.code} language={ex.language} />
                 </div>
               ) : null}
-              <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed">
-                {ex.steps.map((step, si) => (
-                  <li key={si}>{step}</li>
-                ))}
+              <p className="mt-3 text-xs tracking-wide text-muted-foreground uppercase">
+                Steps
+              </p>
+              <ol className="mt-2 space-y-3">
+                {ex.steps.map((step, si) => {
+                  const why = stepWhy(step);
+                  return (
+                    <li key={si} className="flex gap-3 text-sm leading-relaxed">
+                      <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-md bg-muted font-mono text-xs">
+                        {si + 1}
+                      </span>
+                      <div className="min-w-0">
+                        <p>{stepDo(step)}</p>
+                        {why ? (
+                          <p className="mt-1 text-muted-foreground">
+                            <span className="font-medium text-foreground/80">
+                              Why.{" "}
+                            </span>
+                            {why}
+                          </p>
+                        ) : null}
+                      </div>
+                    </li>
+                  );
+                })}
               </ol>
               <p className="mt-3 rounded-md bg-muted px-3 py-2 text-sm">
-                <span className="font-medium">Answer. </span>
+                <span className="font-medium">Final answer. </span>
                 {ex.result}
               </p>
             </div>

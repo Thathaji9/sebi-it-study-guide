@@ -2,483 +2,621 @@ import type { TopicNote } from "@/data/notes";
 
 export const notesEnglish: TopicNote = {
   topic: "english",
-  title: "English for SEBI Paper 1 — worked notes",
+  title: "English — techniques (beginner)",
   blurb:
-    "Phase I English is a 25-mark screening slice: error spotting, fillers, para jumbles, vocabulary, and a short RC. The same habits — agreement, articles, parallel lists, and the difference between an inference and a printed fact — also feed Phase II descriptive precis. Work every example as a five-step elimination, not as a vibe.",
+    "Seven simple techniques for exam English. Match the verb to the real subject. Pick a, an, or the. Find the one error. Fill a blank in a money sentence. Put jumbled sentences in order. In a passage, split fact, inference, and tone. For a precis, cut extra stories, keep the numbers, keep the main claim.",
   blocks: [
     {
-      heading: "Subject–verb agreement — find the true subject first",
-      body: "Bank-exam English treats agreement as a hunting sport: the verb agrees with the grammatical head, not with the nearest noun. A prepositional phrase, an ‘along with’ tail, or a relative clause can sit between the head and the verb and still not steal the number. ‘The quality of the disclosures is poor’ — quality is singular, disclosures is a decoy. ‘The Chairperson, together with the whole-time members, has issued’ — together with / along with / as well as / besides does not make a compound subject; the first noun still governs.\n\nIndefinite pronouns are mostly singular in this paper: each, every, everyone, everybody, anyone, someone, nobody, either, neither. ‘Neither of the reports is complete’ is the expected form: neither is singular; of the reports is a prepositional phrase with a plural object. ‘Either of the two circulars is’ follows the same pattern. When two subjects are joined by or / nor, the verb follows the nearer subject: ‘Neither the trustees nor the AMC has’ versus ‘Neither the AMC nor the trustees have’.\n\nCollective nouns (board, committee, management) take a singular verb when the unit acts as one: ‘The Board has notified.’ A plural is used only when the members are clearly acting separately, which Paper 1 almost never wants. ‘A number of intermediaries have’ (plural) versus ‘The number of intermediaries has’ (singular) is a fixed pair. ‘The data are’ versus ‘the data is’ is messy in real English; many keys still prefer plural data, but a safer exam move is to look at what the options actually test — usually agreement with number / none / each, not a linguistics debate.\n\nAmounts, distances, and time periods that are conceived as one lump take singular: ‘Five crore rupees is a material loss’ in exam English. Titles and names of regulations are singular: ‘The PIT Regulations is a plural-looking title but the paper will usually recast it as ‘The PIT framework is’. Prefer rewriting in your head: ‘This regulation is’ rather than fighting the surface plural.",
+      heading: "Subject–verb agreement",
+      body: "The verb must match the real subject, not the nearest noun. A phrase in the middle does not steal the number. In ‘The quality of the reports is poor’, the head word is quality (one thing), so the verb is is, not are.\n\nIgnore tails like along with, together with, as well as, and besides. ‘The Chairperson, along with the members, has signed’ — Chairperson is still one person, so has is right.\n\nWords like each, every, everyone, neither, and either take a singular verb in this exam. ‘Neither of the reports is complete.’ When two names are joined by or or nor, the verb follows the nearer name: ‘Neither the trustees nor the AMC has’ but ‘Neither the AMC nor the trustees have’.\n\nA number of means many, so the verb is plural. The number of is one figure, so the verb is singular.",
+      howTo: [
+        "Underline the real subject. Cross out of-phrases and along-with tails.",
+        "Ask: is that head word one thing or many?",
+        "Match the verb: one → is/has/was; many → are/have/were.",
+        "If you see or / nor, match the verb to the name closest to it.",
+        "Check the pair a number of (plural) versus the number of (singular).",
+      ],
       bullets: [
-        "Ignore of-phrases: the quality of X is; neither of X is.",
-        "along with / together with / as well as → first noun still rules.",
-        "or / nor → verb follows the nearer subject.",
+        "The verb agrees with the head, not the nearest noun.",
+        "along with / together with / as well as do not make a plural subject.",
+        "neither / either / each are singular here.",
         "a number of = plural; the number of = singular.",
       ],
       examples: [
         {
           title: "Neither of + plural noun",
           prompt:
-            "Identify the error: ‘Neither of the reports are complete.’ (A) No error (B) ‘Neither’ is singular; use ‘is’ (C) ‘Reports’ should be ‘report’ (D) ‘Complete’ should be ‘completed’ only.",
+            "Find the error: ‘Neither of the reports are complete.’ (A) No error (B) Change are to is (C) Change reports to report (D) Change complete to completed.",
           steps: [
-            "Isolate the true subject. ‘Neither’ is the head; ‘of the reports’ is a prepositional phrase. The head is singular in standard exam English.",
-            "The verb ‘are’ is plural. It disagrees with ‘neither’. That is the error.",
-            "Test (A): ‘No error’ fails because a singular head cannot take ‘are’ here.",
-            "Test (C): ‘Neither of’ requires a plural noun after of (the set from which none is taken). Changing reports → report is ungrammatical. (C) fails.",
-            "Test (D): ‘complete’ is a correct predicative adjective. ‘Completed’ would want a passive or a perfect (‘has been completed’). (D) fails. Therefore (B).",
+            {
+              do: "Find the real subject. It is Neither, not reports.",
+              why: "of the reports is only a phrase that names the group. The head word is still neither, which is one.",
+            },
+            {
+              do: "Check the verb. are is a plural verb.",
+              why: "A singular head cannot take are. That mismatch is the error.",
+            },
+            {
+              do: "Test (C). Keep reports plural after of.",
+              why: "You pick from a group, so the noun after of stays plural. Changing it to report is wrong.",
+            },
+            {
+              do: "Test (D). Keep complete as an adjective.",
+              why: "complete describes the reports. completed would need a different grammar, like has been completed.",
+            },
+            {
+              do: "Pick (B): Neither of the reports is complete.",
+              why: "Fix the verb only. The rest of the sentence is already fine.",
+            },
           ],
           result:
-            "(B) Neither of the reports is complete. ‘Neither’ singular; ‘reports’ stays plural; ‘complete’ stays an adjective.",
+            "(B) Neither of the reports is complete. Neither is singular; reports stays plural.",
         },
         {
-          title: "Along with does not pluralise",
+          title: "Along with does not make a plural",
           prompt:
-            "Pick the correct sentence. (A) The Chairperson, along with the whole-time members, have signed the order. (B) The Chairperson, along with the whole-time members, has signed the order. (C) The Chairperson along with the whole-time members have signed the order. (D) The Chairperson, along with the whole-time members, are signing the order as a team so the verb is plural.",
+            "Pick the correct sentence. (A) The Chairperson, along with the members, have signed the order. (B) The Chairperson, along with the members, has signed the order. (C) The Chairperson along with the members have signed the order.",
           steps: [
-            "Head noun: Chairperson (singular). The phrase ‘along with the whole-time members’ is parenthetical, not a compound subject.",
-            "(A) uses ‘have’ — plural verb, wrong agreement. Eliminate.",
-            "(C) drops commas and still uses ‘have’. Same agreement fault.",
-            "(D) invents a ‘team so plural’ rule. Exam English does not convert along-with into and. Eliminate.",
-            "(B) keeps ‘has’ with Chairperson. That is the required form.",
+            {
+              do: "Name the head: Chairperson.",
+              why: "along with the members is extra information. It is not a second subject joined by and.",
+            },
+            {
+              do: "Drop (A) and (C) because they use have.",
+              why: "have is plural. The head is one person, so the verb must be has.",
+            },
+            {
+              do: "Keep (B): …has signed the order.",
+              why: "has matches Chairperson. The commas around along with also mark it as extra, not a compound subject.",
+            },
           ],
           result:
-            "(B) The Chairperson, along with the whole-time members, has signed the order.",
+            "(B) The Chairperson, along with the members, has signed the order.",
         },
         {
           title: "A number of versus the number of",
           prompt:
-            "Fill the verbs: ‘A number of FPIs ___ filed; the number of FPIs ___ risen.’ (A) has, have (B) have, has (C) have, have (D) has, has.",
+            "Fill both verbs: ‘A number of funds ___ filed; the number of funds ___ risen.’ (A) has, have (B) have, has (C) have, have (D) has, has.",
           steps: [
-            "‘A number of + plural’ means ‘many’ and takes a plural verb: have filed.",
-            "‘The number of + plural’ means a single figure and takes a singular verb: has risen.",
-            "(A) reverses both. (C) makes the number plural. (D) makes a number singular.",
-            "Only (B) pairs have with a number of, has with the number of.",
-            "Apply the same split to ‘a number of intermediaries were inspected’ / ‘the number of intermediaries was 412’.",
+            {
+              do: "Read a number of funds as many funds.",
+              why: "In exam English, a number of + plural noun takes a plural verb. So the first blank is have.",
+            },
+            {
+              do: "Read the number of funds as one figure.",
+              why: "the number is a single count, so the second blank is has.",
+            },
+            {
+              do: "Pick (B). Reject the others.",
+              why: "(A) swaps both. (C) makes the number plural. (D) makes a number singular.",
+            },
           ],
           result:
-            "(B) A number of FPIs have filed; the number of FPIs has risen.",
-        },
-        {
-          title: "Neither…nor nearer-subject rule",
-          prompt:
-            "Choose: (A) Neither the trustees nor the AMC have issued the addendum. (B) Neither the trustees nor the AMC has issued the addendum. (C) Neither the AMC nor the trustees has issued the addendum. (D) Neither of the two has issued, so both (B) and (C) must be wrong.",
-          steps: [
-            "With neither…nor the verb agrees with the nearer subject, not with a blended plural.",
-            "In (A) the nearer subject is AMC (singular) but the verb is have (plural). Fault.",
-            "In (B) nearer subject AMC + has. Agreement holds.",
-            "In (C) nearer subject is trustees (plural) but the verb is has (singular). Fault. (The reverse order would need have: Neither the AMC nor the trustees have…)",
-            "(D) confuses ‘neither of’ (singular pronoun) with ‘neither…nor’ (two subjects). It is not a reason to reject (B). Answer (B).",
-          ],
-          result:
-            "(B) Neither the trustees nor the AMC has issued the addendum. Flip the order and the verb would become have.",
+            "(B) A number of funds have filed; the number of funds has risen.",
         },
       ],
     },
     {
-      heading: "Error spotting — articles, prepositions, parallelism",
-      body: "Error-spot items usually hide in three pockets. Articles: use a/an for a non-unique countable, the for a unique or previously identified noun, and zero article for bare plurals and most mass nouns in general statements. ‘The SEBI Act, 1992’ takes the because it is a unique statute. ‘Investors require disclosure’ needs no article before investors in the generic sense. ‘An UPSI’ is wrong: UPSI begins with a vowel sound, so ‘an unpublished…’, but the abbreviation is usually ‘UPSI’ spoken as letters (you-pee-ess-eye) — exam keys still expect ‘UPSI’ without an, or ‘an unpublished price-sensitive…’. Safer: ‘the communication of UPSI’.\n\nPrepositions in official English are collocational, not logical. A circular is issued to intermediaries (recipients), issued by SEBI (author), issued for a purpose, issued under a regulation (legal source). Eligible for a benefit; comply with a regulation; prohibit someone from doing; differ from; interested in; according to; in accordance with. ‘Comply to’ and ‘according with’ are the usual traps. ‘Comprise of’ is disliked; ‘comprise’ or ‘consist of’ is cleaner.\n\nParallelism requires the same grammatical shape after a coordinator or in a list. ‘The Board seeks to protect investors, to promote development, and to regulate the market’ — three infinitives. Breaking the chain (‘protect investors, promoting development, and regulation’) is the error. After not only…but also, the structure after each marker must match: not only the prospectus but also the advertisements; not only filed but also disseminated. Comparisons with as / than need a comparable noun: ‘The T+1 cycle is shorter than the T+2 cycle’, not ‘shorter than T+2 was having’.\n\nWhen four options label parts of a sentence (A)(B)(C)(D), read once for sense, once for agreement, once for article/preposition, once for parallel lists. If two faults exist, the question usually points at the first underlined slot; this paper’s items are mostly single-error. ‘No error’ is real, but it is rarer than candidates hope.",
+      heading: "Articles — a, an, the",
+      body: "Use a or an for one non-unique countable thing. Use a before a consonant sound (a circular, a union, a SEBI report). Use an before a vowel sound (an order, an hour, an IPO). The letter that starts the word is not the test — the sound is. hour starts with a vowel sound, so an hour. union starts with a ‘y’ sound, so a union.\n\nUse the when the listener can tell which one you mean: a unique thing (the SEBI Act), something already named, or the only one in that context (the Chairperson of SEBI).\n\nUse no article for a general plural or a general mass noun: Investors need disclosure. Information is power. Do not write the investors when you mean investors in general.\n\nA unique law takes the, not a: the SEBI Act, 1992 — not a SEBI Act.",
+      howTo: [
+        "Ask: is this one countable thing, a unique named thing, or a general group?",
+        "One new countable thing → a or an. Unique or already known → the. General plural/mass → no article.",
+        "For a / an, say the next word out loud. Consonant sound → a. Vowel sound → an.",
+        "Laws, offices, and ‘the only one’ almost always take the.",
+        "Read the full sentence. Do not pick an article that fights the meaning.",
+      ],
       bullets: [
-        "issued to (recipients) / by (author) / under (statute) / for (purpose).",
-        "comply with; prohibit from; eligible for; consist of (not comprise of).",
-        "Lists after and / or / not only…but also must keep the same grammatical form.",
-        "the + unique statute (the SEBI Act); zero article for generic plurals (investors).",
+        "a / an = one, not unique. the = this one, unique or already named.",
+        "Sound, not spelling: an hour, a union, an IPO.",
+        "the SEBI Act (unique law). investors with no article (people in general).",
       ],
       examples: [
         {
-          title: "Issued to / by / under / for",
+          title: "A unique law needs the",
           prompt:
-            "Fill in: ‘The circular was issued _____ all registered intermediaries.’ (A) for (B) to (C) at (D) by for. Explain why the others fail.",
+            "Spot the article error: ‘A SEBI Act requires the investors to read a prospectus.’ (A) A SEBI Act (B) requires (C) the investors (D) a prospectus.",
           steps: [
-            "The blank names the recipients of the circular. The collocation is issued to someone.",
-            "(A) issued for can mark a purpose (‘issued for public comments’), not the addressee list. It fails here.",
-            "(C) issued at wants a place or time (‘issued at Mumbai’ / ‘issued at 9 a.m.’), not persons. It fails.",
-            "(D) by for is not English. Issued by would name the author (SEBI), but the stem already has ‘was issued’ and wants recipients.",
-            "Therefore (B) to. Memory pair: issued by SEBI to intermediaries under the SEBI Act for compliance.",
+            {
+              do: "Look at A SEBI Act. There is only one such statute.",
+              why: "A unique law takes the, not a. So (A) is the designed error.",
+            },
+            {
+              do: "Check the investors. The sentence means investors in general.",
+              why: "A general plural takes no article: requires investors. This can be a second weak spot, but the first slot is the clear error.",
+            },
+            {
+              do: "Keep a prospectus. It is one countable document, not yet unique.",
+              why: "The reader does not know which prospectus yet, so a is right.",
+            },
+            {
+              do: "Write the fix: The SEBI Act requires investors to read a prospectus.",
+              why: "the for the unique Act; zero article for generic investors; a for one prospectus.",
+            },
           ],
           result:
-            "(B) to. Recipients take to; author takes by; statute takes under; purpose takes for.",
+            "Error in (A): say the SEBI Act, not a SEBI Act. Generic investors need no the.",
         },
         {
-          title: "Article before a unique statute and a generic plural",
+          title: "A versus an — listen to the sound",
           prompt:
-            "Spot the error: ‘A SEBI Act requires the investors to read a prospectus before applying.’ Parts: (A) A SEBI Act (B) requires (C) the investors (D) to read a prospectus before applying.",
+            "Fill the blanks: ‘SEBI issued ___ order after ___ hour of debate on ___ union of two schemes.’ (A) a, a, an (B) an, an, a (C) an, a, a (D) a, an, an.",
           steps: [
-            "The statute is unique: the SEBI Act, not a SEBI Act. (A) is the article error.",
-            "(B) requires agrees with a singular Act. If we correct (A) to The SEBI Act, requires stays fine.",
-            "(C) the investors forces a specific set. Generic investors usually take zero article: ‘requires investors to read’. This can be a second fault, but the underlined first slot is the designed error.",
-            "(D) is a correct infinitive of purpose after require X to-infinitive.",
-            "Corrected sentence: ‘The SEBI Act requires investors to read a prospectus before applying.’ Why (A) fails: indefinite article on a unique proper statute.",
+            {
+              do: "Say order. It starts with a vowel sound (or-).",
+              why: "Vowel sound → an order.",
+            },
+            {
+              do: "Say hour. The h is silent.",
+              why: "You hear our, a vowel sound → an hour, not a hour.",
+            },
+            {
+              do: "Say union. It starts with a ‘y’ sound (you-nion).",
+              why: "Consonant sound → a union, even though the letter is u.",
+            },
+            {
+              do: "Pick (B): an order, an hour, a union.",
+              why: "The test is sound, not the first letter on the page.",
+            },
           ],
-          result:
-            "Error in (A): unique statute needs the, not a. Generic ‘investors’ is cleaner without the.",
+          result: "(B) an order; an hour; a union.",
         },
         {
-          title: "Parallelism in a three-part statutory list",
+          title: "The for a named office, zero for a mass noun",
           prompt:
-            "Which is parallel? (A) SEBI shall protect investors, promoting markets, and regulation of intermediaries. (B) SEBI shall protect investors, promote markets, and regulate intermediaries. (C) SEBI shall protect investors, to promote markets, and regulating intermediaries. (D) SEBI shall protection of investors, promote markets, and regulate intermediaries.",
+            "Choose: (A) Chairperson issued information to public. (B) The Chairperson issued the information to the public. (C) The Chairperson issued information to the public. (D) A Chairperson issued an information to public.",
           steps: [
-            "After shall we need a base-form verb chain: protect / promote / regulate.",
-            "(A) mixes a verb (protect) with a participle (promoting) and a noun (regulation). Parallelism fails.",
-            "(C) mixes to-infinitive and participle after a bare verb. Fails.",
-            "(D) starts with a noun (protection) after shall — ungrammatical — then returns to verbs. Fails.",
-            "(B) keeps three bare infinitives (the shall is shared). That is the parallel form of the SEBI preamble duties.",
+            {
+              do: "The sentence means SEBI’s Chairperson, a unique office here.",
+              why: "That office takes the. Bare Chairperson in (A) is too bald for this exam style.",
+            },
+            {
+              do: "information is a mass noun. You do not say an information.",
+              why: "(D) is wrong for that reason. information usually takes no article when it means news in general.",
+            },
+            {
+              do: "the public is a set phrase for people as a group.",
+              why: "Exam English prefers the public, not public alone, in this slot.",
+            },
+            {
+              do: "Prefer (C) over (B).",
+              why: "(B) makes the information sound like one already-known packet. (C) keeps information general and still names the office and the public.",
+            },
           ],
           result:
-            "(B) protect, promote, and regulate — three verbs sharing shall.",
-        },
-        {
-          title: "Not only…but also and a preposition trap",
-          prompt:
-            "Spot the fault: ‘The intermediary must not only comply to the PIT code but also the LODR filings.’ Why each repair option succeeds or fails.",
-          steps: [
-            "Two faults can sit together: comply to is the wrong preposition (needs with), and not only…but also is not parallel (verb phrase versus noun phrase).",
-            "Repair of preposition only: ‘comply with the PIT code but also the LODR filings’ — still unparallel, because not only takes a verb phrase and but also takes a noun.",
-            "Repair of parallelism only: ‘not only comply to the PIT code but also file the LODR filings’ — still contains comply to.",
-            "Full repair: ‘must not only comply with the PIT code but also file the LODR returns’ (verb + with-phrase // verb + noun) or ‘must comply with not only the PIT code but also the LODR filings’ (two nouns after with).",
-            "If options offer ‘No error’, reject. If they offer ‘replace to with with’, that may be the keyed error when only one slot is underlined. Always check parallelism as a second pass.",
-          ],
-          result:
-            "comply with (not to). Keep the same shape after not only and but also — two verbs or two nouns, not a mix.",
+            "(C) The Chairperson issued information to the public. Unique office → the; mass noun → no article.",
         },
       ],
     },
     {
-      heading: "Fillers — collocation, grammar, and one-word logic",
-      body: "Cloze / filler items are three different games sold in one packet. Single-blank grammar fillers test articles, prepositions, conjunctions, and agreement: the answer must fit the syntax on both sides. Double-blank vocabulary fillers test collocation pairs (mitigate risk, disclose material facts, conduct surveillance, a prudent investor). Phrase fillers test connectors: however (contrast), moreover (addition), therefore (result), unless (negative condition), lest (negative purpose — rare and formal).\n\nRead the whole sentence before looking at options. Then cancel options that break grammar even if they are thematically related. ‘The regulation aims at prohibit insider trading’ is a grammar fail (aims at + -ing, or aims to + infinitive). ‘The regulation aims to prohibit insider trading’ or ‘aims at prohibiting’. Do not pick prohibit just because the GA fact is true.\n\nTone of official English is Latinate and dry: issued, notified, prescribed, deemed, pursuant to, in so far as. Slang (gutted, slammed, axed) is almost never the filler in a SEBI-flavoured sentence. If two synonyms remain, pick the one that matches the legal register: ‘material’ not ‘juicy’; ‘adverse’ not ‘nasty’; ‘mitigate’ not ‘fix up’.\n\nFor paired blanks, solve the easier blank first. If blank two must be a noun because it follows the, you have already killed verb options. Then test collocation: pose a risk, not pose a danger as often; take cognisance of; give effect to; enter into an agreement; pass an order; levy a penalty.",
+      heading: "Error spotting — find the one error",
+      body: "These items hide one fault, not three. Read the sentence once for sense, once for agreement, once for articles, once for a wrong small word (preposition), and once for a broken list.\n\nCommon small-word traps: comply with a rule (not comply to); issued to the people who must follow it; issued by the author; issued under a law; issued for a purpose; prohibit someone from doing; eligible for; consist of.\n\nLists must keep the same shape. After shall you want three verbs: protect, promote, and regulate — not protect, promoting, and regulation. After not only … but also, keep two verbs or two nouns, not a mix.\n\nIf a part looks fine, it may be the ‘no error’ option — but that is rarer than students hope. When two faults exist, the paper usually underlines one slot. Fix that slot.",
+      howTo: [
+        "Read the whole sentence. Do not stop at the first odd word.",
+        "Check the verb against the real subject.",
+        "Check a / an / the.",
+        "Check small words: with, to, by, under, from, for.",
+        "Check lists and not only … but also for the same grammar shape.",
+        "Pick the one underlined fault. Do not rewrite the whole sentence unless asked.",
+      ],
       bullets: [
-        "Fit syntax first, meaning second, official register third.",
-        "aims to + infinitive; aims at + -ing; prohibit X from + -ing.",
-        "Connectors: however ≠ therefore; unless = if not; despite + noun, although + clause.",
-        "Paired blanks: solve the grammatically forced blank first.",
+        "One error is the game. Do not hunt for a second unless two parts are marked.",
+        "comply with; issued to / by / under / for; prohibit from.",
+        "A list after and must stay parallel: three verbs, or three nouns, not a mix.",
       ],
       examples: [
         {
-          title: "Single blank — grammar beats GA knowledge",
+          title: "Wrong small word: comply to",
           prompt:
-            "The Board aims _____ insider trading in listed securities. (A) at prohibit (B) to prohibit (C) prohibiting to (D) for prohibit.",
+            "Spot the error: ‘The broker must comply to the code and file returns on time.’ (A) must (B) comply to (C) the code (D) file returns on time.",
           steps: [
-            "aims to + infinitive is standard; aims at + gerund is also standard. aims at prohibit mixes at with a base verb — ungrammatical.",
-            "(A) at prohibit fails the gerund test. (D) for prohibit is not a collocation of aim.",
-            "(C) prohibiting to has the gerund but then a stray to. It does not complete the clause.",
-            "(B) to prohibit is the clean infinitive complement. The GA fact (SEBI prohibits insider trading) is true, but (A) would still be wrong if you forced the fact into bad grammar.",
-            "Alternate correct sentence not in the options: ‘aims at prohibiting insider trading’. Do not invent it if it is not offered.",
+            {
+              do: "Look at comply to.",
+              why: "The set phrase is comply with a rule. comply to is the error.",
+            },
+            {
+              do: "Keep must, the code, and file returns.",
+              why: "The rest is ordinary formal English. The paper wants the one bad preposition.",
+            },
+            {
+              do: "Write the fix: comply with the code.",
+              why: "with names the rule you follow. to would name a person you go toward, which is the wrong idea.",
+            },
           ],
-          result:
-            "(B) to prohibit. True market facts cannot rescue a broken complement.",
+          result: "Error in (B): comply with, not comply to.",
         },
         {
-          title: "Connector filler — despite versus although versus however",
+          title: "A broken list after shall",
           prompt:
-            "_____ T+1 compressed counterparty risk, operational failures at custodians can still delay pay-in. (A) Despite (B) Although (C) However (D) Because.",
+            "Which sentence is parallel? (A) SEBI shall protect investors, promoting markets, and regulation of intermediaries. (B) SEBI shall protect investors, promote markets, and regulate intermediaries. (C) SEBI shall protect investors, to promote markets, and regulating intermediaries.",
           steps: [
-            "The blank sits at the start of a clause that already has a finite verb (compressed). We need a subordinator that takes a clause, or a preposition that takes a noun.",
-            "(A) Despite takes a noun / -ing, not a finite clause. ‘Despite T+1 compressed…’ is ungrammatical. Despite would need ‘Despite T+1’s compression of…’.",
-            "(C) However is an adverb, not a clause-linker in this slot. ‘However, T+1 compressed…’ would start a new sentence and would also reverse the logic.",
-            "(D) Because would claim that T+1 is the reason operational failures delay pay-in — the opposite of the intended contrast.",
-            "(B) Although correctly marks contrast and takes a clause. Meaning: even though settlement is faster, ops risk remains.",
+            {
+              do: "After shall, look for the same verb shape three times.",
+              why: "shall is shared. The list should be protect / promote / regulate — three base verbs.",
+            },
+            {
+              do: "Drop (A): promoting and regulation break the chain.",
+              why: "One verb, then an -ing word, then a noun is not a matching list.",
+            },
+            {
+              do: "Drop (C): to promote and regulating do not match protect.",
+              why: "You cannot mix a bare verb, a to-verb, and an -ing word in one shall-list.",
+            },
+            {
+              do: "Keep (B).",
+              why: "Three verbs share shall. That is the parallel form.",
+            },
           ],
-          result:
-            "(B) Although. despite + noun; although + clause; however as a sentence adverb; because = cause, not contrast.",
+          result: "(B) protect, promote, and regulate — three verbs sharing shall.",
         },
         {
-          title: "Paired blanks — collocation",
+          title: "Issued to the recipients",
           prompt:
-            "Listed companies must _____ all _____ events to the stock exchanges without delay. (A) hide, trivial (B) disclose, material (C) mitigate, festive (D) surveil, edible.",
+            "Fill in: ‘The circular was issued ___ all registered brokers.’ (A) for (B) to (C) at (D) by.",
           steps: [
-            "Blank 1 is a verb of communication to exchanges. LODR language is disclose / intimate, not hide.",
-            "Blank 2 must be the LODR adjective for price-sensitive or performance-changing events: material. Trivial is the antonym.",
-            "(A) hide + trivial is illegal and illogical. (C) mitigate events is the wrong verb (you mitigate risk, you disclose events); festive is nonsense. (D) surveil is a verb often used of markets, not of companies ‘surveilling events’ to exchanges; edible is comic.",
-            "Check register: disclose material events is the exact official pair.",
-            "Therefore (B). If a later blank used surveillance, that word belongs to the exchange/SEBI watch on trading, not to the company’s filing duty.",
+            {
+              do: "Ask what the blank names. It names the people who receive the circular.",
+              why: "Recipients take issued to.",
+            },
+            {
+              do: "Reject for, at, and by in this slot.",
+              why: "for is a purpose (issued for comments). at is a place or time. by is the author (issued by SEBI).",
+            },
+            {
+              do: "Pick (B) to.",
+              why: "Memory line: issued by SEBI to brokers under the Act for compliance.",
+            },
           ],
           result:
-            "(B) disclose, material. Company filings = disclosure of material events; surveillance is the market-watch word.",
-        },
-        {
-          title: "Unless versus until versus if",
-          prompt:
-            "Trading in the scrip will not resume _____ the exchange lifts the restriction. (A) unless (B) until (C) if (D) lest.",
-          steps: [
-            "The main clause is negative (will not resume). We need the time/condition at which the negative state ends.",
-            "until marks the time boundary: not resume until the lift happens. That matches.",
-            "unless = if not. ‘will not resume unless the exchange lifts’ is actually possible logically (resume only if lift), but the stem’s ‘will not resume ___ the exchange lifts’ without a verb after unless is missing ‘unless + clause’ wait — ‘unless the exchange lifts the restriction’ is a full clause, so unless is grammatical too.",
-            "Prefer until when the idea is a waiting period that ends at a moment. unless is a condition, not a clock. Exam keys for ‘will not…resume ___’ plus a future event usually want until.",
-            "(C) if would yield ‘will not resume if the exchange lifts’ — the opposite. (D) lest = so that not, and takes a subjunctive, wrong meaning. Choose (B) until.",
-          ],
-          result:
-            "(B) until. unless is a negative condition; until is the time-limit after a negative; if here reverses the sense.",
+            "(B) to. Recipients take to; author takes by; law takes under; purpose takes for.",
         },
       ],
     },
     {
-      heading: "Para jumbles — opener, mandatory pair, closer",
-      body: "A four-sentence jumble is solved in a fixed order of tests, never by reading all 24 permutations. First find the opener: a sentence that can start a paragraph. It names a topic without a backwards pronoun (this, these, such, that), without a result marker (therefore, hence, consequently), and without a contrast that presupposes a claim (however, nevertheless) unless the contrast is against common knowledge. General definitional sentences and problem statements make good openers.\n\nSecond, hunt a mandatory pair: two sentences that must sit together because of a pronoun, a demonstrative, a repeated noun with the, a cause-effect (therefore / that is why), or a logical contrast (but the 2022 design…). If B introduces ‘shortening settlement’ and C says ‘that operational stack’, C cannot precede B. Third, find the closer: a therefore / hence / thus sentence, a policy conclusion, or a sentence that names the practical path after the reason has been given.\n\nFourth, test leftover sentences in the holes that remain. Fifth, read the sequence aloud as a paragraph and kill any order that strands a pronoun. In SEBI-flavoured jumbles the content is often T+1, T+0, disclosure, or surveillance; do not let true GA facts override the pronoun chain. A factually correct sentence can still be in the wrong slot.\n\nOpening-sentence standalone questions (‘which should come first?’) use the same opener tests. If two sentences look general, pick the one that the others clearly refer back to. A sentence with therefore is almost never first.",
+      heading: "Fillers and vocabulary in a financial sentence",
+      body: "A blank in a money or market sentence is three tests in one. First the grammar must fit on both sides. Then the meaning must fit. Then the word must sound official, not slang.\n\naims to prohibit is fine. aims at prohibit is not (you need aims at prohibiting, or aims to prohibit). disclose material events is the official pair. hide trivial events is both illegal and the wrong tone.\n\nUseful words: mitigate means reduce a risk (mitigate counterparty risk). disclosure means telling the market a fact you must tell. surveillance means watching trades for tricks. material means important enough to move a decision or a price. prudent means carefully wise.\n\nConnectors: although + a full clause; despite + a noun; however often starts a new sentence; because shows cause, not contrast.",
+      howTo: [
+        "Read the whole sentence before you open the options.",
+        "Kill any option that breaks grammar, even if the fact sounds true.",
+        "Then pick the word that matches the meaning (risk, disclosure, watch, contrast).",
+        "Prefer dry official words: disclose, material, mitigate — not juicy, hide, fix up.",
+        "For two blanks, solve the easier blank first.",
+      ],
       bullets: [
-        "Opener: no this/therefore/however-to-an-unseen-claim; names the topic.",
-        "Mandatory pair: pronoun, the + repeated noun, that is why, hence.",
-        "Closer: therefore / hence / practical path / named design choice.",
-        "True GA content does not beat a broken pronoun chain.",
+        "Grammar first, meaning second, official tone third.",
+        "mitigate a risk; disclose a material event; surveillance watches trades.",
+        "although + clause; despite + noun; however is not a clause-linker in the middle of one sentence.",
       ],
       examples: [
         {
-          title: "Four-sentence T+1 jumble",
+          title: "Grammar beats a true market fact",
           prompt:
-            "Arrange: A. Phased inclusion of stocks was therefore the practical path. B. Shortening settlement compresses counterparty exposure. C. Operational capacity at brokers, custodians and depositories cannot be assumed overnight. D. That is why a jump from T+2 to T+1 for every scrip on a single day was not the 2022 design.",
+            "The Board aims ___ insider trading in listed shares. (A) at prohibit (B) to prohibit (C) prohibiting to (D) for prohibit.",
           steps: [
-            "Find the opener. A has therefore — not first. D has That is why — needs an antecedent. C is a constraint, usually after the idea it constrains. B states the policy idea with no backward pointer. Opener = B.",
-            "Mandatory pair: B names shortening settlement; C says operational capacity cannot be assumed overnight — the cost of doing B fast. D’s That is why points at the B+C tension. Pair path: B then C, and C then D (or B-C-D as a chain).",
-            "Closer: A’s therefore names the practical path (phasing) after D has rejected the big-bang jump. A closes.",
-            "Leftover check: B-C-D-A. After B, C is the operational but. After C+B, D explains the 2022 design. A restates the method.",
-            "Reject C-B (cannot assume capacity before we know what we are assuming it for). Reject A anywhere but last. Order: B C D A.",
+            {
+              do: "Look at what can follow aims.",
+              why: "aims to + verb (aims to prohibit) is standard. aims at + -ing (aims at prohibiting) is also standard. The options must match one of those shapes.",
+            },
+            {
+              do: "Drop (A) at prohibit and (D) for prohibit.",
+              why: "at needs prohibiting, not prohibit. for prohibit is not English.",
+            },
+            {
+              do: "Drop (C) prohibiting to.",
+              why: "The extra to after the -ing word leaves the sentence unfinished.",
+            },
+            {
+              do: "Pick (B) to prohibit.",
+              why: "The idea ‘SEBI stops insider trading’ is true, but a true fact cannot save bad grammar in (A).",
+            },
           ],
-          result:
-            "B–C–D–A. Opener B; pair B–C and C–D; closer A (therefore).",
+          result: "(B) to prohibit. A true GA fact does not fix a broken verb.",
         },
         {
-          title: "Which sentence should come first? (T+0)",
+          title: "Disclose material events",
           prompt:
-            "A. A limited beta therefore tests operations without forcing the entire market onto a new clock. B. Same-day settlement needs funding, confirmation and custody to finish before evening. C. That operational stack is heavier than T+1. D. Hence T+0 began as an optional, narrow basket. Which is first?",
+            "Listed companies must ___ all ___ events to the stock exchanges without delay. (A) hide, trivial (B) disclose, material (C) mitigate, festive (D) surveil, edible.",
           steps: [
-            "A contains therefore — result, not opener. D contains Hence — result, not opener. C contains That operational stack — That needs a named stack.",
-            "B names the topic (same-day settlement) and the operational needs, with no backward word. B is the only legal opener.",
-            "Mandatory pair: B lists funding/confirmation/custody; C calls that stack heavier than T+1. Pair B–C.",
-            "Closers: A (therefore beta) and D (hence optional basket) both conclude; D is a tighter policy label, A explains the beta logic. A plausible full order is B–C–A–D or B–C–D–A; the question only asked the first sentence.",
-            "Answer the asked limb: first sentence is B. Do not pick A because it contains the true GA fact about a limited beta.",
+            {
+              do: "Blank 1 is what a company does toward the exchange.",
+              why: "The duty is to tell the market. That verb is disclose, not hide or surveil.",
+            },
+            {
+              do: "Blank 2 is the kind of event that must be told.",
+              why: "Official English uses material — important to price or to an investor’s choice.",
+            },
+            {
+              do: "Kill (A), (C), and (D).",
+              why: "hide trivial is the opposite. mitigate festive mixes a risk-verb with a party word. surveil edible is nonsense.",
+            },
+            {
+              do: "Pick (B).",
+              why: "disclose material events is the set pair. Surveillance is what exchanges do to trades, not what companies file.",
+            },
           ],
           result:
-            "B is the opener. A and D are therefore/hence closers; C’s That points back to B.",
+            "(B) disclose, material. Companies disclose; exchanges watch (surveillance).",
+        },
+        {
+          title: "Mitigate the risk, not a lookalike",
+          prompt:
+            "T+1 was designed to ___ overnight counterparty exposure. (A) migrate (B) mitigate (C) militate (D) meditate.",
+          steps: [
+            {
+              do: "Name the object: exposure, which is a risk.",
+              why: "You need a verb that means reduce that risk.",
+            },
+            {
+              do: "mitigate means reduce the harm of something you may not fully remove.",
+              why: "That matches overnight counterparty exposure. Pick (B).",
+            },
+            {
+              do: "Reject migrate, militate, and meditate.",
+              why: "migrate = move home or system. militate (against) = work against, and it wants against. meditate = think quietly. All three are lookalikes with the wrong job.",
+            },
+          ],
+          result:
+            "(B) mitigate. You mitigate a risk. You do not mitigate a Chairperson or a circular.",
+        },
+      ],
+    },
+    {
+      heading: "Para jumbles — opener, then pair, then closer",
+      body: "Do not try all 24 orders. Use three tests.\n\nFirst find the opener. It names the topic. It does not start with this, these, such, that, therefore, hence, or however (those words look backward). A definition or a plain problem sentence is a good start.\n\nSecond find a mandatory pair. Two sentences must sit together because of a pronoun (that stack), a repeated noun with the, or a cause word (that is why). If B names shortening settlement and C says that operational stack, C cannot come before B.\n\nThird find the closer. therefore, hence, thus, or a practical path (so they phased the change) usually ends the paragraph.\n\nThen drop leftover sentences into the holes. Read the full order once. If a pronoun has no home, the order is wrong. A true market fact can still sit in the wrong slot.",
+      howTo: [
+        "Find the opener: no this / therefore / hence / however to an unseen claim.",
+        "Find a pair: a pointing word (that, such, this) must follow the sentence it points to.",
+        "Find the closer: therefore / hence / the practical path.",
+        "Place leftovers in the remaining holes.",
+        "Read the paragraph aloud. Kill any order that strands a pronoun.",
+      ],
+      bullets: [
+        "Opener names the topic and looks forward, not back.",
+        "Pair = pronoun or that is why glued to the line it needs.",
+        "Closer = therefore / hence / the method they chose.",
+      ],
+      examples: [
+        {
+          title: "Four sentences on T+1",
+          prompt:
+            "Arrange: A. Phased inclusion of stocks was therefore the practical path. B. Shortening settlement cuts counterparty risk. C. Operational capacity at brokers and custodians cannot be assumed overnight. D. That is why a jump from T+2 to T+1 for every stock on one day was not the 2022 design.",
+          steps: [
+            {
+              do: "Find the opener. Pick B.",
+              why: "A has therefore (result). D has That is why (needs a cause). C is a limit, usually after the idea it limits. B names the topic with no backward word.",
+            },
+            {
+              do: "Pair B with C, then glue D on.",
+              why: "B names shortening settlement. C says operations cannot switch overnight. D’s That is why points at that tension.",
+            },
+            {
+              do: "Put A last.",
+              why: "therefore names the practical path after D has rejected the one-day jump.",
+            },
+            {
+              do: "Read B–C–D–A as a paragraph.",
+              why: "Idea, cost, ‘that is why’, then the method. No stranded pronoun.",
+            },
+          ],
+          result: "B–C–D–A. Opener B; pair B–C then C–D; closer A.",
+        },
+        {
+          title: "Which sentence comes first?",
+          prompt:
+            "A. A limited test therefore checks operations without forcing the whole market onto a new clock. B. Same-day settlement needs funding, confirmation and custody to finish before evening. C. That operational stack is heavier than T+1. D. Hence T+0 began as an optional, narrow basket. Which is first?",
+          steps: [
+            {
+              do: "Cross out A and D as openers.",
+              why: "therefore and Hence mark results. Results are not first.",
+            },
+            {
+              do: "Cross out C as opener.",
+              why: "That operational stack needs a stack already named.",
+            },
+            {
+              do: "Pick B as first.",
+              why: "B names same-day settlement and the jobs that must finish. Nothing in B looks backward.",
+            },
+            {
+              do: "Note the pair B–C even if the question only asks the first line.",
+              why: "C’s That points at B’s list. A true fact in A does not make A first.",
+            },
+          ],
+          result: "B is the opener. A and D close; C’s That follows B.",
         },
         {
           title: "Pronoun pair in a disclosure jumble",
           prompt:
-            "A. Such silence can itself mislead investors when the rumour is specific and price-sensitive. B. Listed companies sometimes delay an exchange intimation while they verify a market rumour. C. LODR, however, expects timely disclosure of material events, not a perfect internal novel. D. Verification is necessary, but it is not a licence to wait until the price has already moved. Find opener, pair, closer.",
+            "A. Such silence can itself mislead investors. B. Listed companies sometimes delay an exchange filing while they check a rumour. C. The listing rules, however, expect timely disclosure of material events. D. Checking is necessary, but it is not a licence to wait until the price has already moved. Find opener, pair, closer.",
           steps: [
-            "Opener test: A’s Such silence needs a prior mention of silence/delay. C’s however needs a claim to contrast. D’s it refers to verification. B introduces the delay-while-verifying behaviour with no backward pronoun. Opener = B.",
-            "Mandatory pair: B names delay-while-verify; D comments on verification — D should follow B (or follow a sentence that keeps verification in play). C names the LODR duty as contrast. A’s Such silence packs B’s delay into a consequence.",
-            "A natural chain: B (behaviour) → D (verification is not a licence to wait) → C (LODR contrast) → A (such silence misleads). Alternative B–C–D–A also keeps Such silence last.",
-            "Closer: A is the consequence sentence (can mislead). Good closer. C’s however can sit mid-paragraph, not first.",
-            "Lock B as first and A as last. Between them, D should not precede the first mention of verification in B. Resulting order B–D–C–A (or B–C–D–A if you treat LODR as the immediate contrast). The designed pair is B–D (verification) and A last (Such silence).",
+            {
+              do: "Pick B as opener.",
+              why: "A’s Such silence needs a delay already named. C’s however needs a claim to push against. D’s it needs checking already on the table. B introduces the delay with no backward word.",
+            },
+            {
+              do: "Pair B with D.",
+              why: "B names delay-while-checking. D comments on that checking. D cannot start the paragraph.",
+            },
+            {
+              do: "Put A last. Park C in the middle.",
+              why: "Such silence packs B’s delay into a result, so A closes. however is a mid-paragraph contrast, never first.",
+            },
           ],
           result:
-            "Opener B; B–D is the verification pair; closer A (Such silence). C’s however is mid-paragraph, never first.",
-        },
-        {
-          title: "Eliminate a fake opener that is true GA",
-          prompt:
-            "A. Tuhin Kanta Pandey assumed charge as SEBI Chairperson on 1 March 2025. B. For that reason a 2024 memory-based paper that already names him as Chair is mixing cycles. C. Chairperson questions are year-stamped, not timeless GK. D. Madhabi Puri Buch held the post through calendar 2024. The options for first sentence are A or C. Which, and why A can still be second?",
-          steps: [
-            "Both A and D are dated facts; either can open a timeline paragraph. C is a methodological rule that the other sentences illustrate. The question says the options for first are A or C.",
-            "If C opens (‘questions are year-stamped’), A and D become examples and B becomes the consequence (for that reason). That is a clean C–D–A–B or C–A–D–B.",
-            "If A opens, we start with 2025, then must still introduce 2024 Buch before B’s ‘2024 paper’. Possible but clumsier unless D follows at once: A is a bad first sentence when the paragraph’s point is the method C.",
-            "B’s For that reason needs the method + the two dates. B is a closer, not an opener.",
-            "Pick C as opener. A is true GA and still not first, because the paragraph is about the year-stamp rule, which A merely instantiates.",
-          ],
-          result:
-            "Opener C (the rule). A is a true 2025 fact but is an example, not the topic sentence. B is the closer.",
+            "Opener B; pair B–D; closer A. A good full order is B–D–C–A.",
         },
       ],
     },
     {
-      heading: "Financial English vocabulary — mitigate, disclosure, surveillance, materiality",
-      body: "Four words do an unusual amount of work in SEBI-flavoured English and in Phase II essays. Mitigate means reduce the severity of a risk or harm that you cannot (or have not) eliminated. You mitigate counterparty risk by shortening settlement and collecting margins; you do not ‘mitigate a circular’ or ‘mitigate a Chairperson’. Near-synonyms: lessen, alleviate, cushion. Antonyms in options: aggravate, exacerbate, compound. Do not confuse with militate (against), mediate, or migrate.\n\nDisclosure is the act of making information known to the market under a duty (LODR, offer documents, insider lists). It is not the same as publicity or a press leak. Related: disseminate, intimate (to the exchange), notify. Concealment / omission / silence can be the antonym in a rumour-plus-duty paragraph. Surveillance is the market-infrastructure watch: exchanges and SEBI watch orders, prices, and positions for manipulation and for circuit-breaker triggers. Companies do not ‘surveil’ their own board minutes to the exchange; they disclose. Regulators conduct surveillance; they do not usually ‘disclose’ another company’s UPSI.\n\nMateriality is the threshold at which a fact would matter to an investor’s decision or to the price of securities. A material event must be disclosed; an immaterial operational hiccup need not be dressed as a stock-exchange filing. Related: significant, price-sensitive, relevant. Antonyms: trivial, de minimis, cosmetic. In PIT, unpublished price-sensitive information is a cousin of materiality but a distinct legal term — do not write ‘material UPSI’ as if the words were interchangeable in every blank.\n\nOther high-yield items: prudent (cautiously wise; antonym reckless), precursor (forerunner), optional (antonym mandatory / compulsory), deemed (treated as, by law), pursuant to (in accordance with), caveat (warning), redress (remedy a grievance), novation (substitution of a new party — a legal term, not a halt), fungible (interchangeable units). Spell separately, not seperately; occurrence not occurence; privilege not priviledge.",
+      heading: "Reading comprehension — fact, inference, tone",
+      body: "A fact question is answered by a line you can point to: a date, a name, a definition. If the passage says T+1 became the default from 27 January 2023, that date is the fact — not a date you remember from class.\n\nAn inference must follow from the passage, but it is not printed as a ready sentence. Take one small logical step. Do not add outside knowledge. From ‘optional T+0 is a limited extra path, not a replacement’, you may infer that T+0 is not treated as already compulsory for every stock. You may not infer that the author wants T+0 banned.\n\nTone is the author’s attitude: cautious, critical, approving, calm-and-diagnostic. Official prose is usually calm analysis, not a rant and not a cheer. Mentioning a reform is not a celebration of that reform.\n\nExtreme words (always, never, must, only) are often wrong unless the passage was that strong. The main idea covers the whole argument, not one detail and not your own reform plan.",
+      howTo: [
+        "Label the question: fact, inference, tone, or main idea.",
+        "Fact: point to a line. Copy the date or name as printed.",
+        "Inference: write the small step. If you needed extra GK, it is not an inference.",
+        "Tone: pick the attitude word that matches the heat of the prose (calm vs angry vs happy).",
+        "Kill options that add a new policy, a new product, or always / never.",
+      ],
       bullets: [
-        "mitigate risk / harm (not ‘mitigate a statute’); ≠ militate / mediate.",
-        "disclosure = duty to tell the market; surveillance = watch trading.",
-        "material = decision- or price-relevant; trivial is the foil.",
-        "prudent / reckless; optional / mandatory; precursor = forerunner.",
-      ],
-      examples: [
-        {
-          title: "Mitigate in a settlement sentence",
-          prompt:
-            "T+1 was designed to _____ overnight counterparty exposure. (A) migrate (B) mitigate (C) militate (D) meditate. Why each wrong option fails.",
-          steps: [
-            "The object is exposure (a risk). The verb must mean reduce that risk. mitigate is the fit.",
-            "(A) migrate means move location or system. You can migrate software to T+1; you do not migrate exposure in this sentence.",
-            "(C) militate (against) means tend to prevent. Grammar would need against, and the sense would be that T+1 works against exposure — possible in loose prose, but not the set collocation, and the option is bare militate.",
-            "(D) meditate is think quietly. Comic in a CCP sentence.",
-            "Pick (B). In an essay, write ‘mitigate counterparty risk’; do not write ‘mitigate T+1’ (T+1 is the tool, not the harm).",
-          ],
-          result:
-            "(B) mitigate. migrate/militate/meditate are lookalikes with the wrong meaning or the wrong object.",
-        },
-        {
-          title: "Disclosure versus surveillance",
-          prompt:
-            "Match: (i) a listed company files a Reg. 30 intimation (ii) the exchange’s alert system flags circular trading (iii) SEBI publishes a consultation paper. Words: disclosure, surveillance, neither-quite.",
-          steps: [
-            "(i) is disclosure / intimation under LODR — the company telling the market a material fact.",
-            "(ii) is surveillance — watching the order book for PFUTP-type patterns. Calling it disclosure would mean the manipulator was ‘disclosing’ the fraud, which is nonsense.",
-            "(iii) a consultation paper is public communication by the regulator, but it is not LODR disclosure and not market surveillance. In a two-word trap, pick neither; in a vocab item, ‘public consultation’ / ‘seeking comments’.",
-            "A filler that says companies must conduct surveillance of material events to the exchange is mixing the two nouns. Replace with disclose.",
-            "Write the pair in the margin: issuer → disclosure; exchange/SEBI on trades → surveillance.",
-          ],
-          result:
-            "(i) disclosure (ii) surveillance (iii) public consultation, not LODR disclosure and not trade surveillance.",
-        },
-        {
-          title: "Materiality — why ‘juicy’ fails",
-          prompt:
-            "Only _____ events need immediate exchange intimation; a broken office kettle is not one. (A) juicy (B) material (C) optional (D) fungible. Antonym in the second clause?",
-          steps: [
-            "LODR uses material for events that can affect performance or the price of securities. (B) is the legal adjective.",
-            "(A) juicy is tabloid register, not a regulation. It fails tone and precision.",
-            "(C) optional describes T+0 versus mandatory T+1, not the importance of an event. An optional event is not a LODR category.",
-            "(D) fungible describes interchangeable demat units, not events.",
-            "The kettle is trivial / immaterial — the antonym limb. Precis habit: keep material and trivial as a pair, not big and small.",
-          ],
-          result:
-            "(B) material. Foil = trivial. juicy/optional/fungible fail register or meaning.",
-        },
-        {
-          title: "Prudent, precursor, optional — three quick keys",
-          prompt:
-            "(i) Synonym of prudent: reckless / wise and cautious / obsolete / hostile. (ii) In ‘The circular was a precursor to the full T+1 roll-out,’ precursor means? (iii) Antonym of optional in ‘optional T+0’?",
-          steps: [
-            "prudent = showing care for the future; wise / cautious. Reckless is the antonym, not the synonym. Obsolete = outdated. Hostile = unfriendly. So (i) wise / cautious.",
-            "precursor = forerunner / something that comes before and signals what follows. The circular came before full T+1. Not ‘enemy’, not ‘penalty’, not ‘Chairperson’.",
-            "optional T+0 ran beside mandatory / compulsory / default T+1. The antonym of optional here is mandatory (or compulsory), not ‘illegal’ and not ‘surveilled’.",
-            "Check spelling of separately if a fourth item appears: separately from separate, never seperate.",
-            "Write three answers: wise/cautious; forerunner; mandatory/compulsory.",
-          ],
-          result:
-            "(i) wise / cautious (ii) forerunner (iii) mandatory / compulsory (T+1 remained the default cycle).",
-        },
-      ],
-    },
-    {
-      heading: "Precis habits — cut without changing the author’s point",
-      body: "Phase I may not ask a full precis, but the same muscle is used in RC ‘main idea’ items and is compulsory in Phase II Paper 1 (about 30 marks). A precis is a proportional miniature of the original: same stance, same order of ideas, no new examples, no extra adjectives, no ‘I think’. If the passage argues that T+0 should stay optional, your precis may not conclude that T+0 must be mandated. If the passage is cautious, your miniature must stay cautious.\n\nCount the ideas, not the sentences. A typical 200–250-word passage has four to six idea-units (problem, mechanism, risk, policy test, caveat). Your precis should hit each unit in that order, in about one-third of the words, in your own syntax. Do not lift three consecutive original sentences. Do not open with ‘The author says that’ in every line; one framing clause is enough. Drop illustrations, keep the claim the illustration was proving.\n\nGrammar in a precis is ordinary formal English: agreement, parallel lists, the right preposition. Do not introduce new errors while compressing. Numbers that are load-bearing (T+1 from 27 January 2023; optional T+0 from 28 March 2024; 4% inflation target) stay; decorative numbers go. Names stay if the argument depends on them (Buch versus Pandey in a year-stamp paragraph); ornamental name-dropping goes.\n\nTitle the precis with a noun phrase that names the issue, not a slogan. ‘Optional T+0 as an operational beta, not a mandate’ is a title; ‘T+0 is great’ is not. Never add a recommendation the passage did not make. Never ‘correct’ the author’s economics. Your job is fidelity plus brevity.",
-      bullets: [
-        "Same stance and same idea-order; about one-third the words.",
-        "Keep load-bearing dates/names; drop decorative examples.",
-        "No new policy punchline; no ‘I think’; no copied sentence-chains.",
-        "Title = noun phrase of the issue, not a cheer.",
-      ],
-      examples: [
-        {
-          title: "What a precis may not do",
-          prompt:
-            "Passage stance: optional T+0 should remain a limited beta because custody and funding may not finish by evening. Four student precis openings — which fails, and why?",
-          steps: [
-            "Opening A: ‘Same-day settlement needs the funds, confirmation and custody legs to finish before evening, so a limited optional beta tests the stack without forcing every scrip onto a new clock.’ This preserves stance and mechanism. Keep.",
-            "Opening B: ‘SEBI must make T+0 compulsory for all listed stocks immediately.’ This reverses the author’s caution into a mandate. Fail.",
-            "Opening C: ‘T+0 is a commodity-options product on NCDEX.’ This changes the facts. Fail.",
-            "Opening D: ‘I feel settlement cycles are boring but T+1 was nice in 2023.’ First person plus a new value judgement. Fail.",
-            "The only surviving precis opening is A. B is the classic Phase II trap: writing the essay you wanted instead of the passage you were given.",
-          ],
-          result:
-            "Keep A. B mandates what the passage kept optional; C misidentifies the product; D adds the student.",
-        },
-        {
-          title: "Compress a four-idea paragraph",
-          prompt:
-            "Original (trimmed): ‘Shortening settlement compresses counterparty exposure. Operational capacity at brokers, custodians and depositories cannot be assumed overnight. That is why a jump from T+2 to T+1 for every scrip on a single day was not the 2022 design. Phased inclusion of stocks was therefore the practical path.’ Write a one-sentence precis and list what you dropped.",
-          steps: [
-            "Idea 1: shorter cycle → less counterparty time. Idea 2: ops capacity is a constraint. Idea 3: therefore no big-bang 2022 jump. Idea 4: phasing was the method.",
-            "One-sentence miniature: ‘Because faster settlement cuts counterparty risk but operations cannot switch overnight, India phased T+1 rather than moving every scrip in a single jump.’",
-            "Dropped: the full list brokers/custodians/depositories (kept as ‘operations’); the exact T+2 label can stay because it is load-bearing, or be implied by ‘jump’.",
-            "Did not add: dates 27 January 2023, T+0, Buch, or a recommendation to go to T+0. Those are other paragraphs.",
-            "Word count of the original is about 55; the miniature is about 30. Proportional, same order, same stance.",
-          ],
-          result:
-            "Phased T+1 because speed cuts counterparty risk but operations cannot flip overnight — no 2022 big-bang. Do not add T+0 or a mandate.",
-        },
-        {
-          title: "Title versus slogan",
-          prompt:
-            "Choose a precis title: (A) T+0 forever (B) Optional T+0 as a limited operational beta beside T+1 (C) How I would reform NSE (D) Circuit breakers explained.",
-          steps: [
-            "(A) is a slogan and picks a side the limited-beta passage did not shout. Bad title.",
-            "(C) invites an essay the student wanted to write. Bad.",
-            "(D) names the wrong topic. Bad.",
-            "(B) is a noun-phrase label of the actual issue: optional, limited, operational, beside T+1. That is precis-title form.",
-            "If the passage had been about MWCB 10/15/20%, then (D) would fit and (B) would be off-topic. Titles follow the passage, not the rest of your GA notes.",
-          ],
-          result:
-            "(B). Titles are descriptive noun phrases of the author’s issue, not cheers or a different syllabus item.",
-        },
-        {
-          title: "Numbers: keep, drop, or refuse to invent",
-          prompt:
-            "Passage mentions ‘a limited basket (initially 25 stocks) from 28 March 2024’. Student precis writes ‘T+0 for 250 stocks in 2022 under Chairman Pandey’. List the faults.",
-          steps: [
-            "25 → 250 is an invented order-of-magnitude. Precis may drop 25 but may not inflate it.",
-            "2024 → 2022 back-dates the beta into the T+1 phasing year. Load-bearing date was changed, not compressed.",
-            "Pandey as 2022 Chair is a GA error (Buch was Chair from March 2022; Pandey from March 2025) and was not in the passage anyway. Do not import GK to sound informed.",
-            "A faithful compression: ‘In March 2024 exchanges began a limited optional T+0 basket beside T+1.’ The 25 can stay if space allows.",
-            "Rule: drop decorative figures; keep figures that change the claim; never replace a figure with a guess; never add a Chair the passage did not name.",
-          ],
-          result:
-            "Faults: 250 for 25, 2022 for 2024, Pandey imported and back-dated. Faithful: limited optional T+0 from March 2024 beside T+1.",
-        },
-      ],
-    },
-    {
-      heading: "Reading comprehension — fact, inference, and tone",
-      body: "RC questions in Paper 1 are shorter than CAT passages but they use the same three labels. A fact question is answered by a sentence you can point to: a date, a name, a definition, a stated cause. If the passage says ‘T+1 became the market-wide cash-equity cycle from 27 January 2023’, a fact item can ask when, and the answer is that date — not 2020, not 28 March 2024 (that is T+0).\n\nAn inference is a conclusion that must follow from the passage but is not printed as a ready sentence. It must be narrower than a world-knowledge essay. From ‘optional T+0 began as a limited beta because the operational stack is heavier than T+1’ you may infer that the author does not treat T+0 as already safe for every scrip. You may not infer that the author wants T+0 abolished, or that NCDEX is involved, or that SEBI will mandate T+0 next month. If you cannot point to the supporting lines plus a small logical step, it is not an inference; it is a guess.\n\nTone is the author’s attitude: cautious, critical, approving, diagnostic, ironic. Official-economic prose is usually analytical / cautionary, not sarcastic. A single adjective in the last sentence (‘the useful questions are older than Unity’) can mark a dry, non-alarmist tone. Do not pick ‘indignant’ unless there is moral heat; do not pick ‘celebratory’ because a reform is mentioned; mentioning T+1 is not a cheer for T+1.\n\nMain-idea items are precis in MCQ form: the option that covers the whole argument without a new policy. Extreme options (always, only, never, must) are usually wrong unless the passage was that absolute. Vocab-in-context items ask what the word means here, not its rarest dictionary sense. Precursor in a T+1 sentence is forerunner, not ‘chemical starter’.",
-      bullets: [
-        "Fact = point to a line. Inference = one necessary step, no extra GK.",
-        "Tone = attitude (cautious/analytical vs indignant/celebratory).",
-        "Main idea = whole argument, not a detail and not your reform plan.",
-        "Extreme wording is a red flag; vocab = meaning in this sentence.",
+        "Fact = in the passage. Inference = one necessary step, no extra GK.",
+        "Tone = attitude, not the topic name.",
+        "Main idea = the whole claim. A true detail can still be too small.",
       ],
       examples: [
         {
           title: "Fact versus inference on settlement",
           prompt:
-            "Passage: ‘T+1 has been the default cash-equity cycle since 27 January 2023. Optional T+0 continued as a limited additional path, not as a replacement of T+1.’ Q1 (fact): default cycle? Q2 (inference): does the author treat T+0 as already universal?",
+            "Passage: ‘T+1 has been the default cash-equity cycle since 27 January 2023. Optional T+0 continued as a limited extra path, not as a replacement of T+1.’ Q1 (fact): what is the default cycle? Q2 (inference): does the author treat T+0 as already universal?",
           steps: [
-            "Q1 is a fact lookup. The printed default is T+1 from 27 January 2023. Not T+5, not compulsory T+0.",
-            "Q2 cannot be answered by a single quoted phrase ‘T+0 is not universal’, but ‘limited additional path, not a replacement’ forces the inference that T+0 is not treated as market-wide compulsory.",
-            "A false inference would be ‘the author wants T+0 repealed’ — the passage did not say that.",
-            "A false fact option would be ‘T+1 restored after 2023 to T+2’ — contradicts the printed since 27 January 2023.",
-            "Label answers: Q1 fact = T+1 default from 27 Jan 2023. Q2 inference = T+0 is not universal/mandatory. Not a licence to add 2025 Chairperson trivia.",
+            {
+              do: "Answer Q1 from the printed date and label.",
+              why: "The passage says the default is T+1 from 27 January 2023. That is a fact lookup, not a memory test.",
+            },
+            {
+              do: "For Q2, use limited extra path, not a replacement.",
+              why: "Those words force the step: T+0 is not treated as market-wide and compulsory. That is an inference.",
+            },
+            {
+              do: "Reject ‘the author wants T+0 repealed’.",
+              why: "That extra wish is not in the passage. An inference cannot add a new policy.",
+            },
           ],
           result:
-            "Fact: default T+1 since 27 Jan 2023. Inference: T+0 is an extra limited path, not a full replacement. No repeal inference.",
+            "Fact: default T+1 since 27 January 2023. Inference: T+0 is extra and limited, not a full replacement.",
         },
         {
-          title: "Tone — analytical, not indignant",
+          title: "Tone — calm diagnosis, not a rant",
           prompt:
-            "Closing lines: ‘The useful questions are older than Unity: is the price clear, is the chance of a prize disclosed, can a child spend without a parent?’ Tone: (A) celebratory (B) indignant polemic (C) dry diagnostic / cautionary (D) comic parody of SEBI.",
+            "Closing lines: ‘The useful questions are older than the new app: is the price clear, is the chance of a prize disclosed, can a child spend without a parent?’ Tone: (A) celebratory (B) angry polemic (C) dry, careful diagnosis (D) comic parody.",
           steps: [
-            "The author lists old consumer-protection questions in calm syntax. That is diagnostic: naming tests, not shouting.",
-            "(A) celebratory would praise games or loot boxes. The close is a list of risks, not a cheer.",
-            "(B) indignant polemic would use moral heat, insult, or ‘must be banned’. The phrase ‘useful questions’ is cool, not furious.",
-            "(D) parody would mock the regulator’s voice. Using Unity as a timestamp is a wry comparison, not a sketch-comedy turn. Slight dryness ≠ parody.",
-            "Pick (C). If a later question asks inference, you may say the author rejects both ‘cardboard boxes on a shelf’ and ‘every randomised reward is a casino’ — those were printed contrasts, not tone labels.",
+            {
+              do: "Notice the author lists tests in calm sentences.",
+              why: "Naming checks (price, prize, child) is diagnostic. There is no cheer and no insult.",
+            },
+            {
+              do: "Drop (A) celebratory.",
+              why: "A list of risks is not praise.",
+            },
+            {
+              do: "Drop (B) and (D).",
+              why: "Angry would shout or demand a ban. Parody would mock the regulator’s voice. useful questions is cool, not furious or jokey.",
+            },
+            {
+              do: "Pick (C).",
+              why: "Dry and careful matches official-exam tone.",
+            },
           ],
-          result:
-            "(C) dry diagnostic / cautionary. Not a celebration, not a rant, not a parody.",
+          result: "(C) dry, careful diagnosis. Not a cheer, not a rant, not a joke.",
         },
         {
           title: "Main idea versus a true detail",
           prompt:
-            "Passage argues: rumours move faster than verified disclosure; instant forced denials risk inaccuracy; slow circulars let prices move on lies; a middle path is a short duty to confirm or deny material specific rumours. Options: (A) Prices never move on rumours (B) The live policy problem is the timing and truth of issuer speech, not a slogan about social media (C) T+0 abolished rumours (D) Madhabi Puri Buch invented SCORES in 2025.",
+            "Passage arc: rumours move faster than checked disclosure; instant forced denials can be wrong; slow silence lets prices move on lies; a middle path is a short duty to confirm or deny a specific material rumour. Options: (A) Prices never move on rumours (B) The live problem is the timing and truth of company speech (C) T+0 abolished rumours (D) The 2025 Chairperson invented this rule.",
           steps: [
-            "(A) contradicts any passage that says prices move on lies while companies stay silent. False detail / opposite.",
-            "(C) imports settlement-cycle GA that the rumour passage did not use. True-or-false in the world is irrelevant; it is not the main idea.",
-            "(D) is year-mixed GK (Buch’s term ended Feb 2025; SCORES is older grievance plumbing). Not in the passage. Kill.",
-            "(B) restates the whole arc: speed versus accuracy, and a middle duty, without a new gadget. That is main-idea shape.",
-            "A detail option that merely repeats ‘authenticated channels help’ would be true but too narrow for main idea. Prefer the option that covers silence, speed, and the proposed middle path.",
+            {
+              do: "Drop (A).",
+              why: "The passage says prices can move on lies. never contradicts it.",
+            },
+            {
+              do: "Drop (C) and (D).",
+              why: "They import other GA. Even if a date is true in the world, it is not this passage’s idea.",
+            },
+            {
+              do: "Keep (B).",
+              why: "It covers speed versus accuracy and the middle duty, without a new gadget.",
+            },
           ],
           result:
-            "(B) is the main idea. (A) contradicts; (C) and (D) are off-passage (and (D) also mangled facts).",
+            "(B) is the main idea. (A) fights the passage. (C) and (D) are off-passage.",
+        },
+      ],
+    },
+    {
+      heading: "Precis — cut examples, keep numbers, keep the main claim",
+      body: "A precis is a short faithful copy of the author’s point. Same stance. Same order of ideas. About one third of the words. No ‘I think’. No new advice.\n\nCut examples and stories. If the passage uses a kettle or a list of office names only to prove a claim, keep the claim and drop the props.\n\nKeep numbers and dates that carry the claim (T+1 from 27 January 2023; a basket of 25 stocks). You may drop a decorative figure. You may not change 25 into 250, and you may not invent a year.\n\nKeep the main claim. If the author says T+0 should stay optional, your precis may not say it must be made compulsory. Title the precis with a plain noun phrase of the issue, not a slogan like ‘T+0 forever’.",
+      howTo: [
+        "List the idea units in order (problem, how it works, risk, policy, warning).",
+        "Drop examples, jokes, and extra names that do not carry the claim.",
+        "Keep load-bearing numbers and dates. Do not change them. Do not invent new ones.",
+        "Write the same stance in your own short sentences.",
+        "Check: did I add a must / should the author did not say? If yes, cut it.",
+      ],
+      bullets: [
+        "Cut examples. Keep the claim the example was proving.",
+        "Keep numbers that change the meaning. Never replace a figure with a guess.",
+        "Same stance, shorter words, no ‘I think’.",
+      ],
+      examples: [
+        {
+          title: "Do not reverse the author’s stance",
+          prompt:
+            "Passage stance: optional T+0 should stay a limited test because custody and funding may not finish by evening. Student openings: (A) Same-day settlement needs those jobs to finish by evening, so a limited optional test checks the stack without forcing every stock onto a new clock. (B) SEBI must make T+0 compulsory for all stocks at once. (C) I feel settlement is boring. Which precis opening is allowed?",
+          steps: [
+            {
+              do: "Keep (A).",
+              why: "It keeps the caution and the mechanism. That is precis work.",
+            },
+            {
+              do: "Kill (B).",
+              why: "It turns optional into compulsory. That changes the main claim.",
+            },
+            {
+              do: "Kill (C).",
+              why: "First person and a new feeling are not in the passage.",
+            },
+          ],
+          result:
+            "Only (A). (B) reverses the claim. (C) adds the student.",
         },
         {
-          title: "Inference that does not follow",
+          title: "Compress four ideas; drop the extra list",
           prompt:
-            "Premises in passage: ‘All markets are regulated’ is not given. Actual: ‘Algorithmic trading is not one activity: impact-minimising execution differs from deceptive flicker quotes.’ Which inference follows? (A) Every algo is spoofing (B) Policy should distinguish purpose, not punish speed as such (C) Spoofing is legal in T+1 markets (D) SEBI has banned all algos.",
+            "Original: ‘Shortening settlement cuts counterparty risk. Operational capacity at brokers, custodians and depositories cannot be assumed overnight. That is why a jump from T+2 to T+1 for every stock on one day was not the 2022 design. Phased inclusion of stocks was therefore the practical path.’ Write one sentence and say what you cut.",
           steps: [
-            "The printed distinction is between execution algos and deceptive flicker quotes. From that, a fair inference is that a single ban on ‘algorithms’ would over- and under-hit. (B) tracks that.",
-            "(A) erases the distinction the passage just drew. Does not follow.",
-            "(C) is a legal claim the passage did not make; T+1 is not a spoofing licence. Does not follow. (Also false as GA: spoofing-type conduct is PFUTP territory.)",
-            "(D) is an extreme factual claim, not in the passage. Does not follow.",
-            "Choose (B). Mark (A)(C)(D) as ‘extra or opposite’. This is the same discipline as syllogism: do not assume overlap the author refused to assume.",
+            {
+              do: "Name the four claims: faster cycle cuts risk; operations cannot flip overnight; so no one-day jump; so they phased it.",
+              why: "A precis must hit each unit in that order, not only the last line.",
+            },
+            {
+              do: "Write: ‘Because faster settlement cuts risk but operations cannot switch overnight, India phased T+1 rather than moving every stock in one jump.’",
+              why: "One sentence, same stance, same order.",
+            },
+            {
+              do: "Cut the full list brokers / custodians / depositories. Keep T+1 / T+2 if they carry the claim.",
+              why: "The list was an example of ‘operations’. The cycle labels are load-bearing.",
+            },
+            {
+              do: "Do not add T+0, a Chairperson, or ‘this must now be compulsory’.",
+              why: "Those ideas are other paragraphs. A precis does not import them.",
+            },
           ],
           result:
-            "(B) follows. (A) and (D) smash the distinction; (C) adds a false legal slogan.",
+            "Phased T+1 because speed cuts risk but operations cannot flip overnight. Cut the office list; do not add new policy.",
+        },
+        {
+          title: "Keep the number; do not invent a Chair",
+          prompt:
+            "Passage: ‘a limited basket (initially 25 stocks) from 28 March 2024’. Student precis: ‘T+0 for 250 stocks in 2022 under Chairperson Pandey.’ List the faults and write a faithful line.",
+          steps: [
+            {
+              do: "Mark 25 → 250 as a fault.",
+              why: "You may drop 25 to save words. You may not inflate it.",
+            },
+            {
+              do: "Mark 2024 → 2022 as a fault.",
+              why: "The date carries the claim. Changing the year changes the history.",
+            },
+            {
+              do: "Mark Pandey as a fault.",
+              why: "The passage did not name a Chair. Do not import GK. (Pandey also took charge only in March 2025.)",
+            },
+            {
+              do: "Write: ‘In March 2024 exchanges began a limited optional T+0 basket beside T+1.’",
+              why: "Same claim, shorter. Keep 25 if you have room.",
+            },
+          ],
+          result:
+            "Faults: 250 for 25, 2022 for 2024, extra Chair. Faithful: limited optional T+0 from March 2024 beside T+1.",
         },
       ],
     },
