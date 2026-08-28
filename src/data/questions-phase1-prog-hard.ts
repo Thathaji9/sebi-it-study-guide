@@ -168,10 +168,10 @@ class Test {
     "prog-27",
     "programming",
     "hard",
-    "What is printed by the Java program on a conforming implementation?",
+    "With the usual JVM default Integer cache range of -128 through 127, what is printed?",
     ["true true", "true false", "false true", "false false"],
     1,
-    "Integer.valueOf must cache values from -128 through 127, so the 127 references are identical. Caching 128 is not required and the two boxing operations here produce distinct objects under the specified expression.",
+    "Integer.valueOf must cache values from -128 through 127, so the 127 references are identical. Under the stated default cache, 128 is outside the cache and the two boxing operations yield distinct references.",
     {
       language: "java",
       code: `public class Main {
@@ -674,7 +674,7 @@ int main() {
     "prog-48",
     "programming",
     "hard",
-    "On an ABI where sizeof(int) = alignof(int) = 4 and char has size/alignment 1, what is sizeof(P)?",
+    "An ABI places each member at its earliest aligned offset, has sizeof(int) = alignof(int) = 4, and gives P alignment 4. What is sizeof(P)?",
     ["6", "8", "10", "12"],
     3,
     "Three bytes pad c before i, and three tail-padding bytes follow d so successive P objects keep i aligned. The layout is 1 + 3 + 4 + 1 + 3 = 12 bytes.",
@@ -720,6 +720,7 @@ take(X{3});    // line 4`,
       language: "cpp",
       code: `#include <iostream>
 #include <memory>
+#include <utility>
 int main() {
   auto u = std::make_unique<int>(1);
   auto v = std::move(u);
@@ -1270,11 +1271,17 @@ int main(void) {
     2,
     "Before the base case, x accumulates 3+2+1=6. The base returns 6, and each of the three unwinding additions uses the same current static x=6, giving 24.",
     {
-      code: `int f(int n) {
+      language: "java",
+      code: `public class Main {
   static int x = 0;
-  if (n == 0) return x;
-  x += n;
-  return f(n - 1) + x;
+  static int f(int n) {
+    if (n == 0) return x;
+    x += n;
+    return f(n - 1) + x;
+  }
+  public static void main(String[] args) {
+    System.out.print(f(3));
+  }
 }`,
     },
   ),
@@ -1304,7 +1311,8 @@ int main(void) {
     1,
     "f(1)=1-g(0)=0, so g(3)=3-f(1)=3. Therefore f(4)=4-g(3)=1.",
     {
-      code: `int f(int n) {
+      code: `int g(int n);
+int f(int n) {
   if (n <= 0) return 0;
   return n - g(n - 1);
 }
@@ -1610,10 +1618,12 @@ class Square extends Rectangle {
   @Override void setW(int w) { this.w = this.h = w; }
   @Override void setH(int h) { this.w = this.h = h; }
 }
-static int areaAfterResize(Rectangle r) {
-  r.setW(5);
-  r.setH(4);
-  return r.area();
+class Demo {
+  static int areaAfterResize(Rectangle r) {
+    r.setW(5);
+    r.setH(4);
+    return r.area();
+  }
 }`,
     },
   ),
