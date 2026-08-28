@@ -9,12 +9,14 @@ Mocks are pitched at **SEBI Grade A IT difficulty or a notch harder** (GATE-styl
 ## What you can do here
 
 - **Syllabus** — Phase I Paper 2 (IT), Phase II Paper 2 (DSA / strings / OOP), and Paper 1 screening topics, with indicative weightages
-- **Notes** — high-yield revision sheets (normal forms, OSI ports, CIA, ETL, shell specials, OOP pillars)
+- **Notes** — long revision sheets for every syllabus topic, each with worked examples and numbered dry-run steps (normal forms, SQL joins, Java/C++/Python traces, OSI, CIA, ETL, shell specials, DSA, Paper 1 GA/English/Quant/Reasoning)
 - **Topic practice** — MCQs with immediate explanations, including Java/C++/Python dry-runs
-- **Timed mocks** — **six distinct papers** per stage
-  - Phase I Paper 2: 50 questions, 40 minutes, 2 marks each, −0.5 if wrong, 40% cut-off
-  - Phase I Paper 1: 40 questions, 30 minutes, 1.25 marks each, 30% cut-off
-  - Phase II Paper 2: 25 dry-run / debug MCQs, 45 minutes, 4 marks each, 40% cut-off
+- **Timed mocks** — **six distinct papers** per official paper
+  - Phase I Paper 1: 40 questions, 30 minutes (half-length screening mix)
+  - Phase I Paper 2: 50 questions, 40 minutes (official IT length)
+  - Phase II Paper 1: descriptive English — essay + precis (typed) + 5 RC MCQs, 60 minutes
+  - Phase II Paper 2: 25 dry-run / debug MCQs, 45 minutes
+- **PYQs** — memory-based reconstructions (SEBI does not publish official papers) for 2020–2026 cycles across Phase I Papers 1–2 and Phase II Papers 1–2. Original items in the reported topic mix, not copied coaching PDFs.
 - **Interview** — pattern (15% of final merit) plus three mock panels with talking points
 - **Review** — score vs cut-off, topic split, full answer key
 - **Wrong-question revision** — misses stay on this browser (localStorage)
@@ -43,8 +45,8 @@ npm start
 2. Drill **Programming Concepts** first — 30% of Phase I Paper 2.
 3. Sit a full **Phase I Paper 2** mock under 40 minutes. Skip when two options still look equal.
 4. Shift to Phase II dry-runs (stacks, BST inorder, KMP, DP traces) once Paper 2 scoring is stable.
-5. Work an **interview panel** out loud: claim → mechanism → tiny example.
-6. Keep financial-sector GA warm for Paper 1; descriptive English (essay / precis / comprehension) still needs separate typing practice.
+6. Sit **Phase II Paper 1** (descriptive) under 60 minutes — RC is auto-marked; compare essay/precis with the key.
+7. Work an **interview panel** out loud: claim → mechanism → tiny example.
 
 ## Stack
 

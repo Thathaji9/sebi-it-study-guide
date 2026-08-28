@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CodeBlock } from "@/components/practice-session";
+import { descriptiveBySet } from "@/data/descriptive";
 import { topicById } from "@/data/exam";
 import { questionById } from "@/data/questions";
 import { loadProgress } from "@/lib/progress";
@@ -65,8 +66,12 @@ export function ResultView() {
   const pct = result.maxScore
     ? Math.round((result.score / result.maxScore) * 1000) / 10
     : 0;
+  const writingPaper = result?.writing
+    ? descriptiveBySet(result.writing.set)
+    : undefined;
   const needed = (result.cutoffPercent / 100) * result.maxScore;
   const cleared = result.score + 1e-9 >= needed;
+  const isWriting = Boolean(result.writing);
 
   return (
     <div className="space-y-6">
@@ -83,12 +88,18 @@ export function ResultView() {
               </span>
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              {pct}% · cut-off {result.cutoffPercent}% ({needed} marks)
+              {isWriting
+                ? `Comprehension only (auto-marked) · ${pct}% of ${result.maxScore}. Official paper is /100 including essay and precis.`
+                : `${pct}% · cut-off ${result.cutoffPercent}% (${needed} marks)`}
             </p>
           </div>
-          <Badge variant={cleared ? "default" : "destructive"}>
-            {cleared ? "Above cut-off" : "Below cut-off"}
-          </Badge>
+          {isWriting ? (
+            <Badge variant="outline">RC auto-marked · writing self-check</Badge>
+          ) : (
+            <Badge variant={cleared ? "default" : "destructive"}>
+              {cleared ? "Above cut-off" : "Below cut-off"}
+            </Badge>
+          )}
         </div>
         <dl className="mt-4 grid grid-cols-3 gap-3 text-center text-sm">
           <div className="rounded-lg bg-muted/60 py-2">
@@ -106,7 +117,45 @@ export function ResultView() {
         </dl>
       </div>
 
-      {byTopic ? (
+      {writingPaper && result.writing ? (
+        <div className="space-y-4">
+          <section className="rounded-xl border bg-card p-5">
+            <h2 className="font-heading text-lg">Essay — scoring sketch</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Topic you picked:{" "}
+              {writingPaper.essayPrompts[result.writing.chosenEssay] ??
+                "none selected"}
+            </p>
+            {result.writing.essay.trim() ? (
+              <pre className="mt-3 whitespace-pre-wrap rounded-lg bg-muted/50 p-3 font-sans text-sm leading-relaxed">
+                {result.writing.essay}
+              </pre>
+            ) : (
+              <p className="mt-3 text-sm text-muted-foreground">No essay typed.</p>
+            )}
+            <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+              {writingPaper.essayGuide.map((g) => (
+                <li key={g}>{g}</li>
+              ))}
+            </ul>
+          </section>
+          <section className="rounded-xl border bg-card p-5">
+            <h2 className="font-heading text-lg">Precis — model</h2>
+            {result.writing.precis.trim() ? (
+              <pre className="mt-3 whitespace-pre-wrap rounded-lg bg-muted/50 p-3 font-sans text-sm leading-relaxed">
+                {result.writing.precis}
+              </pre>
+            ) : (
+              <p className="mt-3 text-sm text-muted-foreground">No precis typed.</p>
+            )}
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              {writingPaper.precisModel}
+            </p>
+          </section>
+        </div>
+      ) : null}
+
+      {byTopic && !isWriting ? (
         <div className="rounded-xl border bg-card p-5">
           <h2 className="font-heading text-lg">Topic split</h2>
           <ul className="mt-3 space-y-2">
@@ -127,7 +176,9 @@ export function ResultView() {
       ) : null}
 
       <div className="space-y-4">
-        <h2 className="font-heading text-lg">Answer key</h2>
+        <h2 className="font-heading text-lg">
+          {isWriting ? "Comprehension key" : "Answer key"}
+        </h2>
         {questions.map((q, i) => {
           const chosen = answers[q.id];
           const ok = chosen === q.answer;

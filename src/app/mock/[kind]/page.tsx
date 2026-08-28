@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 
+import { DescriptiveRunner } from "@/components/descriptive-player";
 import { MockRunner } from "@/components/exam-player";
-import { mocks } from "@/data/exam";
+import { sitPapers } from "@/data/exam";
 
-const allowed = new Set(mocks.map((m) => m.id));
+const allowed = new Set(sitPapers.map((m) => m.id));
 
 export default async function MockPaperPage({
   params,
@@ -14,15 +15,22 @@ export default async function MockPaperPage({
 }) {
   const { kind } = await params;
   const query = await searchParams;
-  if (!allowed.has(kind)) notFound();
+  const paper = sitPapers.find((m) => m.id === kind);
+  if (!paper || !allowed.has(kind)) notFound();
 
   return (
     <div className="space-y-4">
       <p className="text-xs text-muted-foreground">
-        Stay in this tab. The clock keeps running. Unanswered questions score 0;
-        a wrong answer costs one-fourth of the marks for that question.
+        Stay in this tab. The clock keeps running.
+        {paper.mode === "descriptive"
+          ? " Essay and precis are typed; only comprehension MCQs are auto-marked (unanswered 0, wrong −¼)."
+          : " Unanswered questions score 0; a wrong answer costs one-fourth of the marks for that question."}
       </p>
-      <MockRunner paperId={kind} fresh={query.new === "1"} />
+      {paper.mode === "descriptive" ? (
+        <DescriptiveRunner paperId={kind} fresh={query.new === "1"} />
+      ) : (
+        <MockRunner paperId={kind} fresh={query.new === "1"} />
+      )}
     </div>
   );
 }

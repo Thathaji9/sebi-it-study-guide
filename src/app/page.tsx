@@ -21,9 +21,8 @@ export default function HomePage() {
             </h1>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
               A working desk for the IT stream: official-weightage syllabus,
-              high-yield notes, topic MCQs, six timed papers per stage pitched
-              at SEBI Grade A or harder, and interview panels. Progress stays in
-              this browser.
+              high-yield notes, topic MCQs, six timed mocks per stage, memory-based
+              PYQs, and interview panels. Progress stays in this browser.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
               <Button asChild>
@@ -66,7 +65,7 @@ export default function HomePage() {
             {allQuestions.length} questions in the bank
           </p>
         </div>
-        <div className="grid gap-3 md:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {mockFamilies.map((f) => (
             <Link
               key={f.kind}
@@ -75,7 +74,11 @@ export default function HomePage() {
             >
               <p className="font-heading text-lg">{f.familyTitle}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                6 distinct mocks · {f.questions} questions · {f.minutes} min
+                6 distinct mocks ·{" "}
+                {"mode" in f && f.mode === "descriptive"
+                  ? "essay, precis, RC"
+                  : `${f.questions} questions`}{" "}
+                · {f.minutes} min
               </p>
               <p className="mt-3 text-sm font-medium text-primary">
                 Choose a paper →
@@ -83,6 +86,19 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
+        <Link
+          href="/mock"
+          className="mt-3 flex items-center justify-between rounded-xl border bg-card p-4 transition-colors hover:border-primary/40"
+        >
+          <div>
+            <p className="font-heading text-lg">Previous-year papers</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Memory-based PYQs for 2020–2026 cycles · Phase I Papers 1–2, Phase
+              II Papers 1–2
+            </p>
+          </div>
+          <p className="text-sm font-medium text-primary">Open PYQs →</p>
+        </Link>
       </section>
 
       <section>

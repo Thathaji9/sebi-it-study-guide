@@ -109,7 +109,13 @@ export function MockRunner({
   const updateLive = (partial: Partial<LiveExam>) => {
     setLive((prev) => {
       if (!prev) return prev;
-      const next = { ...prev, ...partial };
+      const next: LiveExam = {
+        ...prev,
+        ...partial,
+        answers: partial.answers
+          ? { ...prev.answers, ...partial.answers }
+          : prev.answers,
+      };
       sessionStorage.setItem(persistKey(paperId), JSON.stringify(next));
       return next;
     });
@@ -253,18 +259,26 @@ function ExamPlayer({
             const selected = live.answers[q.id] === i;
             return (
               <button
-                key={opt}
+                key={`${q.id}-${i}`}
                 type="button"
+                aria-pressed={selected}
                 onClick={() =>
                   patch({ answers: { ...live.answers, [q.id]: i } })
                 }
                 className={cn(
                   "flex items-start gap-3 rounded-lg border px-3 py-2.5 text-left text-sm hover:border-primary/50",
                   selected &&
-                    "border-primary bg-primary/10 ring-1 ring-primary/30",
+                    "border-primary bg-primary/10 ring-2 ring-primary/40",
                 )}
               >
-                <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-md bg-muted font-mono text-xs">
+                <span
+                  className={cn(
+                    "mt-0.5 grid size-6 shrink-0 place-items-center rounded-md font-mono text-xs",
+                    selected
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted",
+                  )}
+                >
                   {letters[i]}
                 </span>
                 <span>{opt}</span>

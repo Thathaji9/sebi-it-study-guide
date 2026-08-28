@@ -24,7 +24,11 @@ const mono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Grade A IT Desk — SEBI Officer Grade A (IT)",
   description:
-    "Syllabus, notes, topic drills and timed mocks for SEBI Grade A Information Technology stream.",
+    "Syllabus, notes, topic drills, timed mocks and memory-based PYQs for SEBI Grade A Information Technology stream.",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/apple-icon.png" }],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
