@@ -2,24 +2,26 @@ import type { TopicNote } from "@/data/notes";
 
 export const notesReasoning: TopicNote = {
   topic: "reasoning",
-  title: "Reasoning — techniques (beginner)",
+  title: "Reasoning — simple notes",
   blurb:
-    "Twelve drawing tricks. Each section is one technique: what it is, the usual trap, a short recipe, three remember lines, and five worked examples. Every example step says what to do and why. Draw on paper. Do not guess.",
+    "We explain Paper-1 Reasoning like class notes a Class-10 student can read: Venn circles, a family tree, a map with North at the top, chairs in a line. Then we solve five tiny examples in each topic, one drawing at a time.",
   blocks: [
     {
-      heading: "Syllogism with Venn — all, some, and no",
-      body: "A syllogism gives two or three sentences (premises) and asks which conclusions must be true. Draw circles. All A are B: put circle A fully inside circle B. Some A are B: the two circles share a patch (at least one A is a B). No A is B: the two circles stay apart and do not touch.\n\nThe favourite trap is extra overlap. If the sentences do not force two circles to meet, you must not draw them meeting — and you also must not swear they never meet. A conclusion is definite only when every allowed drawing agrees.",
+      heading: "Syllogism (Venn circles)",
+      body: "A syllogism is two or three sentences about groups. Draw Venn circles. All cats are animals: the cat circle sits fully inside the animal circle. Some animals are brown: the two circles share a patch. No dog is a cat: the two circles stay apart and do not touch.\n\nOn the exam, tick a conclusion only if every allowed drawing agrees. Do not add extra overlap the sentences did not force, and do not forbid a meeting they still allow. All A are B does not mean All B are A. Two ‘some’ sentences do not chain; two ‘all’ sentences do.",
       howTo: [
-        "Write the premises. For each, draw a fresh pair of circles (all = inside, some = forced overlap, no = apart).",
+        "Write the premises. For each, draw circles (all = inside, some = forced overlap, no = apart).",
         "Do not add a meeting or a gap that the sentences did not force. If two drawings are both legal, keep both.",
         "Read conclusion I. Tick it only if it is true in every legal drawing.",
-        "Read conclusion II the same way. If I is true in one drawing and false in another, I does not follow.",
+        "Read conclusion II the same way. If two drawings disagree, it does not follow.",
         "Watch reverses: All A are B does not mean All B are A. Two ‘some’ sentences do not chain.",
       ],
       bullets: [
+        "Syllogism = Venn circles.",
         "Definite = true in every legal Venn. If two drawings disagree, it does not follow.",
         "Never add extra overlap. ‘Some B are C’ need not touch A even if All A are B.",
         "All A are B plus All B are C does give All A are C. Two ‘somes’ do not.",
+        "All A are B does not mean All B are A.",
       ],
       examples: [
         {
@@ -187,18 +189,20 @@ export const notesReasoning: TopicNote = {
       ],
     },
     {
-      heading: "Conversions and only-a-few",
-      body: "Some conclusions are just a rewrite of one premise. That rewrite is called conversion. All A are B gives Some B are A (and Some A are B). No A is B gives No B is A. Some A are B gives Some B are A. Some A are not B does not convert to Some B are not A.\n\nOnly a few A are B means two things at once: Some A are B, and Some A are not B. The trap is treating ‘only a few’ as a plain ‘some’ (you drop the ‘some not’) or as ‘only A are B’ (which means All B are A — a different sentence).",
+      heading: "Conversions and ‘only a few’",
+      body: "Sometimes a conclusion is just the same Venn flipped around. All banks are offices still means some offices are banks — you turned the sentence, you did not draw a new circle. ‘Only a few A are B’ is two pictures at once: a shared patch, and a leftover bit of A that stays out of B.\n\nOn the exam, safe flips are: All A are B → Some B are A; No A is B → No B is A; Some A are B → Some B are A. Do not flip Some A are not B. ‘Only a few A are B’ = Some A are B AND Some A are not B. That is not the same as ‘only A are B’, which means All B are A.",
       howTo: [
-        "If the conclusion uses the same two terms as one premise, try conversion first before drawing a big chain.",
+        "If the conclusion uses the same two terms as one premise, try conversion first.",
         "Flip All A are B into Some B are A. Flip No A is B into No B is A. Flip Some A are B into Some B are A.",
         "Do not flip Some A are not B. That conversion is not safe.",
-        "If you see ‘only a few A are B’, write two ticks: Some A are B, and Some A are not B. Then combine with the other premises.",
+        "If you see ‘only a few A are B’, write two ticks: Some A are B, and Some A are not B.",
         "Do not mix up ‘only a few A are B’ with ‘only A are B’. The second means All B are A.",
       ],
       bullets: [
+        "A conversion is the same Venn flipped, not a new circle.",
         "Safe flips: all → some the other way; no ↔ no; some ↔ some. Not ‘some not’.",
         "Only a few A are B = some A are B AND some A are not B.",
+        "‘Only A are B’ means All B are A — a different sentence.",
         "Two ‘some’ premises still do not chain. Conversion is not a chain.",
       ],
       examples: [
@@ -367,19 +371,21 @@ export const notesReasoning: TopicNote = {
       ],
     },
     {
-      heading: "Coded inequality — decode, then walk the chain",
-      body: "A coded inequality replaces >, ≥, =, ≤, < with signs such as @, *, #, $, &. First decode onto a single chain of letters. Then walk from one letter to the other. A definite > needs a same-direction path with at least one strict > (or < the other way) and no break the other way.\n\nThe trap is comparing across a break. In P > Q ≥ R = S < T you can say P > S, but you cannot say Q < T, because after S the chain goes up. When a < and a > fight in the same walk, the pair cannot be compared.",
+      heading: "Coded inequality",
+      body: "Think of people in a height line: P is taller than Q, Q is at least as tall as R, and so on. The exam hides >, ≥, =, ≤, < behind signs like @ and *. Decode onto one chain first, then walk from letter to letter the way you would walk along that taller/shorter line.\n\nOn the exam, a definite > needs a one-way path with at least one strict step and no break the other way. If the chain goes down and then up, those two letters cannot be compared. Decode first; never walk on the coded symbols. Two ‘maybes’ are not ‘either I or II’.",
       howTo: [
         "Copy the code key: which symbol is >, ≥, =, ≤, <.",
-        "Rewrite the whole statement as one chain of letters and real signs. Do not compare on the coded symbols.",
-        "To test ‘A > B’, walk from A to B. You need every step ≥ or = in that direction, plus at least one strict >.",
+        "Rewrite the whole statement as one chain of letters and real signs.",
+        "To test ‘A > B’, walk from A to B. You need every step ≥ or = that way, plus at least one strict >.",
         "If the walk goes up and then down (or down then up), stop. Those two letters cannot be compared.",
-        "Tick ‘either I or II’ only when the two conclusions are complements (one of them must hold, and they cannot both hold). Two ‘maybes’ are not either/or.",
+        "Tick ‘either I or II’ only when the two conclusions are complements, not two ‘maybes’.",
       ],
       bullets: [
+        "Inequality = a chain of taller/shorter.",
         "Decode first. Never walk on @ and * until they are >, ≥, =, ≤, <.",
         "A definite > needs a one-way path with a strict step and no opposing break.",
         "A < facing a > in the same walk means ‘cannot say’.",
+        "Two ‘maybes’ are not either/or.",
       ],
       examples: [
         {
@@ -545,19 +551,21 @@ export const notesReasoning: TopicNote = {
       ],
     },
     {
-      heading: "Blood relations — draw generations",
-      body: "Turn every phrase into a small family tree before you look at options. Put older people on a higher line and children on the next line down. Mark gender when you know it (box for male, circle for female, or just write M/F). ‘Only son’ and ‘only daughter’ close extra branches.\n\nThe trap is skipping a generation or guessing gender. ‘Son of my grandfather’s only son’ is the speaker or the speaker’s brother — not the father and not an uncle. In-laws (brother-in-law, sister-in-law) need two candidate pictures until a clue picks one.",
+      heading: "Blood relations",
+      body: "Draw a family tree. Older people sit on a higher line; children sit on the line below. Couples share a line. Mark M or F when you know it. ‘Only son’ means that man has no brother on that line. ‘My grandfather’s only son’ is the father, not an uncle.\n\nOn the exam, replace ‘my’ with the speaker. Pointing-to-a-photo: the photo is ‘he’ or ‘she’, not always the speaker. Honour ‘only’. Son of grandfather’s only son is the speaker or the speaker’s brother. Do not jump to uncle or cousin without an extra sibling on the upper line.",
       howTo: [
-        "Replace ‘my’ with the speaker’s name. Pointing-to-a-photo items: the photo is ‘he’ or ‘she’, not the speaker, unless the line says so.",
+        "Replace ‘my’ with the speaker’s name. In a photo item, the photo is ‘he’ or ‘she’, not the speaker, unless the line says so.",
         "Draw one line per generation. Couple on the same line; their children on the line below.",
         "Honour ‘only’: only son means that man has no brother. Only daughter means no second daughter.",
         "For coded relations (A + B means A is father of B), decode each pair into a labelled arrow, then join at the shared person.",
         "Name the asked person relative to the other person. If two answers remain (himself or brother), that pair is often the key.",
       ],
       bullets: [
+        "Blood relation = family tree. Older people on a higher line.",
         "Grandfather’s only son = the speaker’s father (one son on that line).",
         "That father’s son = the speaker or the speaker’s brother.",
         "Draw generations. Do not jump uncle / cousin without an extra sibling on the upper line.",
+        "‘Only’ closes extra branches. Guessing gender is a trap.",
       ],
       examples: [
         {
@@ -723,19 +731,21 @@ export const notesReasoning: TopicNote = {
       ],
     },
     {
-      heading: "Direction sense — N E S W, turns, shortest path",
-      body: "Draw a plus sign every time: North up, East right, South down, West left. A person facing North who turns right faces East; left faces West; about-turn faces South. Write each walking leg as a length on that plus. Location (‘where is she from the start?’) is not the same as facing (‘which way is she looking?’).\n\nThe trap is answering with the last facing when the question asked for location — or adding the walking legs when the question asked for shortest distance. Shortest distance is the straight line, often a leftover on one axis, or √(x² + y²) on a right triangle.",
+      heading: "Direction sense",
+      body: "Draw a map with North at the top, East to the right, South down, West left. A person facing North who turns right now faces East. Write each walking leg as a length on that plus sign. Where she stands (location) is not the same question as which way she looks (facing).\n\nOn the exam, right from North = East, then South, then West, then North again. Left is the other way. Shortest distance is the leftover straight line, often √(x² + y²), not the sum of the walking legs. Cancel opposite legs first, then read the asked question: facing, location, or shortest path.",
       howTo: [
         "Sketch N (up), E (right), S (down), W (left). Mark the start as (0, 0) if a distance is asked.",
         "For each leg: move the stated length, then if there is a turn, turn from the heading you just walked.",
         "Right from North = East. Right from East = South. Right from South = West. Right from West = North. Left is the other way.",
         "After the last leg, read the question: facing, or location from start, or shortest distance.",
-        "Shortest distance: cancel opposite legs, then if two leftover legs are perpendicular, use √(a² + b²). Do not add the walking total.",
+        "Shortest distance: cancel opposite legs, then if two leftover legs are perpendicular, use √(a² + b²).",
       ],
       bullets: [
-        "North up, East right. Right turn from North = East.",
+        "Map with N at the top, East right.",
+        "Right turn from North = East. Left is the other way.",
         "Location of a point and facing of a person are different questions.",
         "Shortest path is the leftover triangle, not the sum of the walk.",
+        "Do not add the walking total when the question asked for shortest distance.",
       ],
       examples: [
         {
@@ -901,19 +911,21 @@ export const notesReasoning: TopicNote = {
       ],
     },
     {
-      heading: "Letter coding — +1, −1, and reverse alphabet",
-      body: "Letter coding hides a regular alphabet trick. The cheap one is a uniform shift: each letter +1 (SEBI → TFCJ) or each letter −1. Another regular is reverse alphabet: A pairs with Z, B with Y, position k pairs with 27 − k. A third is reverse the word first, then shift.\n\nThe trap is mixing two rules. If SEBI → TFCJ is +1, do not also reverse NIFTY. Check the last letter first so you do not decode four letters and then guess the fifth. The option that is every letter −1 is the usual distractor for a +1 stem.",
+      heading: "Letter coding",
+      body: "Each letter takes a step. SEBI → TFCJ means every letter stepped +1: S to T, E to F, B to C, I to J. Another common step is −1, or a jump to the opposite letter (A pairs with Z, B with Y, position k with 27 − k). Sometimes the word is reversed first, then shifted.\n\nOn the exam, find one rule from the given pair and use only that rule. Check the last letter first so a mixed rule (reverse then shift) is not missed. Kill the option that is the opposite shift. Opposite of k is 27 − k.",
       howTo: [
-        "Compare the first given pair letter by letter: S to T, E to F, and so on. Write +1, −1, reverse, or reverse-then-shift.",
-        "Confirm the same rule on the last letter of that pair. If the last letter disagrees, the rule is mixed (often reverse then shift).",
+        "Compare the first given pair letter by letter. Write +1, −1, reverse, or reverse-then-shift.",
+        "Confirm the same rule on the last letter of that pair. If the last letter disagrees, the rule is mixed.",
         "Apply only that rule to the asked word. Work every letter. Do not skip the last one.",
         "Opposite letter of position k is 27 − k (A = 1, Z = 26).",
         "Kill options that are the opposite shift (−1 when the stem was +1) or that drop the last letter.",
       ],
       bullets: [
+        "Each letter takes a step: usually +1, −1, or reverse alphabet.",
         "Uniform +1: check the last letter first, then fill the rest.",
         "Opposite of k is 27 − k. A↔Z, B↔Y, C↔X.",
         "One rule per item. MJESX is the −1 trap for a +1 stem.",
+        "Do not mix two rules on the same word.",
       ],
       examples: [
         {
@@ -1080,7 +1092,7 @@ export const notesReasoning: TopicNote = {
     },
     {
       heading: "Number and symbol coding",
-      body: "Number coding turns words into digits, or turns letters into their place-values. Symbol coding swaps operators (+ means ×) or gives a number-code for each word in a short sentence. Always find what is common: the word that repeats and the digit that repeats are a pair.\n\nThe trap is adding the wrong letters, or assigning a repeating digit to a word that does not repeat. Decode the key first, then apply it. After operator swaps, use normal order of operations on the decoded expression unless the paper says left-to-right only.",
+      body: "Here the code is digits or swapped signs, not a letter step. CAT as 24 is C=3, A=1, T=20 added up. In a sentence code, the word that repeats and the digit that repeats are a pair — match them like matching stickers. If + secretly means ×, rewrite the sum with the real signs before you compute.\n\nOn the exam, A=1 … Z=26 unless the stem uses reverse place-value. Underline the repeating word and the repeating digit. Swap operators first, then use BODMAS. Do not reuse a +1 letter-coding shift on these items.",
       howTo: [
         "Letter-to-number: write A=1 … Z=26 (or the reverse A=26 … Z=1 if the stem fits that). Sum or list as the stem requires.",
         "Sentence-to-digits: underline the word that appears in two lines, and the digit that appears in those same two lines. That digit is that word.",
@@ -1092,6 +1104,8 @@ export const notesReasoning: TopicNote = {
         "Repeating word + repeating digit = a matched pair.",
         "A=1 … Z=26 unless the stem uses reverse place-value.",
         "Swap the operators first; then compute. Do not compute on the printed signs.",
+        "CAT as a sum of place-values is not the same trick as SEBI → TFCJ.",
+        "The leftover word takes the leftover digit.",
       ],
       examples: [
         {
@@ -1257,20 +1271,21 @@ export const notesReasoning: TopicNote = {
       ],
     },
     {
-      heading: "Linear seating — left and right from the person’s view",
-      body: "People in a straight row. Left and right are from each sitter’s view, not from yours if they face you. If everyone faces north, their left is west and their right is east. Draw the row west → east as left → right on the page, so their left matches the left of your drawing.\n\nThe trap is flipping left/right because ‘I am looking at them’. If they face south, their left is east — the left of the page is then their right. Always say it in words: ‘A sits 2nd left of B, so from our left the row is …’.",
+      heading: "Linear seating",
+      body: "People sit on chairs in a line. Left and right are from each sitter’s view, like looking out of their own eyes. If everyone faces north, their left is west — the left of your page when North is up. If they face south, their left is east, so the left of the page is their right.\n\nOn the exam, note facing first. ‘A sits 2nd left of B’ means skip one chair toward B’s left, then put A. Place ends and fixed seats first. Never put two people in one chair. If a clue fights the drawing, an earlier optional branch was wrong.",
       howTo: [
         "Note the facing. Facing north: person’s left = west. Facing south: person’s left = east.",
         "Number seats 1…n from west to east (left to right on the page when north is up).",
         "Place the end clues and any fixed seat first. Then place ‘second to the left of B’ as two seats toward B’s left.",
         "Say the row out loud after each clue: ‘from our left: empty, A, C, B, …’.",
-        "Immediate neighbours fill both sides of a person without yet saying who is left. A later left/right clue locks the side.",
         "If a clue fights the drawing, an earlier optional branch was wrong. Keep two sketches until one dies.",
       ],
       bullets: [
+        "Seating in a line: chairs in a row. Left and right are from the sitter’s view.",
         "Facing north: left = west = left of the page. Facing south: left = east.",
         "‘A sits 2nd left of B’ = skip one seat in B’s left direction, then put A.",
         "Never put two people in one seat. Ends are the cheapest clues.",
+        "Facing south flips left on the page.",
       ],
       examples: [
         {
@@ -1437,20 +1452,21 @@ export const notesReasoning: TopicNote = {
       ],
     },
     {
-      heading: "Circular seating — facing centre versus facing out",
-      body: "People around a table. Draw a clock and number seats 1, 2, 3… clockwise. If they face the centre, a person’s left is clockwise (from above) and a person’s right is anti-clockwise. If they face out, left and right swap: left is anti-clockwise, right is clockwise.\n\nThe trap is using the facing-centre map on an outward-facing table. ‘A sits 2nd left of B’ must name the facing first. Opposite exists only for an even count: in a hexagon, opposite is three seats away; in a square, two seats away. Five people have no unique opposite.",
+      heading: "Circular seating",
+      body: "People sit on chairs around a table. Draw a clock. If they face the centre (looking inward), a person’s left is clockwise from above. If they face out (looking away from the table), left and right swap: left is anti-clockwise. Opposite exists only when the count is even.\n\nOn the exam, write facing in the first line. Facing centre: left = clockwise, right = anti-clockwise. Facing out: the reverse. Opposite in 6 seats = three steps; in 8 seats = four. Five people have no unique opposite. ‘2nd left of B’ still means skip one chair in B’s left direction.",
       howTo: [
         "Write facing in the first line: centre or out. Pick a person, put them at seat 1, number the rest clockwise.",
         "Facing centre: left = clockwise, right = anti-clockwise. Facing out: left = anti-clockwise, right = clockwise.",
-        "Place ‘second to the left of B’ as two seats in B’s left direction. Say it: ‘A is 2nd left of B, so skip one seat that way to A.’",
+        "Place ‘second to the left of B’ as two seats in B’s left direction.",
         "Opposite in 6 seats = three steps. Opposite in 8 seats = four steps. Do not ask opposite in 5.",
-        "Neighbours of X are the two seats touching X. A left/right clue decides which neighbour is which.",
         "If two drawings remain, the next left/right clue kills one. Do not seat two people in one chair.",
       ],
       bullets: [
+        "Seating in a circle: chairs around a table.",
         "Facing centre: left = clockwise from above. Facing out: left = anti-clockwise.",
         "‘2nd left of B’ = skip one seat in B’s left direction — direction depends on facing.",
         "Opposite = n/2 seats away, only when n is even.",
+        "Five people have no unique opposite.",
       ],
       examples: [
         {
@@ -1621,19 +1637,21 @@ export const notesReasoning: TopicNote = {
       ],
     },
     {
-      heading: "Order and ranking — from left, from right, total = L + R − 1",
-      body: "If A is 7th from the left and 12th from the right, the total number of people is 7 + 12 − 1 = 18. You subtract one because A was counted in both ranks. Rank from the other end = total − this-end rank + 1. People sitting between two positions i and j (same end) = |j − i| − 1.\n\nThe trap is adding L + R with no −1 (that gives 19) or converting only one of two ranks before you count ‘between’. Height items: ‘taller than only two’ means 3rd shortest. ‘Shorter than only one’ means 2nd tallest.",
+      heading: "Order and ranking",
+      body: "A row of people. If A is 7th from the left and 12th from the right, A was counted twice — once from each end — so the total is 7 + 12 − 1 = 18. That −1 is the whole trick. Rank from the other end is total − this-end rank + 1.\n\nOn the exam, total = L + R − 1. People between two same-end positions = |j − i| − 1. Convert both ranks to the same end before you count ‘between’. ‘Taller than only two’ means 3rd shortest. ‘Shorter than only one’ means 2nd tallest.",
       howTo: [
         "If one person gives both a left rank and a right rank, total = L + R − 1.",
         "To turn a left rank into a right rank: right = total − left + 1. The other way is the same formula.",
-        "Before counting people between A and B, put both ranks on the same end (both from the left, or both from the right).",
+        "Before counting people between A and B, put both ranks on the same end.",
         "Between = difference of those two positions, minus 1.",
-        "‘Taller than only k’ = (k+1)th from the shortest. ‘Shorter than only k’ = (k+1)th from the tallest. Write a numbered height line.",
+        "‘Taller than only k’ = (k+1)th from the shortest. ‘Shorter than only k’ = (k+1)th from the tallest.",
       ],
       bullets: [
-        "Total = (from left) + (from right) − 1.",
+        "Ranking: total = left + right − 1.",
         "Other-end rank = total − this-end rank + 1.",
-        "Between two same-end ranks = |j − i| − 1. ‘Taller than only k’ = k+1 from the bottom.",
+        "Between two same-end ranks = |j − i| − 1.",
+        "‘Taller than only k’ = k+1 from the bottom.",
+        "Adding L + R with no −1 is the usual trap.",
       ],
       examples: [
         {
@@ -1800,19 +1818,21 @@ export const notesReasoning: TopicNote = {
       ],
     },
     {
-      heading: "Input-output — one machine, one step pattern",
-      body: "An input-output machine rearranges a line by the same rule at every step. In this note the machine does two placements per step: the smallest remaining number moves to the leftmost free settled slot, and the alphabetically earliest remaining word moves to the rightmost free settled slot. The middle tokens keep their order.\n\nThe trap is jumping to step IV from the input, or moving two numbers in one step. Rewrite the full line after every step. The finished output has numbers ascending from the left and words alphabetical from the right.",
+      heading: "Input-output",
+      body: "Picture a machine that rearranges a mixed line, one step at a time. Each step parks the smallest leftover number at the left and the alphabetically earliest leftover word at the right. The messy middle keeps its order. After enough steps, numbers sit small-to-large on the left and words A-to-Z from the right.\n\nOn the exam, copy the input. Rewrite the full line after every step. Do not jump to step IV, and do not move two numbers in one step. Answer position questions from the line you wrote for that step, not from the input and not from the finished output.",
       howTo: [
         "Copy the input. List the numbers from small to large, and the words from A to Z. That is the target order.",
         "Each step: park the next smallest leftover number at the left of the still-messy middle, and park the next earliest leftover word at the right of that middle.",
         "Do not move any other token. The middle keeps its relative order.",
-        "Write the whole new line. That is step I. Repeat for step II, III, … until numbers on the left are sorted and words on the right are sorted.",
+        "Write the whole new line. That is step I. Repeat until numbers on the left are sorted and words on the right are sorted.",
         "Answer position questions from the line you actually wrote for that step, not from the input and not from the output.",
       ],
       bullets: [
+        "A machine that rearranges one step at a time.",
         "One number to the left (ascending) and one word to the right (alphabetical) per step.",
         "Middle tokens keep order. Rewrite the whole line each time.",
         "Output: numbers small-to-large on the left, words A-to-Z from the right.",
+        "Do not jump to step IV from the input.",
       ],
       examples: [
         {
@@ -1981,20 +2001,22 @@ export const notesReasoning: TopicNote = {
       ],
     },
     {
-      heading: "Floor or box puzzle — place one clue at a time",
-      body: "A floor puzzle stacks people on floors 1 (ground) to 5 (top), unless the stem numbers the top as 1. A box puzzle is the same drawing with boxes in a stack. Make a single column of five slots. Place the unique clues first (who is on 5, who is on the ground). Then place ‘immediately above’ as the next integer up.\n\nThe trap is filling two people into one floor, or treating ‘two floors above’ as next door. Two floors above K is a gap of one. Odd floors are 1, 3, 5. If two sketches survive, the last clue’s job is to kill one. Paper-1 keys are unique; if both sketches live, you missed an ‘only’ or an ‘immediate’.",
+      heading: "Floor and box puzzles",
+      body: "A building with floors. Ground is floor 1, top is 5, unless the stem numbers the top as 1. Fill the building floor by floor from the clues. Put the unique facts first (who is on 5, who is on the ground). ‘Immediately above’ is the next floor up; ‘two floors above’ skips one. A box stack is the same drawing.\n\nOn the exam, one person (or box) per floor. Odd floors are 1, 3, 5. If two sketches survive, the last clue kills one. Paper-1 keys are unique. Do not treat ‘two above’ as next door.",
       howTo: [
         "Draw five slots in a column. Label 1 at the bottom if the stem says ground = 1.",
         "Place every clue that names a floor number or an end (top / ground) first.",
         "Place ‘immediately above X’ in the slot next to X. Place ‘two above X’ with one empty slot between.",
         "Use ‘odd floor’ / ‘even floor’ to cut the leftover slots. One person per slot.",
-        "When a second attribute (colour, city) appears, fill it on the same column after the people are locked — or lock a colour when it is tied to a known floor.",
-        "Read the asked question. If it is already a premise (‘L lives immediately above K’), tick L, then still check the tower so no option contradicts it.",
+        "When a second attribute (colour, city) appears, fill it on the same column after the people are locked.",
+        "If two sketches live, you missed an ‘only’ or an ‘immediate’. The last clue kills one.",
       ],
       bullets: [
+        "Fill a building floor by floor from the clues.",
         "Ground = 1 unless the stem numbers the top as 1. One person (or box) per floor.",
         "Immediately above = next floor. Two above = skip one floor.",
         "Place unique clues first. The last clue kills the leftover sketch.",
+        "Odd floors are 1, 3, 5. Do not treat ‘two above’ as next door.",
       ],
       examples: [
         {

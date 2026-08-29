@@ -2,23 +2,27 @@ import type { TopicNote } from "@/data/notes";
 
 export const notesDs: TopicNote = {
   topic: "ds",
-  title: "Data structures — techniques (beginner)",
+  title: "Data structures — simple notes",
   blurb:
-    "A stack is LIFO: the last number you pushed is the first one you pop. Postfix uses that rule. A queue is FIFO: the first in is the first out. BST inorder prints keys sorted. A heap is a complete tree in an array; parent beats children, but inorder is not sorted. A hash table is expected O(1) search if the hash spreads keys out. A singly linked list walks next pointers to insert or delete. JSON objects nest like a tree.",
+    "We explain data structures like class notes a Class-10 student can read: a stack of plates, a ticket line, a family tree, a loud pyramid, a locker number, treasure-map arrows, nested labelled boxes. Then we solve five tiny examples in each topic, one push or one pointer at a time.",
   blocks: [
     {
-      heading: "Stack LIFO — postfix evaluation",
-      body: "A stack is last-in, first-out. Push adds on top. Pop removes the top. Each operation is Θ(1).\n\nPostfix (Reverse Polish) is the exam dry-run. Scan tokens left to right. A number is pushed. An operator pops two values: the first pop is the right operand, the second pop is the left operand. Push the result. At the end the stack holds one number — the answer. Write the stack after every token. Peak depth is the capacity you needed.",
+      heading: "Stack — plates, and postfix",
+      body: "Picture a stack of plates in a canteen. You put a clean plate on top. You take a plate from the top. The last plate you put on is the first you take off (LIFO). Push adds on top. Pop removes the top. Each job is Θ(1).\n\nOn the exam, postfix (Reverse Polish) is that plate rule as a dry-run. Scan tokens left to right. A number is pushed. An operator pops two values: the first pop is the right operand, the second pop is the left operand. Push the result. At the end the stack holds one number — the answer. Write the stack after every token. Peak depth is the capacity you needed. Matching brackets are the same last-on, first-off rule. A queue would close the oldest opener first, which is not how brackets nest.",
       howTo: [
         "Scan tokens left to right.",
-        "Number → push.",
+        "Number → put a plate on top (push).",
         "Operator → pop right, pop left, apply, push the result.",
         "After each token write the stack from bottom to top. The last remaining number is the value.",
+        "Peak depth, not n, is the array capacity you needed.",
+        "Matching brackets: push an opener, pop only if the closer matches the top plate.",
       ],
       bullets: [
-        "LIFO. First pop is the right operand.",
+        "Stack = plates. Last on, first off. First pop is the right operand.",
         "Well-formed postfix of n numbers and n−1 operators ends with one value.",
         "Peak depth, not n, is the needed capacity.",
+        "Matching brackets need a stack, not a ticket line.",
+        "Infix to postfix uses the same plate stack for operators (tighter op sits on top).",
       ],
       examples: [
         {
@@ -46,19 +50,19 @@ print(st[-1])`,
           steps: [
             {
               do: "Token 5: push. Stack is 5. Token 1: stack is 5, 1. Token 2: stack is 5, 1, 2.",
-              why: "A number always goes on the stack. Depth is now 3.",
+              why: "A number always goes on the plate pile. Depth is now 3.",
             },
             {
               do: "Token +: pop right=2, left=1, push 3. After token + the stack is 5, 3.",
-              why: "An operator pops two, uses left op right, and pushes one. Net depth −1.",
+              why: "An operator pops two plates, uses left op right, and pushes one. Net depth −1.",
             },
             {
               do: "Token 4: stack is 5, 3, 4. Token *: pop right=4, left=3, push 12. After token * the stack is 5, 12.",
-              why: "That 12 is (1+2)×4. LIFO gave us 4 as the right operand.",
+              why: "That 12 is (1+2)×4. The top plate was 4, so 4 is the right operand.",
             },
             {
               do: "Token +: stack is 17. Token 3: stack is 17, 3. Token −: pop right=3, left=17, push 14. Stack is 14. Peak depth was 3.",
-              why: "Final size 1 is the value. Peak depth is the array capacity you needed.",
+              why: "Final size 1 is the value. Peak depth is how many plates you needed at once.",
             },
           ],
           result: "Value 14. Snapshots: [5] → [5,1] → [5,1,2] → [5,3] → [5,3,4] → [5,12] → [17] → [17,3] → [14]. Peak depth 3.",
@@ -73,11 +77,11 @@ print(st[-1])`,
           steps: [
             {
               do: "Push 9. Stack is 9. Push 5. Stack is 9, 5.",
-              why: "Operands wait on the stack until their operator arrives.",
+              why: "Numbers wait on the plate pile until their operator arrives.",
             },
             {
               do: "Minus: first pop is 5 (right). Second pop is 9 (left).",
-              why: "The top of a LIFO stack is the most recent number, which is the right operand.",
+              why: "The top plate is the most recent number, which is the right operand.",
             },
             {
               do: "9 − 5 = 4. Stack is 4. Not 5 − 9.",
@@ -110,11 +114,11 @@ print(st[-1])`,
           steps: [
             {
               do: "([{}])(): push (, [, {. After the three opens the stack is (, [, {.",
-              why: "An opening bracket waits on the stack until its closer arrives.",
+              why: "An opening bracket waits on the plate pile until its closer arrives.",
             },
             {
               do: "Then } pops {, ] pops [, ) pops (, () pops the last pair. Stack empty → balanced.",
-              why: "The most recently opened bracket must close first. That is LIFO.",
+              why: "The most recently opened bracket must close first. That is last-plate-off.",
             },
             {
               do: "([)]: push (, push [. Then ) wants the top, which is [, but ) pairs with (. Fail.",
@@ -122,7 +126,7 @@ print(st[-1])`,
             },
             {
               do: "A queue would close the oldest opener first, which is not how brackets nest.",
-              why: "Nested structure is a stack problem, not a FIFO problem.",
+              why: "Nested structure is a plate problem, not a ticket-line problem.",
             },
           ],
           result: "‘([{}])()’ is balanced. ‘([)]’ fails. Matching brackets need a stack.",
@@ -137,7 +141,7 @@ print(st[-1])`,
           steps: [
             {
               do: "1 2 3 4 + + +: after the four numbers the stack is 1, 2, 3, 4. Peak depth 4. Then each + shrinks by one, down to 10.",
-              why: "All operands arrived before any operator. You needed four slots at once.",
+              why: "All operands arrived before any operator. You needed four plates at once.",
             },
             {
               do: "1 2 + 3 + 4 +: after 1 2 the depth is 2, + makes 3, push 3 depth 2, + makes 6, push 4 depth 2, + makes 10. Peak 2.",
@@ -145,7 +149,7 @@ print(st[-1])`,
             },
             {
               do: "Both expressions use 4 numbers. Capacity is the peak, not n.",
-              why: "Exam: ‘how big an array for this postfix?’ → peak depth.",
+              why: "Exam: ‘how big an array for this postfix?’ → peak plate count.",
             },
             {
               do: "Well-formed postfix of n numbers and n−1 operators still ends with one value in both traces.",
@@ -173,15 +177,15 @@ print(st[-1])`,
             },
             {
               do: "+: operator stack empty, push +. Then *: * has higher precedence, so it sits on top of +. Stack is +, *.",
-              why: "A tighter operator must wait closer to its operands, on top.",
+              why: "A tighter operator must wait closer to its operands, as the top plate.",
             },
             {
               do: "End of input: pop * then +. Output 3 4 5 * +.",
-              why: "Flush the stack so * (the top) is applied before +.",
+              why: "Flush the plates so * (the top) is applied before +.",
             },
             {
               do: "Check: postfix 3 4 5 * + = 3+(4*5)=23, not (3+4)*5. The stack encoded precedence.",
-              why: "That is the same LIFO rule as evaluation, run in reverse for conversion.",
+              why: "That is the same plate rule as evaluation, run in reverse for conversion.",
             },
           ],
           result: "Postfix 3 4 5 * +. Operator stack after *: [+, *]. Flush * then +.",
@@ -189,18 +193,22 @@ print(st[-1])`,
       ],
     },
     {
-      heading: "Queue FIFO",
-      body: "A queue is first-in, first-out. Enqueue adds at the rear. Dequeue removes the front. A linked queue with head and tail pointers is Θ(1) per operation. A circular array uses (i+1)%C so free slots at the front can be reused.\n\nBFS uses a queue. Printers and buffers use a queue. A priority queue is not FIFO — that is a heap. A linear array that only grows rear wastes slots after dequeue; circular wrap is the cure.",
+      heading: "Queue — a ticket line",
+      body: "Picture a ticket line. The first person who joined is the first served (FIFO). Enqueue adds at the rear. Dequeue removes the front. A linked queue with head and tail pointers is Θ(1) per job. A circular array uses (i+1)%C so free slots at the front can be reused.\n\nOn the exam, BFS uses this ticket line. Printers and buffers use a queue. A priority queue is not FIFO — that is a heap (a loud pyramid). A linear array that only grows rear wastes slots after dequeue; circular wrap is the cure. Reserved-slot full test: max live size is C−1. A size counter can fill all C slots.",
       howTo: [
         "Enqueue: write at rear, then rear = (rear+1)%C (circular) or tail = new node.",
         "Dequeue: read at front, then front = (front+1)%C or head = head.next.",
         "Empty: front==rear (reserved-slot scheme) or size==0. Full: (rear+1)%C==front or size==C.",
-        "Trace BFS with a queue: the oldest waiting vertex is processed next.",
+        "Trace BFS with a queue: the oldest waiting room is processed next.",
+        "A printer is a ticket line: first job in is first printed. A stack would print the last job first.",
+        "Without wrap, dequeue frees the front but a linear rear still says ‘full’. Circular wrap reuses those slots.",
       ],
       bullets: [
-        "FIFO. Linked head+tail or circular array: Θ(1) enqueue/dequeue.",
-        "BFS, buffers, printers. Not a priority queue.",
+        "Queue = ticket line. First in, first out.",
+        "Linked head+tail or circular array: Θ(1) enqueue/dequeue.",
+        "BFS, buffers, printers. Not a priority queue (that is a heap).",
         "Linear queue without wrap wastes space after dequeue.",
+        "Reserved-slot max live is C−1. Size-counter max live is C.",
       ],
       examples: [
         {
@@ -222,11 +230,11 @@ int front = 0, rear = 0;
             },
             {
               do: "Dequeue twice: 10 then 20. After the second dequeue front=2, rear=4. Live 30,40.",
-              why: "Dequeue moves front. Old 10 and 20 are stale, outside the live window.",
+              why: "Take-from-front moves front. Old 10 and 20 are stale, outside the live window.",
             },
             {
               do: "Enqueue 50: a[4]=50, rear=0. Enqueue 60: a[0]=60, rear=1. After 60 the live cells are 30,40,50,60. front=2, rear=1, full again.",
-              why: "rear wrapped to 0 and reused the slots dequeue had freed.",
+              why: "rear wrapped to 0 and reused the slots dequeue had freed. That is the ring.",
             },
             {
               do: "60 succeeded. A non-circular array would have said ‘rear at the end’ and rejected 60 with two free slots at the front.",
@@ -254,16 +262,16 @@ for v in reversed(g[u]):
 print("dfs", st)`,
           steps: [
             {
-              do: "BFS: dequeue A, enqueue B then C. After expanding A the queue is B, C.",
-              why: "FIFO: B was first in, so B is processed next.",
+              do: "BFS: take A from the front, put B then C at the back. After expanding A the queue is B, C.",
+              why: "Ticket line: B was first in, so B is served next.",
             },
             {
               do: "DFS: pop A, push C then B. After expanding A the stack is C, B with B on top.",
-              why: "LIFO: B is processed next so we go deep into B before C.",
+              why: "Plates: B is taken next so we go deep into B before C.",
             },
             {
               do: "Same neighbours, different end. BFS stays wide. DFS goes deep.",
-              why: "The ADT is the algorithm.",
+              why: "The picture is the algorithm: fire/ticket line versus maze/plates.",
             },
             {
               do: "A printer queue is the BFS picture: first job submitted is first printed.",
@@ -288,7 +296,7 @@ print("dfs", st)`,
             },
             {
               do: "Two dequeues move front to 2. Live data sits at 2,3. Slots 0 and 1 are free.",
-              why: "Dequeue freed space at the front.",
+              why: "Take-from-front freed space at the start of the ticket line.",
             },
             {
               do: "Without wrap, enqueue E still sees rear=4 and fails.",
@@ -343,19 +351,19 @@ print(st.pop(), st.pop(), st.pop())  # C B A`,
           steps: [
             {
               do: "FIFO queue: dequeue A, then B, then C. First submitted is first printed.",
-              why: "Fairness-by-arrival is the queue invariant.",
+              why: "Fairness-by-arrival is the ticket-line rule.",
             },
             {
               do: "If the printer were a stack, C would print first (last in, first out). That starves early jobs.",
-              why: "Wrong ADT. Nested undo is a stack; a waiting line is a queue.",
+              why: "Wrong picture. Nested undo is plates; a waiting line is a ticket queue.",
             },
             {
               do: "A priority queue (heap) would print the highest-priority job, which may be B in the middle.",
-              why: "That is not FIFO. Do not call a heap ‘a queue’ on the exam unless they say priority.",
+              why: "That is not FIFO. Do not call a loud pyramid ‘a queue’ on the exam unless they say priority.",
             },
             {
-              do: "BFS uses the printer picture: oldest waiting vertex next. DFS uses the stack picture.",
-              why: "ADT = algorithm.",
+              do: "BFS uses the printer picture: oldest waiting room next. DFS uses the plate picture.",
+              why: "Picture = algorithm.",
             },
           ],
           result: "Printer FIFO: A, B, C. Stack would print C, B, A. Priority queue is a heap, not FIFO.",
@@ -363,18 +371,22 @@ print(st.pop(), st.pop(), st.pop())  # C B A`,
       ],
     },
     {
-      heading: "BST — inorder is sorted",
-      body: "A binary search tree stores keys so that every left subtree is smaller than the node and every right subtree is larger. Search and insert walk one root-to-leaf path. On a balanced tree that path is Θ(log n). Sorted inserts into a plain BST make a chain of height Θ(n).\n\nInorder (left, node, right) always emits keys in sorted order. That is the BST theorem. Preorder is the insert fingerprint of that shape. A heap is not a BST: parent beats children, but left versus right is free, so inorder of a heap is not sorted.",
+      heading: "BST — family tree, left is smaller",
+      body: "Picture a family tree where every left child is a smaller number and every right child is a larger number. Search and insert walk one root-to-leaf path, like asking ‘smaller? go left; larger? go right.’ On a balanced tree that path is Θ(log n). Sorted inserts into a plain BST make a chain of height Θ(n).\n\nOn the exam, inorder (left, node, right) always emits keys in sorted order. That is the BST theorem. Preorder is the insert fingerprint of that shape. A heap is not a BST: parent is louder than children, but left versus right is free, so inorder of a heap is not sorted. AVL/red-black = BST + height cap.",
       howTo: [
         "Insert: from the root, go left if key < node, right if key > node, hang the new node on a null child.",
         "Search: the same walk. Miss at null.",
         "To list sorted keys: inorder — fully left, print, fully right.",
         "If the insert sequence was already sorted, draw a spine and tick Θ(n) search, not Θ(log n).",
+        "Delete with two children: copy the inorder successor (min of the right subtree), then delete that successor.",
+        "Need extract-max → heap. Need sorted listing → BST inorder. Do not mix the pictures.",
       ],
       bullets: [
-        "Left < node < right. Inorder = sorted keys.",
+        "BST = family tree. Left < node < right. Inorder = sorted keys.",
         "Balanced Θ(log n). Skewed Θ(n).",
         "Heap ≠ BST. AVL/red-black = BST + height cap.",
+        "Preorder is the insert fingerprint, not the sorted listing.",
+        "Two-child delete uses the inorder successor (or predecessor).",
       ],
       examples: [
         {
@@ -406,7 +418,7 @@ print(acc)`,
           steps: [
             {
               do: "50 is root. 30 left of 50. 70 right of 50.",
-              why: "Each insert walks the BST rule from the root and hangs on a null child.",
+              why: "Each insert walks the family-tree rule from the root and hangs on a null child.",
             },
             {
               do: "20 left of 30. 40 right of 30. 60 left of 70. 80 right of 70. Shape: 50 with left 30 (20,40) and right 70 (60,80).",
@@ -414,7 +426,7 @@ print(acc)`,
             },
             {
               do: "Inorder left-node-right: 20, 30, 40, 50, 60, 70, 80.",
-              why: "Inorder of a BST is sorted by the left < node < right invariant.",
+              why: "Inorder of a BST is sorted by the left < node < right rule.",
             },
             {
               do: "Preorder would be 50, 30, 20, 40, 70, 60, 80 — the insert fingerprint, not sorted.",
@@ -435,7 +447,7 @@ while (cur != null) {
           steps: [
             {
               do: "Search 40: 40<50 go left, 40>30 go right, 40==40 hit. Compared 50, 30, 40.",
-              why: "A BST search only walks one path. Other branches are skipped.",
+              why: "A BST search only walks one path of the family tree. Other branches are skipped.",
             },
             {
               do: "Search 45: 45<50 left, 45>30 right, 45>40 go to 40’s right, which is null. Miss. Compared 50, 30, 40.",
@@ -447,7 +459,7 @@ while (cur != null) {
             },
             {
               do: "n=7, height 3 ≈ log₂ 8. If inserts had been 20,30,40,… the path would be Θ(n).",
-              why: "Θ(log n) needs a short tree, not only the BST property.",
+              why: "Θ(log n) needs a short tree, not only the left-smaller rule.",
             },
           ],
           result: "Both searches compare 50, 30, 40 only. 40 hits. 45 misses at null.",
@@ -469,7 +481,7 @@ while (cur != null) {
             },
             {
               do: "Inorder is still 10, 20, 30, 40.",
-              why: "The BST property holds. Correctness survived. Height died.",
+              why: "The family-tree rule still holds. Correctness survived. Height died.",
             },
             {
               do: "Search 40 compares 10, 20, 30, 40 — four steps, Θ(n).",
@@ -502,7 +514,7 @@ while (cur != null) {
             },
             {
               do: "Inorder 20, 40, 50, 70 — still sorted, 30 is gone.",
-              why: "Delete must keep the BST rule. Inorder staying sorted is the check.",
+              why: "Delete must keep the family-tree rule. Inorder staying sorted is the check.",
             },
             {
               do: "A leaf delete (20) is just a null child. A one-child delete splices that child up. Two children need successor (or predecessor).",
@@ -524,18 +536,18 @@ while (cur != null) {
           steps: [
             {
               do: "Complete tree: 10 at root, 7 and 8 children, 3 and 2 under 7. Parent ≥ children holds (max-heap).",
-              why: "Heap order is vertical. Left versus right is free.",
+              why: "Heap order is vertical: parent is louder. Left versus right is free.",
             },
             {
               do: "Inorder 3, 7, 2, 10, 8 — not sorted.",
-              why: "If it were a BST, inorder would be sorted. It is not, so it is not a BST.",
+              why: "If it were a family-tree BST, inorder would be sorted. It is not, so it is not a BST.",
             },
             {
               do: "2 sits to the right of 7 and is smaller than 7. A BST would have sent 2 left.",
               why: "That single counter-example kills ‘every heap is a BST’.",
             },
             {
-              do: "Need sorted listing → BST inorder. Need extract-max → heap. Do not mix the invariants.",
+              do: "Need sorted listing → BST inorder. Need extract-max → heap. Do not mix the pictures.",
               why: "Same binary tree drawing, two different contracts.",
             },
           ],
@@ -544,18 +556,22 @@ while (cur != null) {
       ],
     },
     {
-      heading: "Heap — complete tree, parent beats children",
-      body: "A max-heap is a complete binary tree (filled left to right) where every parent is ≥ its children. A min-heap flips the inequality. Completeness lets us use an array: index i has left 2i+1, right 2i+2, parent floor((i−1)/2) (0-based). Height is always Θ(log n).\n\nInsert: append at the end, sift up. Extract-max: swap root with the last leaf, shrink, sift down. Build-heap bottom-up is Θ(n), not Θ(n log n). Inorder of a heap is not sorted. A heap is a priority queue, not a search tree.",
+      heading: "Heap — a pyramid, parent is louder",
+      body: "Picture a pyramid of voices: a parent is always louder than their kids (max-heap). A min-heap flips the rule: parent is quieter. The pyramid is complete — filled left to right, no holes except maybe on the last row, packed left. Completeness lets us use an array: index i has left 2i+1, right 2i+2, parent floor((i−1)/2) (0-based). Height is always Θ(log n).\n\nOn the exam, insert: append at the end, sift up. Extract-max: swap root with the last leaf, shrink, sift down. Build-heap bottom-up is Θ(n), not Θ(n log n). Inorder of a heap is not sorted. A heap is a priority queue, not a search tree. Peek min/max is the root.",
       howTo: [
-        "Check completeness (no holes on a level except the last, packed left) and the parent ≥ children rule (max-heap).",
-        "Insert: write the new key at the next array slot, swap with parent while it is larger.",
-        "Extract-max: answer is a[0]. Move a[n-1] to a[0], n--, sift down along the larger child.",
+        "Check completeness (no holes on a level except the last, packed left) and the parent-louder-than-kids rule (max-heap).",
+        "Insert: write the new key at the next array slot, swap with parent while it is louder.",
+        "Extract-max: answer is a[0]. Move a[n-1] to a[0], n--, sift down along the louder child.",
         "Do not read inorder and expect sorted keys. Peek min/max is the root.",
+        "n inserts are Θ(n log n). Bottom-up heapify is Θ(n).",
+        "Name min vs max before you sift. Soonest deadline is a min-heap. Highest score is a max-heap.",
       ],
       bullets: [
-        "Complete tree in an array. Parent ≥ children (max-heap).",
-        "Insert / extract Θ(log n). Build-heap Θ(n).",
+        "Heap = a pyramid where the parent is louder than the kids (max-heap).",
+        "Complete tree in an array. Insert / extract Θ(log n). Build-heap Θ(n).",
         "Not a BST: inorder is not sorted.",
+        "Priority queue, not a search tree. Peek is the root.",
+        "0-based: parent floor((i−1)/2), left 2i+1, right 2i+2.",
       ],
       examples: [
         {
@@ -577,11 +593,11 @@ while (i > 0 && a[(i - 1) / 2] < a[i]) {
           steps: [
             {
               do: "Append 15 at index 6. After the append the array is 10, 7, 8, 3, 2, 4, 15. Parent of 6 is 2 (value 8).",
-              why: "Insert always grows the complete tree by one leaf at the end.",
+              why: "Insert always grows the complete pyramid by one leaf at the end.",
             },
             {
               do: "15>8, swap. After that swap the array is 10, 7, 15, 3, 2, 4, 8. i moves to 2. Parent is 0 (value 10).",
-              why: "Sift up while the child beats the parent.",
+              why: "Sift up while the child is louder than the parent.",
             },
             {
               do: "15>10, swap. After that swap the array is 15, 7, 10, 3, 2, 4, 8. i is the root. Stop.",
@@ -589,7 +605,7 @@ while (i > 0 && a[(i - 1) / 2] < a[i]) {
             },
             {
               do: "15 ≥ 7 and 10. Heap property restored. Inorder would not be sorted (7 then 15 then 3…).",
-              why: "A heap only orders parent versus children, not left versus right.",
+              why: "A pyramid only orders parent versus kids, not left versus right.",
             },
           ],
           result: "[15, 7, 10, 3, 2, 4, 8]. Sift-up path 6→2→0.",
@@ -609,7 +625,7 @@ while (i > 0 && a[(i - 1) / 2] < a[i]) {
             },
             {
               do: "Sift down i=0: children 7 and 10. Larger child 10 > 8, swap. After that swap the array is 10, 7, 8, 3, 2, 4.",
-              why: "Sift down along the larger child so the parent-beats-children rule returns.",
+              why: "Sift down along the louder child so the parent-beats-kids rule returns.",
             },
             {
               do: "i=2 holds 8. Only child 4. 8≥4, stop.",
@@ -634,7 +650,7 @@ while (i > 0 && a[(i - 1) / 2] < a[i]) {
           steps: [
             {
               do: "n inserts: the k-th insert sifts up O(log k). Sum is Θ(n log n).",
-              why: "Leaves are inserted last and may travel the full height.",
+              why: "Leaves are inserted last and may travel the full height of the pyramid.",
             },
             {
               do: "Bottom-up: call sift-down on every non-leaf from the last parent down to the root. Half the nodes are leaves and do no work.",
@@ -646,7 +662,7 @@ while (i > 0 && a[(i - 1) / 2] < a[i]) {
             },
             {
               do: "Use bottom-up when the array is already filled. Use insert when keys stream in.",
-              why: "Same ADT, two construction costs.",
+              why: "Same pyramid, two construction costs.",
             },
           ],
           result: "n inserts Θ(n log n). Bottom-up heapify Θ(n).",
@@ -665,11 +681,11 @@ print("last parent", n // 2 - 1)`,
           steps: [
             {
               do: "Parent of i is floor((i−1)/2). Parent of 6 is 2, value 10.",
-              why: "That is the sift-up step when you insert at the end.",
+              why: "That is the sift-up step when you insert at the end of the pyramid.",
             },
             {
               do: "Left child 2i+1, right 2i+2. Index 1 (value 7) has left 3 (value 3) and right 4 (value 2).",
-              why: "Sift-down compares those two children and swaps with the larger (max-heap).",
+              why: "Sift-down compares those two kids and swaps with the louder one (max-heap).",
             },
             {
               do: "Last parent is n//2 − 1 = 2 (value 10). Indexes 3,4,5,6 are leaves.",
@@ -695,12 +711,12 @@ print("last parent", n // 2 - 1)`,
 // extract-min: 3, then 7`,
           steps: [
             {
-              do: "Min-heap sifts up while the child is smaller than the parent (flip of max-heap).",
-              why: "The root must be the smallest key.",
+              do: "Min-heap sifts up while the child is quieter than the parent (flip of max-heap).",
+              why: "The root must be the quietest key — the smallest number.",
             },
             {
               do: "After 10,7,8,3 the array is [3, 7, 8, 10]. Root 3. Inorder is not sorted (7, 3, 10, 8… depending on shape).",
-              why: "Still not a BST. Only the root is the answer to ‘who is min?’.",
+              why: "Still not a family-tree BST. Only the root is the answer to ‘who is min?’.",
             },
             {
               do: "Extract-min: take 3, move last leaf 10 to root, sift down. Next root is 7. Second extract returns 7.",
@@ -716,18 +732,22 @@ print("last parent", n // 2 - 1)`,
       ],
     },
     {
-      heading: "Hash table — expected O(1)",
-      body: "A hash table maps a key to a bucket with h(k). Under a uniform hash, insert, search, and delete are expected Θ(1). Worst case is Θ(n) if every key collides. Load factor α = n/m. Rehash when α gets high.\n\nChaining stores a list in each bucket; α may exceed 1. Open addressing stores keys in the array itself; α must stay < 1. A hash table does not keep keys sorted. Need min / inorder → BST. Need extract-max → heap. Need exact id → hash.",
+      heading: "Hash table — locker number from a name",
+      body: "Picture a bank of lockers. You turn a name into a locker number with h(k). Under a fair hash, insert, search, and delete are expected Θ(1). Worst case is Θ(n) if every key collides into one locker. Load factor α = n/m. Rehash when α gets high.\n\nOn the exam, chaining stores a list in each locker; α may exceed 1. Open addressing stores keys in the array itself; α must stay < 1. A hash table does not keep keys sorted. Need min / inorder → BST family tree. Need extract-max → heap pyramid. Need exact id → hash locker.",
       howTo: [
-        "Compute the home bucket h(k) mod m.",
+        "Compute the home locker h(k) mod m.",
         "If the slot/list is empty, put the key there (O(1)). If not, walk the chain or the probe sequence.",
         "Expected chain length is about α. That is why search is expected O(1+α).",
         "If the question needs order or min/max, do not pick a hash table.",
+        "Rehash when α grows: new locker = h(k) mod new_m for every key.",
+        "O(1) is expected, not guaranteed. Adversarial keys can all share one locker.",
       ],
       bullets: [
-        "Expected O(1) insert/search/delete; worst O(n); unordered.",
+        "Hash = locker number from a name. Expected O(1) insert/search/delete; worst O(n); unordered.",
         "α = n/m. Chaining allows α>1. Open addressing needs α<1.",
         "Not a priority queue and not a sorted map.",
+        "Exact id → hash. Smallest id → BST or min-heap. Highest priority → max-heap.",
+        "A bad hash collapses to one chain of length n.",
       ],
       examples: [
         {
@@ -742,20 +762,20 @@ for k in [50, 700, 76, 85, 92]:
 print(b)`,
           steps: [
             {
-              do: "50%7=1 → bucket 1: [50]. 700%7=0 → [700]. 76%7=6 → [76].",
-              why: "Home bucket is k mod m. Empty bucket insert is O(1).",
+              do: "50%7=1 → locker 1: [50]. 700%7=0 → [700]. 76%7=6 → [76].",
+              why: "Home locker is k mod m. Empty locker insert is O(1).",
             },
             {
-              do: "85%7=1, collide, prepend: bucket 1 is [85, 50]. 92%7=1, prepend: bucket 1 is [92, 85, 50].",
+              do: "85%7=1, collide, prepend: locker 1 is [85, 50]. 92%7=1, prepend: locker 1 is [92, 85, 50].",
               why: "Chaining keeps all colliding keys in one list. α may exceed 1.",
             },
             {
               do: "Search 92 hashes to 1, first node is 92, one comparison — expected O(1) when chains are short.",
-              why: "Expected cost is O(1+α), not a full table scan.",
+              why: "Expected cost is O(1+α), not a full locker scan.",
             },
             {
-              do: "Search 33: 33%7=5, bucket empty, miss in O(1). Worst case would be every key in one bucket, Θ(n).",
-              why: "O(1) is expected, not guaranteed. Adversarial keys can collide.",
+              do: "Search 33: 33%7=5, locker empty, miss in O(1). Worst case would be every key in one locker, Θ(n).",
+              why: "O(1) is expected, not guaranteed. Nasty keys can collide.",
             },
           ],
           result: "92 is at the head of bucket 1. Hit 92 in one step. Miss 33 on empty bucket 5. Expected O(1).",
@@ -771,19 +791,19 @@ print(b)`,
           steps: [
             {
               do: "Exact id, no order: hash table, expected Θ(1).",
-              why: "Hashing is built for ‘this key, this bucket’.",
+              why: "Lockers are built for ‘this name, this number’.",
             },
             {
               do: "Smallest id: BST leftmost Θ(log n), or min-heap peek Θ(1) if the heap is keyed by id. Hash must scan Θ(n).",
-              why: "A hash table has no left-to-right order.",
+              why: "A locker bank has no left-to-right family-tree order.",
             },
             {
               do: "Highest priority extract: max-heap Θ(log n). Hash keyed by id cannot extract max without a scan.",
-              why: "A heap’s invariant is parent ≥ children. A hash has no such root.",
+              why: "A pyramid’s rule is parent louder than kids. A hash has no such root.",
             },
             {
               do: "One structure rarely wins all three. Combine a HashMap with a heap of handles if you need both.",
-              why: "Pick the invariant that matches the query.",
+              why: "Pick the picture that matches the query.",
             },
           ],
           result: "(i) hash expected O(1) (ii) BST or min-heap (iii) max-heap. Hash loses min/max.",
@@ -800,10 +820,10 @@ print(b)`,
           steps: [
             {
               do: "h(42)=2, same as h(12)=2. Collision.",
-              why: "Two keys, one home slot. Hashing does not avoid all collisions.",
+              why: "Two names, one home locker. Hashing does not avoid all collisions.",
             },
             {
-              do: "Chaining: attach 42 in bucket 2’s list. Slot 3 is untouched. Search 42 hashes to 2 and walks that list. Expected O(1+α).",
+              do: "Chaining: attach 42 in locker 2’s list. Slot 3 is untouched. Search 42 hashes to 2 and walks that list. Expected O(1+α).",
               why: "Other keys that hash elsewhere are not slowed.",
             },
             {
@@ -830,11 +850,11 @@ alpha2 = n / m2  # 0.375
           steps: [
             {
               do: "α = 6/8 = 0.75. Expected chain length is about 0.75, so search is still expected a small constant.",
-              why: "α is average keys per bucket. That is the O(1+α) story.",
+              why: "α is average keys per locker. That is the O(1+α) story.",
             },
             {
               do: "Double m to 16 and recompute h(k) mod 16 for every key. New α = 6/16 = 0.375.",
-              why: "Rehash is required because the home bucket depends on m. You cannot just copy lists into a bigger array blindly unless h already used a 2-power trick.",
+              why: "Rehash is required because the home locker depends on m. You cannot just copy lists into a bigger bank blindly unless h already used a 2-power trick.",
             },
             {
               do: "If you never rehash, n grows, α grows, chains become Θ(n), and ‘expected O(1)’ dies.",
@@ -858,7 +878,7 @@ alpha2 = n / m2  # 0.375
 // BST of the same keys is a spine or balanced; still O(log n) if balanced`,
           steps: [
             {
-              do: "All four keys hash to bucket 0. The table is one linked list of length 4. Other buckets empty.",
+              do: "All four keys hash to locker 0. The table is one linked list of length 4. Other lockers empty.",
               why: "A bad hash (or adversarial keys) collapses to Θ(n).",
             },
             {
@@ -867,10 +887,10 @@ alpha2 = n / m2  # 0.375
             },
             {
               do: "A balanced BST of 4 keys searches in Θ(log n). A heap cannot search 28 in log n without extra maps.",
-              why: "If the exam wants guaranteed log n search, tick the tree, not the hash table.",
+              why: "If the exam wants guaranteed log n search, tick the family tree, not the locker bank.",
             },
             {
-              do: "Defence: a better hash, universal hashing, or a tree in each bucket (Java’s late conversion of long chains).",
+              do: "Defence: a better hash, universal hashing, or a tree in each locker (Java’s late conversion of long chains).",
               why: "The ADT still looks like a map. The worst-case bound can be repaired.",
             },
           ],
@@ -879,18 +899,22 @@ alpha2 = n / m2  # 0.375
       ],
     },
     {
-      heading: "Singly linked list insert/delete, and JSON as a tree",
-      body: "A singly linked list is a chain of nodes: each node holds a value and a next pointer to the rest. The empty list is a null head. There is no back pointer, so you cannot jump to the previous node unless you kept it.\n\nInsert at the head is Θ(1): new.next = head, head = new. Insert or delete in the middle needs the node before the hole — walk from the head, Θ(n). JSON is a tree: an object is a node whose children are named fields; an array is a node whose children are numbered. Nested JSON is just a nested tree. Walk it like DFS on objects.",
+      heading: "Linked list and JSON — arrows and nested boxes",
+      body: "Picture a treasure map of arrows. Each box holds a value and an arrow to the next box. The empty list is a null head. There is no back arrow, so you cannot jump to the previous box unless you kept it. Insert at the head is Θ(1): new.next = head, head = new. Insert or delete in the middle needs the box before the hole — walk from the head, Θ(n).\n\nJSON is nested labelled boxes: an object is a box whose children are named fields; an array is a box whose children are numbered. Nested JSON is just a nested tree. Walk it like DFS on objects. There is no cycle in well-formed JSON. A tail pointer makes append Θ(1); without it, append is Θ(n).",
       howTo: [
-        "Draw boxes and arrows. Head points at the first node. Last next is null.",
-        "Insert at head: new.next = head; head = new. Insert after node p: new.next = p.next; p.next = new.",
-        "Delete after p: p.next = p.next.next (do not lose the rest of the chain). Deleting the head is head = head.next.",
-        "JSON: each { } is a parent. Each key is an edge label. Arrays are ordered children. Recurse into nested objects.",
+        "Draw boxes and arrows. Head points at the first box. Last next is null.",
+        "Insert at head: new.next = head; head = new. Insert after box p: new.next = p.next; p.next = new.",
+        "Delete after p: p.next = p.next.next (do not lose the rest of the map). Deleting the head is head = head.next.",
+        "JSON: each { } is a parent box. Each key is an edge label. Arrays are ordered children. Recurse into nested objects.",
+        "Wire the new box to the rest of the chain before you overwrite an old arrow, or you lose the treasure.",
+        "JSON is a tree of nested labelled boxes, not a BST: names are field labels, not ordered search keys.",
       ],
       bullets: [
-        "Singly linked: value + next. Head insert/delete Θ(1). Middle needs the previous node, Θ(n) to find.",
+        "Linked list = treasure-map arrows. Value + next. Head insert/delete Θ(1). Middle needs the previous box, Θ(n) to find.",
         "No tail pointer ⇒ append is Θ(n). A tail pointer makes append Θ(1).",
-        "JSON object/array nesting is a tree. Walk children; there is no cycle in well-formed JSON.",
+        "JSON = nested labelled boxes. Walk children; there is no cycle in well-formed JSON.",
+        "Order of pointer writes matters: link, then move head.",
+        "A stack of plates can be a linked list that always inserts and deletes at the head.",
       ],
       examples: [
         {
@@ -907,20 +931,20 @@ new.next = head
 head = new`,
           steps: [
             {
-              do: "Allocate a node 9. Set 9.next = head (currently 3). Then head = 9.",
-              why: "The new node must point at the old chain before you move head, or you lose 3-5-7.",
+              do: "Allocate a box 9. Set 9.next = head (currently 3). Then head = 9.",
+              why: "The new box must point at the old chain before you move head, or you lose 3-5-7.",
             },
             {
-              do: "After those two writes the list is 9 → 3 → 5 → 7. Old nodes were not copied.",
-              why: "Insert at head is two pointer assignments, Θ(1).",
+              do: "After those two writes the list is 9 → 3 → 5 → 7. Old boxes were not copied.",
+              why: "Insert at head is two arrow assignments, Θ(1).",
             },
             {
               do: "If you wrote head = new first, with new.next still null, the old list is leaked.",
-              why: "Order of pointer writes matters. Link, then move head.",
+              why: "Order of arrow writes matters. Link, then move head.",
             },
             {
-              do: "A stack implemented with a linked list always inserts and deletes at the head. That is why push/pop are Θ(1).",
-              why: "LIFO matches head operations.",
+              do: "A stack of plates implemented with a linked list always inserts and deletes at the head. That is why push/pop are Θ(1).",
+              why: "Last-on, first-off matches head operations.",
             },
           ],
           result: "9.next = old head, then head = 9. List 9 → 3 → 5 → 7. Θ(1).",
@@ -936,16 +960,16 @@ head = new`,
 // p.next = 4;        // 3 -> 4`,
           steps: [
             {
-              do: "Let p point at 3. p.next is 5. Create node 4. First set 4.next = p.next so 4 points at 5.",
-              why: "Hold the rest of the chain before you overwrite p.next.",
+              do: "Let p point at 3. p.next is 5. Create box 4. First set 4.next = p.next so 4 points at 5.",
+              why: "Hold the rest of the treasure map before you overwrite p.next.",
             },
             {
               do: "Then p.next = 4. List is 3 → 4 → 5 → 7.",
-              why: "Two writes. The node after p is the insertion point.",
+              why: "Two writes. The box after p is the insertion point.",
             },
             {
               do: "If you set p.next = 4 first, you lose the pointer to 5 unless you saved it.",
-              why: "Same order rule as head insert: wire the new node to the tail side first.",
+              why: "Same order rule as head insert: wire the new box to the tail side first.",
             },
             {
               do: "Finding p is Θ(n) if you only have the head and a value to match. The insert itself is Θ(1) once p is known.",
@@ -964,11 +988,11 @@ head = new`,
 // 3's next becomes 7; node 5 is unlinked`,
           steps: [
             {
-              do: "Start at head 3. 3.next is 5, the victim. You cannot ask 5 for its previous node — there is no prev pointer.",
+              do: "Start at head 3. 3.next is 5, the victim. You cannot ask 5 for its previous box — there is no prev arrow.",
               why: "Singly linked means one arrow forward. Delete in the middle needs the predecessor.",
             },
             {
-              do: "Set 3.next = 5.next (which is 7). List is 3 → 7. Node 5 is unlinked.",
+              do: "Set 3.next = 5.next (which is 7). List is 3 → 7. Box 5 is unlinked.",
               why: "That one assignment splices 5 out. Do not forget to keep 7.",
             },
             {
@@ -976,8 +1000,8 @@ head = new`,
               why: "Head delete is a special case.",
             },
             {
-              do: "A doubly linked list stores prev, so you can delete from a pointer to the victim in Θ(1). You pay extra memory per node.",
-              why: "Same ADT family, extra arrow.",
+              do: "A doubly linked list stores prev, so you can delete from a pointer to the victim in Θ(1). You pay extra memory per box.",
+              why: "Same family, extra arrow.",
             },
           ],
           result: "Need predecessor 3. Set 3.next = 7. Head delete would be head = head.next.",
@@ -991,16 +1015,16 @@ head = new`,
 print(doc["user"]["id"])  # path user -> id`,
           steps: [
             {
-              do: "Root object has two children: key user (an object) and key ok (leaf true).",
-              why: "Each JSON object is a node. Keys are edge names.",
+              do: "Root box has two children: key user (an object) and key ok (leaf true).",
+              why: "Each JSON object is a labelled box. Keys are edge names.",
             },
             {
-              do: "The user object has children id=7 and name=\"Ana\". Those two leaves sit under user, not under the root.",
-              why: "Nesting in the file is parenthood in the tree.",
+              do: "The user box has children id=7 and name=\"Ana\". Those two leaves sit under user, not under the root.",
+              why: "Nesting in the file is parenthood in the tree of boxes.",
             },
             {
               do: "Parent of \"Ana\" is the user object. Path from the root to id is user → id. Value 7.",
-              why: "A path is a sequence of keys, like a file path.",
+              why: "A path is a sequence of labels, like a file path.",
             },
             {
               do: "This is not a graph with cycles. Well-formed JSON is a tree (or a forest if you have a top-level array of roots).",
@@ -1021,10 +1045,10 @@ print(doc[1]["ys"][1])  # 4`,
           steps: [
             {
               do: "Root is an array (ordered children 0 and 1). Child 0 is {x:1}. Child 1 is {x:2, ys:[3,4]}. ys is a nested array of two leaves.",
-              why: "Arrays are nodes with numbered edges 0,1,2,… Objects have named edges.",
+              why: "Arrays are boxes with numbered edges 0,1,2,… Objects have named edges.",
             },
             {
-              do: "Two object nodes (plus the root array and the ys array). Print x by walking each element of the root array and reading key x.",
+              do: "Two object boxes (plus the root array and the ys array). Print x by walking each element of the root array and reading key x.",
               why: "A loop on an array is walking siblings. Recurse when a value is another object/array.",
             },
             {
@@ -1032,7 +1056,7 @@ print(doc[1]["ys"][1])  # 4`,
               why: "Mix of named and numbered edges on one path.",
             },
             {
-              do: "Not a BST: keys are field names, not ordered search keys, and left/right does not mean smaller/larger. It is just a tree of nested values.",
+              do: "Not a BST: keys are field names, not ordered search keys, and left/right does not mean smaller/larger. It is just nested labelled boxes.",
               why: "Use tree language (parent, child, path). Do not run inorder and expect sorted numbers.",
             },
           ],

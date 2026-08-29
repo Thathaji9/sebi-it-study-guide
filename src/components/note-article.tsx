@@ -34,13 +34,17 @@ export function NoteArticle({
           {note.blurb}
         </p>
         <p className="mt-2 text-xs text-muted-foreground">
-          {stats.sections} techniques · {stats.examples} worked examples with
+          {stats.sections} sections · {stats.examples} worked examples with
           numbered steps
         </p>
         <p className="mt-3 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm">
-          Every technique on this page has a <span className="font-medium">How to solve</span> recipe
-          and exam examples. Each example is <span className="font-medium">Question → numbered
-          steps (what / why) → Final answer</span>.
+          Each section starts with an everyday picture, then a{" "}
+          <span className="font-medium">How to solve</span> recipe and five exam
+          examples. Every example is{" "}
+          <span className="font-medium">
+            Question → numbered steps (what / why) → Final answer
+          </span>
+          .
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Button asChild>

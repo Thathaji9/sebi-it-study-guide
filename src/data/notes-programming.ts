@@ -2,23 +2,26 @@ import type { TopicNote } from "@/data/notes";
 
 export const notesProgramming: TopicNote = {
   topic: "programming",
-  title: "Java / C / C++ — techniques (beginner)",
+  title: "Programming — simple notes",
   blurb:
-    "Exam programs are short. Make a table of every variable. Walk one line at a time. i++ uses the old number then adds 1. Java always copies the argument. Overload is chosen before the program runs; override waits for the real object. A constructor builds the parent first. finally still runs. A Java String never changes in place.",
+    "We explain Java and C++ like class notes a Class-10 student can read: a stamp on a counter, a photocopy of a page, a shop with two windows. Then we walk five tiny examples in each topic, one line at a time.",
   blocks: [
     {
-      heading: "i++ vs ++i",
-      body: "i++ is post-increment. The expression uses the old i, then i becomes i+1. ++i is pre-increment. i becomes i+1 first, then the expression uses the new i. A lone i++; and a lone ++i; leave i the same at the end. The difference shows up when you save the value, print it, or use it as an array index.\n\nDraw three columns: i before, value used, i after. Do one ++ per line. In C++, two ++ on the same i in one expression is undefined. Do not guess a number for that.",
+      heading: "What is i++ vs ++i?",
+      body: "i++ is like stamping today’s number on a form, then adding 1 to the counter. The form gets the old number. The counter becomes bigger after the stamp. ++i is the other way: first add 1 to the counter, then stamp the new number on the form.\n\nA lonely i++; or a lonely ++i; only turns the counter. Nobody saves the stamp, so both leave i the same at the end. The difference shows up when you store the value, print it, or use it as an array index. Draw three columns: i before, number used, i after. In C++, two ++ on the same i in one line is not a defined answer. Do not guess a number for that.",
       howTo: [
         "Write i before the line.",
         "If you see i++, copy the old i, then add 1 to i.",
         "If you see ++i, add 1 to i first, then copy the new i.",
-        "Fill a table: i before | value used | i after.",
+        "Fill a table: i before | number used | i after.",
+        "A lonely i++ or ++i in a for-loop only adds 1. Nobody reads the stamp.",
       ],
       bullets: [
-        "i++ = use old, then add 1. ++i = add 1, then use new.",
+        "i++ = stamp the old number, then add 1.",
+        "++i = add 1 first, then stamp the new number.",
         "for (i = 0; i < n; i++) and ++i in the update run the body the same number of times.",
-        "Do not dry-run C++ i++ + ++i on the same variable. That is undefined.",
+        "The difference shows only when you save, print, or index with the ++.",
+        "Do not guess C++ i++ + ++i on the same variable. That answer is not defined.",
       ],
       examples: [
         {
@@ -36,19 +39,19 @@ export const notesProgramming: TopicNote = {
           steps: [
             {
               do: "Start table: i = 1. a and b are not set yet.",
-              why: "Always write the old i before you apply ++.",
+              why: "Always write the old i before you stamp or add 1.",
             },
             {
-              do: "a = i++. Value used is 1, so a = 1. Then i becomes 2. Table: a=1, i=2.",
-              why: "i++ means use the old i, then add 1.",
+              do: "a = i++. Number stamped is 1, so a = 1. Then i becomes 2. Table: a=1, i=2.",
+              why: "i++ means stamp the old i, then add 1 to the counter.",
             },
             {
-              do: "b = ++i. First i becomes 3. Value used is 3, so b = 3. Table: a=1, b=3, i=3.",
-              why: "++i means add 1 first, then use the new i.",
+              do: "b = ++i. First i becomes 3. Number stamped is 3, so b = 3. Table: a=1, b=3, i=3.",
+              why: "++i means add 1 first, then stamp the new i.",
             },
             {
               do: "print a, b, i with spaces → 1 3 3.",
-              why: "The print uses the table, not a second round of ++.",
+              why: "The print reads the table. It does not stamp again.",
             },
           ],
           result: "1 3 3",
@@ -66,20 +69,20 @@ export const notesProgramming: TopicNote = {
 }`,
           steps: [
             {
-              do: "Start: i = 0. Array: index 0→10, 1→20, 2→30, 3→40.",
-              why: "The index used is the value of the ++ expression, not the later i.",
+              do: "Start: i = 0. Array: box 0→10, 1→20, 2→30, 3→40.",
+              why: "The index used is the stamped number, not the i you see later.",
             },
             {
-              do: "a[i++]: index used is 0, so 10. Then i becomes 1.",
-              why: "i++ uses the old index, then adds 1.",
+              do: "a[i++]: index stamped is 0, so 10. Then i becomes 1.",
+              why: "i++ stamps the old index, then adds 1.",
             },
             {
-              do: "Next, a[++i]: i goes 1→2 first. Index used is 2, so 30.",
-              why: "++i adds 1 before the index is read. Java finishes the left operand before the right one.",
+              do: "Next, a[++i]: i goes 1→2 first. Index stamped is 2, so 30.",
+              why: "++i adds 1 before the index is read. Java finishes the left part before the right part.",
             },
             {
               do: "print 10 30. Final i is 2.",
-              why: "We skipped index 1 because ++i jumped from 1 to 2.",
+              why: "We skipped box 1 because ++i jumped from 1 to 2.",
             },
           ],
           result: "10 30",
@@ -99,16 +102,16 @@ export const notesProgramming: TopicNote = {
 }`,
           steps: [
             {
-              do: "new C(): field i = 7.",
-              why: "The ++ is on the object field, not on a copy of a parameter.",
+              do: "new C(): the object’s i = 7.",
+              why: "The ++ is on the object’s counter, not on a photocopy of a number.",
             },
             {
-              do: "return i++: value sent back is 7. Then the field i becomes 8.",
-              why: "i++ still means use old, then add 1. The add happens before the method really leaves.",
+              do: "return i++: number sent back is 7. Then the object’s i becomes 8.",
+              why: "i++ still means stamp old, then add 1. The add happens before the method really leaves.",
             },
             {
               do: "x = 7. c.i is 8.",
-              why: "x stored the yielded value. The object kept the bump.",
+              why: "x stored the stamped number. The object kept the +1.",
             },
             {
               do: "print 7 8.",
@@ -131,24 +134,24 @@ export const notesProgramming: TopicNote = {
 }`,
           steps: [
             {
-              do: "A for-loop does: init once, test, body, update, test, body, update… until the test is false.",
-              why: "The update is a lone statement. It is not used as a value.",
+              do: "A for-loop does: start once, test, body, add 1, test, body, add 1… until the test is false.",
+              why: "The update is a lonely statement. Nobody saves the stamp.",
             },
             {
               do: "First loop: i is 0, 1, 2. Each time the body does a++. After three bodies a is 3. Then i becomes 3 and i < 3 fails.",
-              why: "i++ in the update still adds 1 after the body. The old value is thrown away.",
+              why: "i++ in the update still adds 1 after the body. The old stamp is thrown away.",
             },
             {
               do: "Second loop: j is 0, 1, 2. Each time the body does b++. After three bodies b is 3. Then ++j makes j=3 and the test fails.",
-              why: "++j in the update also just adds 1. There is nobody reading the expression value.",
+              why: "++j in the update also just adds 1. There is nobody reading the stamped number.",
             },
             {
               do: "Both loops ran the body 3 times. print 3 3.",
-              why: "i++ vs ++i only differs when you save or print the expression. A lone update does not.",
+              why: "i++ vs ++i only differs when you save or print the stamp. A lonely update does not.",
             },
             {
-              do: "Do not rewrite this as ‘++j starts at 1 so the body runs twice’. Init is still j = 0.",
-              why: "The ++ sits in the update slot, not in the init slot.",
+              do: "Do not rewrite this as ‘++j starts at 1 so the body runs twice’. Start is still j = 0.",
+              why: "The ++ sits in the update slot, not in the start slot.",
             },
           ],
           result: "3 3",
@@ -169,15 +172,15 @@ export const notesProgramming: TopicNote = {
           steps: [
             {
               do: "Start table: i = 0. Array is [0, 0, 0].",
-              why: "Write i before each store. The index used is the value of i++, not the later i.",
+              why: "Write i before each store. The index used is the stamped number, not the later i.",
             },
             {
-              do: "a[i++] = 5. Index used is 0, so a[0] = 5. Then i becomes 1. Array is [5, 0, 0].",
+              do: "a[i++] = 5. Index stamped is 0, so a[0] = 5. Then i becomes 1. Array is [5, 0, 0].",
               why: "i++ means use the old i as the index, then add 1.",
             },
             {
-              do: "a[i++] = 7. Index used is 1, so a[1] = 7. Then i becomes 2. Array is [5, 7, 0].",
-              why: "Same rule on the next line. We did not skip a slot.",
+              do: "a[i++] = 7. Index stamped is 1, so a[1] = 7. Then i becomes 2. Array is [5, 7, 0].",
+              why: "Same rule on the next line. We did not skip a box.",
             },
             {
               do: "a[2] was never written, so it stays 0. Final i is 2.",
@@ -193,18 +196,21 @@ export const notesProgramming: TopicNote = {
       ],
     },
     {
-      heading: "Pass-by-value",
-      body: "Java always passes a copy. For int, the copy is the number. Changing the parameter does not change the caller’s variable. For an object or array, the copy is the arrow (the reference). Both arrows can point at the same heap object, so a[0]=8 is seen by the caller, but a = new … only moves the copy.\n\nC++ is the same for a plain int. int& is an alias: the parameter is another name for the caller’s variable. int* is a copy of an address; *p writes through to the caller’s int. Swapping the pointers p and q does not swap the caller’s pointer variables.",
+      heading: "What is pass-by-value?",
+      body: "Pass-by-value is like handing someone a photocopy of a page. They can scribble on the copy. Your original notebook stays the same. In Java every argument is a photocopy. For an int, the photocopy is the number. For an array or object, the photocopy is the arrow that points at the real box.\n\nIf they write on the box through that arrow (a[0]=8), you see it, because there is still one box. If they throw away their photocopy and pick a new arrow (a = new …), your arrow does not move. C++ is the same for a plain int. int& is not a photocopy: it is a second name written on your original page. int* is a photocopy of an address; *p writes through to your int. Swapping the photocopied addresses p and q does not swap the caller’s pointer names.",
       howTo: [
-        "Ask: did the callee get a copy of a number, a copy of an arrow, or a C++ alias?",
-        "If the body writes x = … it only changes the copy (unless the parameter is int&).",
-        "If the body writes a[i]= or *p= it changes the shared object.",
+        "Ask: did the method get a photocopy of a number, a photocopy of an arrow, or a C++ second name?",
+        "If the body writes x = … it only changes the photocopy (unless the parameter is int&).",
+        "If the body writes a[i]= or *p= it changes the shared box.",
         "After the call, look only at the caller’s names.",
+        "Java cannot make the caller’s local point at a different object.",
       ],
       bullets: [
-        "Java cannot make the caller’s local point at a different object.",
-        "C++ int& is an alias. C++ int* is a copied address.",
-        "Integer in Java is immutable, so a swap(Integer, Integer) cannot help.",
+        "Java always passes a photocopy, never the original name.",
+        "A photocopy of an arrow still points at the same box, so a[0]= is seen.",
+        "a = new … moves only the photocopy. The caller’s arrow stays.",
+        "C++ int& is a second name on the original page. C++ int* is a copied address.",
+        "Integer in Java cannot be rewritten in place, so a swap(Integer, Integer) cannot help.",
       ],
       examples: [
         {
@@ -227,12 +233,12 @@ export const notesProgramming: TopicNote = {
               why: "These are the only names the print will see.",
             },
             {
-              do: "swap copies: a=1, b=2. a and b are new slots.",
-              why: "Java pass-by-value copies the bits of the int.",
+              do: "swap gets photocopies: a=1, b=2. a and b are new slots.",
+              why: "Java pass-by-value copies the number, like a photocopy of a page.",
             },
             {
               do: "Inside swap: t=1, a=2, b=1. Caller x and y stay 1 and 2.",
-              why: "Assigning a parameter never writes the caller’s local.",
+              why: "Writing on the photocopy never writes the caller’s original.",
             },
             {
               do: "print 1 2.",
@@ -257,15 +263,15 @@ int main() {
           steps: [
             {
               do: "main: x=1, y=2.",
-              why: "int& does not make new ints. a is another name for x.",
+              why: "int& does not make new ints. a is another name written on x’s page.",
             },
             {
               do: "t = a copies 1. a = b writes 2 into x. Table: x=2, y=2, t=1.",
-              why: "Writing the alias writes the caller’s variable.",
+              why: "Writing the second name writes the caller’s variable.",
             },
             {
               do: "b = t writes 1 into y. Table: x=2, y=1.",
-              why: "b is an alias for y, so the second write finishes the swap.",
+              why: "b is a second name for y, so the second write finishes the swap.",
             },
             {
               do: "cout prints 21 with no space.",
@@ -291,20 +297,20 @@ int main() {
 }`,
           steps: [
             {
-              do: "main: x → heap [1, 2], length 2.",
-              why: "The variable x holds an arrow, not the cells themselves.",
+              do: "main: x → box [1, 2], length 2.",
+              why: "The name x holds an arrow, not the cells themselves.",
             },
             {
-              do: "bump copies the arrow. a and x point at the same array. a[0]=8 writes the heap. Array is [8, 2].",
-              why: "A copy of a reference still points at the same object, so slot writes are shared.",
+              do: "bump photocopies the arrow. a and x point at the same array. a[0]=8 writes the box. Array is [8, 2].",
+              why: "A photocopy of an arrow still points at the same box, so slot writes are shared.",
             },
             {
-              do: "a = new int[]{9} moves only the copy a. x still points at [8, 2].",
-              why: "Rebinding a parameter never moves the caller’s arrow.",
+              do: "a = new int[]{9} moves only the photocopy a. x still points at [8, 2].",
+              why: "Throwing away the photocopy never moves the caller’s arrow.",
             },
             {
               do: "print 8 2.",
-              why: "x[0] is the mutated slot. x.length is still 2.",
+              why: "x[0] is the changed slot. x.length is still 2.",
             },
           ],
           result: "8 2",
@@ -329,24 +335,24 @@ class Main {
 }`,
           steps: [
             {
-              do: "main: x → heap Box with n=3.",
+              do: "main: x → a Box with n=3.",
               why: "x holds an arrow. The number 3 lives in the Box, not in x itself.",
             },
             {
-              do: "bump copies the arrow. b and x point at the same Box. b.n = 9 writes that Box. n is 9.",
-              why: "A copy of a reference still points at the same object, so field writes are shared.",
+              do: "bump photocopies the arrow. b and x point at the same Box. b.n = 9 writes that Box. n is 9.",
+              why: "A photocopy of an arrow still points at the same box, so field writes are shared.",
             },
             {
               do: "b = new Box() makes a second Box and moves only b. Then b.n = 1 writes the second Box.",
-              why: "Rebinding the parameter never moves the caller’s arrow x.",
+              why: "Moving the photocopy never moves the caller’s arrow x.",
             },
             {
               do: "bump returns. x still points at the first Box, whose n is 9.",
-              why: "The 1 was written on an object nobody in main can see.",
+              why: "The 1 was written on a box nobody in main can see.",
             },
             {
               do: "print 9.",
-              why: "Ask two questions: did we write a field of the shared object, or did we move the copy?",
+              why: "Ask two questions: did we write a field of the shared box, or did we move the photocopy?",
             },
           ],
           result: "9",
@@ -368,15 +374,15 @@ int main() {
 }`,
           steps: [
             {
-              do: "main: x = 3. f(&x) copies the address of x into p.",
-              why: "int* is a copied address, not an alias of the pointer variable itself.",
+              do: "main: x = 3. f(&x) photocopies the address of x into p.",
+              why: "int* is a copied address, not a second name of the pointer itself.",
             },
             {
               do: "*p = 8 writes through the address. x becomes 8.",
               why: "*p means ‘the int sitting at that address’. That int is the caller’s x.",
             },
             {
-              do: "p = &y moves only the copy p so it points at local y. x is still 8.",
+              do: "p = &y moves only the photocopy p so it points at local y. x is still 8.",
               why: "Assigning p never changes main’s idea of ‘where x lives’.",
             },
             {
@@ -385,7 +391,7 @@ int main() {
             },
             {
               do: "print 8. To swap two caller ints you need int& or you swap *p and *q, not p and q.",
-              why: "Same Java lesson: write through the arrow, or the copy only moves.",
+              why: "Same Java lesson: write through the arrow, or the photocopy only moves.",
             },
           ],
           result: "8",
@@ -393,18 +399,22 @@ int main() {
       ],
     },
     {
-      heading: "Overload vs override",
-      body: "Overload means the same name with different parameter lists in one class. The compiler picks one using the types it can see (the variable’s type and the argument types). That happens before the program runs.\n\nOverride means a child class rewrites a parent instance method with the same signature. Java instance methods are virtual. The real object’s class wins at run time. Fields do not override. static methods do not override. private methods do not override. In C++ you need the word virtual or the parent method still runs.",
+      heading: "What is overload vs override?",
+      body: "Overload is like one shop name with two counters: ‘pay by cash’ and ‘pay by card’. You pick the counter before you enter, from the signboard (the types the compiler can see). Override is like the person who actually showed up at the window. The child class rewrites the parent’s method. Java looks at the real object, not the name on the ticket.\n\nSame name, different parameter lists → overload, chosen before the program runs. Same name, same parameters, child class → override, chosen from the real object if the method is virtual. Fields do not override. static methods do not override. private methods do not override. In C++ you need the word virtual or the parent method still runs.",
       howTo: [
-        "Write the variable’s type (what the compiler sees) and the object’s type (what new created).",
-        "Same name, different parameters → overload. Pick from the variable’s type.",
-        "Same name, same parameters, child class → override. Pick from the object if the method is virtual.",
-        "Fields, static, and private always use the variable’s type.",
+        "Write the variable’s type (the signboard) and the object’s type (who showed up).",
+        "Same name, different parameters → overload. Pick from the signboard.",
+        "Same name, same parameters, child class → override. Pick from who showed up, if the method is virtual.",
+        "Fields, static, and private always use the signboard.",
+        "In C++, no virtual means the parent method still runs.",
       ],
       bullets: [
+        "Overload = same shop, different counters, chosen before you enter.",
+        "Override = the person who actually showed up at the window.",
         "Parent p = new Child(): p.x is Parent’s field; p.m() is Child’s instance method.",
         "Child.show(String) does not override Parent.show(Object).",
         "C++ without virtual: p->f() is Base::f even if the object is Derived.",
+        "static and private do not override. Fields do not override.",
       ],
       examples: [
         {
@@ -427,20 +437,20 @@ class Main {
 }`,
           steps: [
             {
-              do: "p’s variable type is Parent. The object is Child. Heap has Parent.x=1 and Child.x=2.",
-              why: "Two classes can each have a field named x. They are two slots, not one override.",
+              do: "p’s signboard says Parent. The person who showed up is Child. There are two x boxes: Parent.x=1 and Child.x=2.",
+              why: "Two classes can each have a field named x. They are two slots, not one rewrite.",
             },
             {
-              do: "p.x uses the variable type Parent → 1.",
-              why: "Field access is compile-time. Fields never override.",
+              do: "p.x uses the signboard Parent → 1.",
+              why: "Field access follows the signboard. Fields never override.",
             },
             {
-              do: "p.m() is an instance method. Child overrides m → C.",
-              why: "Override waits for the real object.",
+              do: "p.m() is an instance method. Child rewrites m → C.",
+              why: "Override waits for the person who showed up.",
             },
             {
               do: "print 1 C.",
-              why: "One print mixes a compile-time field with a run-time method.",
+              why: "One print mixes a signboard field with a real-object method.",
             },
           ],
           result: "1 C",
@@ -464,20 +474,20 @@ class Main {
 }`,
           steps: [
             {
-              do: "p’s variable type is Parent. Parent only has show(Object). The compiler picks show(Object).",
-              why: "Overload uses the methods the variable’s type can see, even if the argument is a String.",
+              do: "p’s signboard says Parent. Parent only has show(Object). That is the counter we pick.",
+              why: "Overload uses the methods the signboard can see, even if the argument is a String.",
             },
             {
               do: "Child.show(String) is not in that list.",
-              why: "Extra overloads in the child are invisible through a Parent reference.",
+              why: "Extra counters in the child are invisible through a Parent ticket.",
             },
             {
-              do: "At run time the object is Child. Child overrides show(Object) → CO.",
-              why: "After overload picks a signature, override can still replace that one method.",
+              do: "When the program runs, the person who showed up is Child. Child rewrites show(Object) → CO.",
+              why: "After overload picks a counter, override can still replace that one method.",
             },
             {
               do: "print CO. CS is never called.",
-              why: "Compile-time pick, then run-time body.",
+              why: "Pick the counter first (overload), then see who showed up (override).",
             },
           ],
           result: "CO",
@@ -502,16 +512,16 @@ int main() {
 }`,
           steps: [
             {
-              do: "p has type B*. The object is D.",
+              do: "p’s signboard says B*. The person who showed up is D.",
               why: "C++ uses the pointer’s type unless the method is virtual.",
             },
             {
               do: "f is virtual. p->f() runs D::f → Df.",
-              why: "virtual means override at run time.",
+              why: "virtual means look at who showed up.",
             },
             {
               do: "g is not virtual. p->g() runs B::g → Bg.",
-              why: "Without virtual, the compiler binds g to B forever.",
+              why: "Without virtual, the compiler wires g to B forever.",
             },
             {
               do: "Output DfBg.",
@@ -540,24 +550,24 @@ class Main {
 }`,
           steps: [
             {
-              do: "p’s variable type is P. The object is C.",
+              do: "p’s signboard says P. The person who showed up is C.",
               why: "Write both labels before you pick a method.",
             },
             {
-              do: "s() is static in both classes. p.s() is chosen from the variable type P → P.",
-              why: "static is not virtual. Java even warns that p.s() should be written P.s().",
+              do: "s() is static in both classes. p.s() is chosen from the signboard P → P.",
+              why: "static is not ‘who showed up’. Java even warns that p.s() should be written P.s().",
             },
             {
-              do: "C.s() is hiding, not overriding. The object C is ignored for s.",
+              do: "C.s() hides P.s(); it does not override. The object C is ignored for s.",
               why: "Same name and empty parameters is still not override when the method is static.",
             },
             {
-              do: "t() is an instance method. C overrides t. p.t() → Ct.",
-              why: "Instance override waits for the real object.",
+              do: "t() is an instance method. C rewrites t. p.t() → Ct.",
+              why: "Instance override waits for the person who showed up.",
             },
             {
               do: "print P Ct.",
-              why: "One print mixes a compile-time static with a run-time instance method.",
+              why: "One print mixes a signboard static with a real-object instance method.",
             },
           ],
           result: "P Ct",
@@ -581,24 +591,24 @@ class Main {
 }`,
           steps: [
             {
-              do: "p’s variable type is P. The object is C. go() is inherited from P.",
-              why: "C does not override go, so go’s body is still P’s body.",
+              do: "p’s signboard says P. The person who showed up is C. go() is inherited from P.",
+              why: "C does not rewrite go, so go’s body is still P’s body.",
             },
             {
               do: "Inside P.go() the call is h(). P.h() is private.",
               why: "A private method is invisible outside P, including in a child.",
             },
             {
-              do: "C.h() looks like an override, but it is a new method. It does not replace P.h().",
-              why: "private methods do not override. There is no virtual call here.",
+              do: "C.h() looks like a rewrite, but it is a new method. It does not replace P.h().",
+              why: "private methods do not override. There is no ‘who showed up’ call here.",
             },
             {
               do: "go() therefore runs P.h() → P, even though the object is C.",
-              why: "The call is wired to P at compile time.",
+              why: "The call is wired to P before the program runs.",
             },
             {
               do: "print P. If h() had been public (or protected) in both classes, the print would have been C.",
-              why: "The specifier decides whether the child rewrite is a real override.",
+              why: "The word private decides whether the child’s rewrite is a real override.",
             },
           ],
           result: "P",
@@ -606,18 +616,22 @@ class Main {
       ],
     },
     {
-      heading: "Constructors",
-      body: "A constructor has the class name and no return type. It runs when you write new. In Java the first line must be this(…) or super(…) if you write either. If you write neither, Java inserts super(). You cannot write both in the same constructor. this() calls a sibling constructor. That sibling will call super.\n\nC++ builds the base class first, then this class. Destruction is the reverse: child destructor, then parent. If you delete a child through a parent pointer, the parent destructor must be virtual, or cleanup is undefined.",
+      heading: "What is a constructor?",
+      body: "A constructor is the builder who puts up a house. The child’s house sits on the parent’s house, so you build the parent house first. super(…) is ‘please build the parent now’. this(…) is ‘please start from my other door first; that door will still build the parent’.\n\nA constructor has the class name and no return type. It runs when you write new. In Java the first line must be this(…) or super(…) if you write either. If you write neither, Java inserts super(). You cannot write both in the same constructor. C++ builds the base class first, then this class. Destruction is the reverse: child first, then parent. If you delete a child through a parent pointer, the parent destructor must be virtual, or cleanup is not defined.",
       howTo: [
         "Find new Class(…). That is the constructor that starts.",
-        "If the first line is this(…), jump to that sibling. Come back later for the rest of the body.",
-        "If the first line is super(…) (or C++ base), run the parent constructor first.",
-        "Prints in constructors go parent then child. Prints in destructors go child then parent.",
+        "If the first line is this(…), jump to that other door. Come back later for the rest of the body.",
+        "If the first line is super(…) (or C++ base), build the parent house first.",
+        "Prints in constructors go parent then child.",
+        "Prints in destructors go child then parent.",
       ],
       bullets: [
+        "Build the parent house first, then the child.",
         "new Child() prints Base then Child if both constructors print.",
         "Java: this() or super() first — never both in one constructor.",
+        "If you write neither, Java inserts super() with no arguments.",
         "delete (Base*)child is defined only if ~Base is virtual.",
+        "Child fields are set after super returns and before the child constructor body.",
       ],
       examples: [
         {
@@ -645,11 +659,11 @@ class Main {
           steps: [
             {
               do: "new Child() enters Child(). First line this(5). The print C0 waits.",
-              why: "this() must be first. The rest of this constructor runs after the sibling returns.",
+              why: "this() must be first. The rest of this constructor runs after the other door returns.",
             },
             {
               do: "Child(int n) with n=5. First line super(n+1) → super(6).",
-              why: "The sibling still has to build the parent before its own body.",
+              why: "The other door still has to build the parent house before its own body.",
             },
             {
               do: "Base(6) prints B6 and a space. Buffer is \"B6 \".",
@@ -681,7 +695,7 @@ int main() {
           steps: [
             {
               do: "D x starts. Base B() runs first and prints B.",
-              why: "C++ always constructs the parent before the child body.",
+              why: "C++ always builds the parent house before the child body.",
             },
             {
               do: "Then D() prints D. Buffer is BD.",
@@ -689,7 +703,7 @@ int main() {
             },
             {
               do: "main ends. ~D runs first and prints d. Buffer is BDd.",
-              why: "Destruction is the reverse of construction.",
+              why: "Pulling down the house is the reverse of building it.",
             },
             {
               do: "Then ~B prints b. Buffer is BDdb.",
@@ -719,15 +733,15 @@ int main() {
               why: "Constructors are silent in this program. The question is delete.",
             },
             {
-              do: "p has type B*. The object is D. ~B is virtual, so delete p starts at ~D.",
-              why: "A virtual destructor uses the real object, like a virtual method.",
+              do: "p’s signboard says B*. The object is D. ~B is virtual, so delete p starts at ~D.",
+              why: "A virtual destructor looks at who showed up, like a virtual method.",
             },
             {
               do: "~D prints D. Then ~B prints B. Buffer is DB.",
               why: "After the child destructor, the parent destructor still runs.",
             },
             {
-              do: "If ~B were not virtual, this delete would be undefined. Do not pick “only B” as a defined answer.",
+              do: "If ~B were not virtual, this delete would not be defined. Do not pick “only B” as a defined answer.",
               why: "Without virtual, the compiler would call only ~B and skip ~D.",
             },
           ],
@@ -754,7 +768,7 @@ class Child extends Base {
             },
             {
               do: "The inserted super() has no matching constructor. javac rejects Child().",
-              why: "The parent must be built first. Java will not guess super(0) for you.",
+              why: "The parent house must be built first. Java will not guess super(0) for you.",
             },
             {
               do: "Fix: Child() { super(1); … } or add Base() { } in the parent.",
@@ -791,11 +805,11 @@ class Main {
             },
             {
               do: "Base() prints B. Buffer is B.",
-              why: "Parent body is first.",
+              why: "Parent body is first. Parent house first.",
             },
             {
               do: "Back in Child, instance fields are set. x = printX() prints X. Buffer is BX.",
-              why: "Field initialisers run after super returns and before the rest of the child constructor.",
+              why: "Field starters run after super returns and before the rest of the child constructor.",
             },
             {
               do: "Then the Child() body prints C. Buffer is BXC.",
@@ -803,7 +817,7 @@ class Main {
             },
             {
               do: "print BXC. Remember the order: parent constructor, child fields, child body.",
-              why: "A field initialiser is not ‘before everything’. It is after the parent is built.",
+              why: "A field starter is not ‘before everything’. It is after the parent is built.",
             },
           ],
           result: "BXC",
@@ -811,18 +825,22 @@ class Main {
       ],
     },
     {
-      heading: "finally",
-      body: "Java tries catch clauses from top to bottom and uses the first type that fits. Put the most specific type first. catch (Exception) above catch (IOException) does not compile: the second catch can never run.\n\nfinally runs when you leave the try/catch — success, caught throw, or throw that will keep going. A return in try still runs finally first. If finally itself returns, that value wins and the try return is dropped.",
+      heading: "What is finally?",
+      body: "finally is the school bell. The bell still rings even if the test is cancelled, even if you finished early, even if you were sent out. try is the test. catch is the teacher who handles a problem. finally is the bell that always rings when you leave that room.\n\nJava tries catch clauses from top to bottom and uses the first type that fits. Put the most specific type first. catch (Exception) above catch (IOException) does not compile: the second catch can never run. A return in try still runs finally first. If finally itself returns, that value wins and the try return is dropped.",
       howTo: [
         "Run the try body until it ends or throws.",
         "If it throws, walk catch from top to bottom. Use the first matching type.",
         "Then run finally. Always, unless the whole JVM is dying.",
         "If both try and finally return, the finally return is the method’s result.",
+        "An assignment in finally still happens, but it does not replace a saved return.",
       ],
       bullets: [
+        "The school bell still rings even if the test is cancelled.",
         "catch (Exception) then catch (IOException) is a compile error.",
         "try { return 1; } finally { return 2; } returns 2.",
         "try { return 1; } finally { x = 2; } still returns 1. The assignment runs but does not replace the saved 1.",
+        "finally also runs when the throw will keep going to the caller.",
+        "Most specific catch on top, most general catch at the bottom.",
       ],
       examples: [
         {
@@ -844,15 +862,15 @@ class Main {
           steps: [
             {
               do: "try prints T. Buffer is T.",
-              why: "The try body runs until the throw.",
+              why: "The try body (the test) runs until the throw.",
             },
             {
               do: "throw RuntimeException. catch (RuntimeException) matches and prints C. Buffer is TC.",
-              why: "The first matching catch handles the throw. The exception stops here.",
+              why: "The first matching catch is the teacher who handles it. The exception stops here.",
             },
             {
               do: "finally prints F. Buffer is TCF.",
-              why: "finally still runs after a successful catch.",
+              why: "The school bell still rings after a successful catch.",
             },
             {
               do: "main ends normally. Output TCF.",
@@ -879,11 +897,11 @@ class Main {
 }`,
           steps: [
             {
-              do: "try hits return 1 and saves pending result 1.",
-              why: "A return in try does not leave the method until finally finishes.",
+              do: "try hits return 1 and saves waiting answer 1.",
+              why: "A return in try does not leave the method until the bell (finally) finishes.",
             },
             {
-              do: "finally runs and hits return 2. Pending result becomes 2. The 1 is dropped.",
+              do: "finally runs and hits return 2. Waiting answer becomes 2. The 1 is dropped.",
               why: "A return in finally replaces any saved try/catch return.",
             },
             {
@@ -892,7 +910,7 @@ class Main {
             },
             {
               do: "If finally only did x = 2 with no return, the method would still return 1.",
-              why: "Assignment in finally is not the same as return in finally.",
+              why: "Writing a box in finally is not the same as return in finally.",
             },
           ],
           result: "2",
@@ -924,7 +942,7 @@ class Test {
             },
             {
               do: "Second catch (IOException) is unreachable. javac rejects it.",
-              why: "Unreachable catch is a compile error, not a runtime “E versus I” race.",
+              why: "An unreachable catch is a compile error, not a runtime “E versus I” race.",
             },
             {
               do: "Result is compile error. The fix is IOException first, then Exception.",
@@ -952,16 +970,16 @@ class Test {
 }`,
           steps: [
             {
-              do: "try hits return 1 and saves pending result 1.",
-              why: "The method does not leave until finally finishes.",
+              do: "try hits return 1 and saves waiting answer 1.",
+              why: "The method does not leave until the bell (finally) finishes.",
             },
             {
               do: "finally runs x = 2. Field x becomes 2. There is no return in finally.",
-              why: "An assignment is not a return. The saved 1 stays the method result.",
+              why: "Writing a box is not a return. The saved 1 stays the method result.",
             },
             {
               do: "f returns 1. After the call, x is 2.",
-              why: "Side effects in finally still happen. They just do not replace the saved return.",
+              why: "Side jobs in finally still happen. They just do not replace the saved return.",
             },
             {
               do: "print 1 2.",
@@ -1002,7 +1020,7 @@ class Test {
             },
             {
               do: "f still runs finally and prints F. Buffer is TF. Then the exception leaves f.",
-              why: "finally runs on the way out, even when the throw will keep going.",
+              why: "The school bell still rings on the way out, even when the throw will keep going.",
             },
             {
               do: "main’s catch matches RuntimeException and prints C. Buffer is TFC.",
@@ -1014,7 +1032,7 @@ class Test {
             },
             {
               do: "If finally had thrown a new exception, that new one would have hidden the RuntimeException.",
-              why: "A throw (or return) in finally replaces the pending throw from try.",
+              why: "A throw (or return) in finally replaces the waiting throw from try.",
             },
           ],
           result: "TFC",
@@ -1022,18 +1040,22 @@ class Test {
       ],
     },
     {
-      heading: "Java String immutability",
-      body: "A Java String cannot change its letters. concat, substring, toUpperCase, and replace make a new String. If you ignore the result, the old variable still points at the old letters. s.concat(\"c\") without s = leaves s unchanged.\n\nStringBuilder is a mutable box. append and reverse change the same object. Two variables that point at one builder see each other’s edits. == on String tests “same object”, not “same letters”. Use equals for letters.",
+      heading: "What is a Java String?",
+      body: "A Java String is a laminated card. You cannot scribble on it. concat, substring, toUpperCase, and replace print a new card. If you ignore the new card, your hand still holds the old one. s.concat(\"c\") without s = leaves s unchanged.\n\nStringBuilder is a notebook you can write in. append and reverse change the same notebook. Two names that point at one notebook see each other’s writing. == on String tests ‘same card’, not ‘same letters’. Use equals for letters.",
       howTo: [
-        "Ask: is this a String or a StringBuilder?",
-        "String method → new object. If you do not assign, the old variable is unchanged.",
-        "StringBuilder method → same object changes, even if you ignore the return (it returns this).",
-        "== is identity. equals is letters.",
+        "Ask: is this a String (laminated card) or a StringBuilder (notebook)?",
+        "String method → new card. If you do not assign, the old name is unchanged.",
+        "StringBuilder method → same notebook changes, even if you ignore the return (it returns this).",
+        "== is same card. equals is same letters.",
+        "s = s + \"x\" moves the name s onto a new card.",
       ],
       bullets: [
-        "s = s + \"x\" rebinds s. s.concat(\"x\") must be assigned or it is thrown away.",
-        "StringBuilder.append returns this, so chaining mutates one object.",
+        "A String is laminated. You cannot scribble on it.",
+        "s = s + \"x\" moves s. s.concat(\"x\") must be assigned or it is thrown away.",
+        "StringBuilder.append returns this, so chaining writes on one notebook.",
         "\"ab\" == s+\"b\" with a non-final s is usually false. s.equals(\"ab\") can still be true.",
+        "== is identity (same card). equals is letters.",
+        "Ignoring toUpperCase or replace leaves the old card in your hand.",
       ],
       examples: [
         {
@@ -1050,20 +1072,20 @@ class Test {
 }`,
           steps: [
             {
-              do: "s points at \"ab\".",
-              why: "String variables hold an arrow to an unchangeable object.",
+              do: "s points at the laminated card \"ab\".",
+              why: "String names hold an arrow to a card you cannot scribble on.",
             },
             {
-              do: "s.concat(\"c\") builds \"abc\" and throws it away. s still points at \"ab\".",
+              do: "s.concat(\"c\") prints a new card \"abc\" and throws it away. s still points at \"ab\".",
               why: "Ignoring a String method result does not write s.",
             },
             {
               do: "t = s.concat(\"c\") keeps a new \"abc\". s is still \"ab\".",
-              why: "You must assign if you want the new String.",
+              why: "You must assign if you want the new card in a name.",
             },
             {
               do: "print ab abc.",
-              why: "Two arrows, two objects.",
+              why: "Two arrows, two cards.",
             },
           ],
           result: "ab abc",
@@ -1083,15 +1105,15 @@ class Test {
 }`,
           steps: [
             {
-              do: "sb → builder holding ab. tb = sb copies the arrow. One object.",
-              why: "tb = sb does not copy the letters. It copies the reference.",
+              do: "sb → notebook holding ab. tb = sb copies the arrow. One notebook.",
+              why: "tb = sb does not copy the letters. It copies the arrow.",
             },
             {
-              do: "sb.append(\"c\") mutates to abc. tb sees abc too.",
-              why: "append changes the builder in place.",
+              do: "sb.append(\"c\") writes in place to abc. tb sees abc too.",
+              why: "append changes the notebook, not a new card.",
             },
             {
-              do: "tb.reverse() mutates the same object to cba.",
+              do: "tb.reverse() writes the same notebook to cba.",
               why: "reverse also writes in place. Both names share it.",
             },
             {
@@ -1115,16 +1137,16 @@ class Test {
 }`,
           steps: [
             {
-              do: "s1 → interned \"ab\". s2 → interned \"a\".",
-              why: "Literals can share one object. That is not the later concat.",
+              do: "s1 → shared printed card \"ab\". s2 → shared printed card \"a\".",
+              why: "Literals can share one card. That is not the later join.",
             },
             {
-              do: "s2 += \"b\" is s2 = s2 + \"b\". s2 is not final, so this builds a new object at run time.",
+              do: "s2 += \"b\" is s2 = s2 + \"b\". s2 is not final, so this prints a new card while the program runs.",
               why: "A new String is a different arrow even when the letters match.",
             },
             {
-              do: "s1 == s2 is false (different objects).",
-              why: "== on String is identity.",
+              do: "s1 == s2 is false (different cards).",
+              why: "== on String is ‘same card’, not ‘same letters’.",
             },
             {
               do: "s1.equals(s2) is true (letters a,b). print false true.",
@@ -1147,20 +1169,20 @@ class Test {
 }`,
           steps: [
             {
-              do: "s points at \"ab\".",
-              why: "A String object cannot change its letters.",
+              do: "s points at the laminated card \"ab\".",
+              why: "A String card cannot change its letters.",
             },
             {
-              do: "s.toUpperCase() builds \"AB\" and throws it away. s still points at \"ab\".",
+              do: "s.toUpperCase() prints a new card \"AB\" and throws it away. s still points at \"ab\".",
               why: "Ignoring a String method result does not write s.",
             },
             {
-              do: "s.replace('a', 'x') builds \"xb\" and throws it away. s is still \"ab\".",
-              why: "replace also returns a new String. The old object is untouched.",
+              do: "s.replace('a', 'x') prints a new card \"xb\" and throws it away. s is still \"ab\".",
+              why: "replace also returns a new card. The old card is untouched.",
             },
             {
               do: "print ab.",
-              why: "Both calls were wasted because nobody stored the result.",
+              why: "Both calls were wasted because nobody stored the new card.",
             },
             {
               do: "The fix is s = s.toUpperCase() or String t = s.replace(...).",
@@ -1183,24 +1205,24 @@ class Test {
 }`,
           steps: [
             {
-              do: "s starts as the literal \"a\". Then s = s + \"b\" builds a new \"ab\" at run time and points s at it.",
-              why: "s is not final, so + is not folded into the interned literal \"ab\".",
+              do: "s starts as the printed card \"a\". Then s = s + \"b\" prints a new \"ab\" while the program runs and points s at it.",
+              why: "s is not final, so + is not folded into the shared printed card \"ab\".",
             },
             {
-              do: "t = \"a\".concat(\"b\") also builds a new \"ab\" object.",
+              do: "t = \"a\".concat(\"b\") also prints a new \"ab\" card.",
               why: "concat always returns a new String when the argument is not empty.",
             },
             {
               do: "s.equals(t) compares letters a,b → true.",
-              why: "equals is content. Both objects hold a then b.",
+              why: "equals is content. Both cards hold a then b.",
             },
             {
-              do: "s == t compares arrows. Two new objects → false.",
-              why: "== on String is identity, not letters.",
+              do: "s == t compares arrows. Two new cards → false.",
+              why: "== on String is same card, not same letters.",
             },
             {
               do: "print true false.",
-              why: "Assigned concat worked. Identity still failed. Use equals in exam answers about content.",
+              why: "Assigned concat worked. Same-card still failed. Use equals in exam answers about content.",
             },
           ],
           result: "true false",
@@ -1208,20 +1230,22 @@ class Test {
       ],
     },
     {
-      heading: "Recursion vs a loop (factorial / fib trace)",
-      body: "A recursive method solves a smaller copy of the same problem, then comes back. Every call needs a base case that returns without calling itself. Trace factorial by writing a stack of frames: fact(4) waits for fact(3), which waits for fact(2), until fact(1) returns 1.\n\nA loop keeps one frame and updates a box. fact(4) in a loop is f=1; multiply by 2, 3, 4. Same answer, no stack of waiting calls.\n\nFibonacci is the usual trap. fib(n) = fib(n-1)+fib(n-2) recomputes the same smaller n many times. A loop (or a memo table) computes each n once. Missing the base case in recursion grows the stack until the program dies. A loop with a bad test can run forever, but it does not grow a call stack.",
+      heading: "What is recursion vs a loop?",
+      body: "Recursion is like a Russian doll, or like calling yourself with a smaller job. fact(4) waits for fact(3), which waits for fact(2), until a tiny doll (the base case) returns a number with no further call. A loop is one person at one desk, updating one box again and again. fact(4) in a loop is f=1; multiply by 2, 3, 4. Same answer, no pile of waiting dolls.\n\nEvery recursive call needs a base case that returns without calling itself. Fibonacci is the usual trap: fib(n) = fib(n-1)+fib(n-2) asks the same smaller n many times. A loop (or a remembered table) computes each n once. Missing the base case grows the pile of dolls until the program dies. A loop with a bad test can run forever, but it does not grow a call pile.",
       howTo: [
         "Find the base case. If n is already small, write the return value and stop.",
-        "For recursion, draw one stack frame per call. Write what that frame is waiting for.",
-        "Walk back out: each frame uses the value that returned from below.",
+        "For recursion, draw one doll (one stack frame) per call. Write what that doll is waiting for.",
+        "Walk back out: each doll uses the number that returned from the smaller doll.",
         "For a loop, keep one row: the running answer and the loop index. Update the row each trip.",
         "If the same n is asked twice (fib), count the extra calls. A loop would do that n once.",
       ],
       bullets: [
+        "Recursion = a Russian doll: call yourself with a smaller job.",
         "Base case first. No base case → stack overflow, not a number.",
-        "factorial(n) = n * factorial(n-1). A loop multiplies 1..n in one frame.",
+        "factorial(n) = n * factorial(n-1). A loop multiplies 1..n at one desk.",
         "Naive fib is correct but slow: the same fib(k) is drawn many times in the tree.",
         "A loop of n steps is enough for fib if you keep the last two numbers.",
+        "Missing base case → pile of calls. Missing i++ → one spinning desk.",
       ],
       examples: [
         {
@@ -1239,24 +1263,24 @@ class Test {
 }`,
           steps: [
             {
-              do: "fact(4): n is 4, not ≤ 1, so it must compute 4 * fact(3). Frame 4 waits.",
-              why: "The multiply cannot finish until the smaller call returns.",
+              do: "fact(4): n is 4, not ≤ 1, so it must compute 4 * fact(3). Doll 4 waits.",
+              why: "The multiply cannot finish until the smaller doll returns.",
             },
             {
-              do: "fact(3) waits for 3 * fact(2). fact(2) waits for 2 * fact(1). Stack is 4, 3, 2, 1.",
-              why: "Each call is a new frame with its own n. Draw them as a pile.",
+              do: "fact(3) waits for 3 * fact(2). fact(2) waits for 2 * fact(1). Pile is 4, 3, 2, 1.",
+              why: "Each call is a new doll with its own n. Draw them nested, like Russian dolls.",
             },
             {
-              do: "fact(1): n ≤ 1, return 1. This is the base case. No further call.",
-              why: "The pile stops growing only when a frame returns a number with no recursive call.",
+              do: "fact(1): n ≤ 1, return 1. This is the tiniest doll. No further call.",
+              why: "The pile stops growing only when a doll returns a number with no recursive call.",
             },
             {
               do: "Walk back: fact(2) = 2*1 = 2. fact(3) = 3*2 = 6. fact(4) = 4*6 = 24.",
-              why: "Each waiting multiply uses the value that returned from below.",
+              why: "Each waiting multiply uses the number that returned from the smaller doll.",
             },
             {
-              do: "print 24. Peak stack was four frames (4 down to 1).",
-              why: "The extra cost of recursion here is the pile of frames, not a wrong answer.",
+              do: "print 24. Peak pile was four dolls (4 down to 1).",
+              why: "The extra cost of recursion here is the pile of dolls, not a wrong answer.",
             },
           ],
           result: "24",
@@ -1278,7 +1302,7 @@ class Test {
           steps: [
             {
               do: "One call fact(4). Table: f=1, i will run 2, 3, 4.",
-              why: "A loop reuses the same method frame. There is no fact(3) call.",
+              why: "A loop is one person at one desk. There is no fact(3) call.",
             },
             {
               do: "i=2: f = 1*2 = 2. i=3: f = 2*3 = 6. i=4: f = 6*4 = 24. Then i=5 fails i<=4.",
@@ -1286,7 +1310,7 @@ class Test {
             },
             {
               do: "return 24. print 24.",
-              why: "Same answer as the recursive trace. The homework is the table, not a stack.",
+              why: "Same answer as the recursive trace. The homework is the table, not a pile of dolls.",
             },
             {
               do: "Peak extra stack is one frame. Recursion needed four frames for n=4.",
@@ -1315,7 +1339,7 @@ class Test {
           steps: [
             {
               do: "Base: fib(0)=0, fib(1)=1. fib(5) = fib(4)+fib(3).",
-              why: "Write the two children before you expand them.",
+              why: "Write the two smaller dolls before you open them.",
             },
             {
               do: "fib(4)=fib(3)+fib(2). Now fib(3) appears under fib(5) and again under fib(4).",
@@ -1326,7 +1350,7 @@ class Test {
               why: "The values are the usual 0,1,1,2,3,5. The tree is still correct.",
             },
             {
-              do: "Count calls: fib(5) does two calls, fib(4) two more, and fib(3) is fully drawn twice. Many frames for a tiny n.",
+              do: "Count calls: fib(5) does two calls, fib(4) two more, and fib(3) is fully drawn twice. Many dolls for a tiny n.",
               why: "Time grows like the Fibonacci numbers themselves, not like n.",
             },
             {
@@ -1357,7 +1381,7 @@ class Test {
 }`,
           steps: [
             {
-              do: "n=5, not a base. Start a=0 (fib 0), b=1 (fib 1). One frame only.",
+              do: "n=5, not a base. Start a=0 (fib 0), b=1 (fib 1). One desk only.",
               why: "We store the last two answers instead of calling fib again.",
             },
             {
@@ -1366,14 +1390,14 @@ class Test {
             },
             {
               do: "i=3: c=1+1=2 → a=1, b=2. i=4: c=1+2=3 → a=2, b=3. i=5: c=2+3=5 → a=3, b=5.",
-              why: "Five is reached in three more multiplies-worth of additions: n−1 steps after the bases.",
+              why: "Five is reached in n−1 steps after the bases.",
             },
             {
               do: "return b which is 5. print 5.",
               why: "Same answer as recursive fib(5), but each i was done once.",
             },
             {
-              do: "This loop is the usual exam ‘better fib’. Recursion with a memo table is also linear; bare recursion is not.",
+              do: "This loop is the usual exam ‘better fib’. Recursion with a remembered table is also linear; bare recursion is not.",
               why: "The bug in naive fib is repeated work, not a wrong formula.",
             },
           ],
@@ -1394,7 +1418,7 @@ static int badLoop(int n) {
           steps: [
             {
               do: "badFact(4) calls badFact(3), then 2, 1, 0, −1, … There is no if that returns a number.",
-              why: "Without a base case the pile of frames never stops growing.",
+              why: "Without a tiniest doll the pile of frames never stops growing.",
             },
             {
               do: "The JVM throws StackOverflowError. You never get a product.",
@@ -1402,7 +1426,7 @@ static int badLoop(int n) {
             },
             {
               do: "badLoop(4): i stays 2 forever, so i <= n stays true. f is multiplied by 2 again and again.",
-              why: "A forgotten i++ is an infinite loop in one frame. The stack does not grow.",
+              why: "A forgotten i++ is an infinite loop at one desk. The pile does not grow.",
             },
             {
               do: "The program hangs (or wraps the int) but it is not StackOverflowError.",
@@ -1410,7 +1434,7 @@ static int badLoop(int n) {
             },
             {
               do: "Exam pick: missing base case → stack overflow. Missing i++ → infinite loop.",
-              why: "Name the failure from the shape: pile of calls vs one spinning frame.",
+              why: "Name the failure from the shape: pile of dolls vs one spinning desk.",
             },
           ],
           result: "badFact → StackOverflowError. badLoop → infinite loop (no growing stack).",
