@@ -54,7 +54,10 @@ export function NoteArticle({
       {note.blocks.map((b) => (
         <section key={b.heading} className="rounded-xl border bg-card p-5">
           <h2 className="font-heading text-xl">{b.heading}</h2>
-          <div className="mt-3">
+          <p className="mt-3 text-xs tracking-wide text-muted-foreground uppercase">
+            In simple words
+          </p>
+          <div className="mt-1.5">
             <Paragraphs text={b.body} />
           </div>
           {b.howTo?.length ? (
