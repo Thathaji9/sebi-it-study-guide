@@ -2,23 +2,26 @@ import type { TopicNote } from "@/data/notes";
 
 export const notesWarehouse: TopicNote = {
   topic: "warehouse",
-  title: "Warehouse — techniques (beginner)",
+  title: "Data warehouse — simple notes",
   blurb:
-    "A data warehouse is a calm copy of business facts for questions, not for live trading. Learn ETL order, star versus snowflake, and the cube moves slice, dice, and roll-up. Walk every cube with real numbers.",
+    "We explain a data warehouse like class notes a Class-10 student can read: a store-room of yesterday’s shop ledgers, boxes wiped and put on labelled shelves, a cube you can slice. Then we solve five tiny examples in each topic, one job or one number at a time.",
   blocks: [
     {
       heading: "ETL: extract, transform, load",
-      body: "ETL is the nightly pipeline: Extract (copy from the live systems), Transform (clean, rename, look up keys), Load (put tidy rows into warehouse tables). Think unpack groceries, wash and chop, then put them in the fridge — in that order.\n\nELT loads the raw bag into a lake first, then chops inside the platform. Exams still want E-T-L unless they name a lake. Load dimension tables (the “who/what/when” cards) before facts (the numbers), because facts store those cards’ surrogate keys.",
+      body: "A data warehouse is a big store-room of yesterday’s shop ledgers. The live till still rings in the shop. The warehouse only keeps a calm copy so you can ask questions later. ETL is how the copy arrives: pick the boxes off the van (Extract), wipe the dust and rewrite the labels (Transform), then put them on labelled shelves (Load).\n\nThe exam order is Extract → Transform → Load. Load the “who / what / when” shelves (dimensions) before the number boxes (facts), because facts store those shelf numbers. ELT dumps the raw bag into a lake first, then cleans inside. Write E-T-L unless the paper names a lake. Live trading numbers are OLTP. Yesterday’s tidy snapshot is the warehouse. Do not mix the two jobs.",
       howTo: [
-        "Name the stage: copy file = Extract; reject/clean/lookup = Transform; insert into FACT_ = Load.",
-        "Dimensions before facts. A missing broker key is a late-arriving dimension — stub first, then the fact.",
-        "Reruns must not double-count: delete/truncate that date’s partition or MERGE on a natural key.",
-        "Live position for trading is OLTP. Yesterday’s conformed snapshot is ETL. Do not mix the jobs.",
+        "Name the job: copy the file = Extract; clean, rename, or look up keys = Transform; insert into FACT_ = Load.",
+        "Put dimension shelves up first, then facts. A missing broker key needs a stub row before the fact.",
+        "If you run the same date twice, wipe that date’s slice first so you do not count twice.",
+        "Live till = OLTP. Yesterday’s store-room = warehouse. Do not mix the jobs.",
+        "If they say data lake / ELT, land the raw bag first, then clean inside.",
       ],
       bullets: [
-        "Classical order: Extract → Transform (clean, conform, keys) → Load.",
-        "Load dimensions before facts. Facts store dimension keys.",
-        "ELT: land raw first, transform in place. Same three jobs, different machine.",
+        "Warehouse = a store-room of yesterday’s shop ledgers, not the live till.",
+        "ETL order: Extract → Transform → Load.",
+        "Load dimensions (who / what / when) before facts (the numbers).",
+        "ELT lands raw first, then transforms. Exams still want E-T-L unless they name a lake.",
+        "Rerun a date by replacing that slice, not by inserting again.",
       ],
       examples: [
         {
@@ -27,16 +30,16 @@ export const notesWarehouse: TopicNote = {
             "Jobs: (A) lookup member_sk, (B) copy yesterday’s trade file, (C) bulk insert FACT_TRADE, (D) map city “BOM” → “Mumbai”, (E) reject qty ≤ 0. Order them.",
           steps: [
             {
-              do: "B is Extract — pull the source file. Nothing in the warehouse has changed yet.",
-              why: "Extract is photocopying the shopping list, not cooking.",
+              do: "B copies yesterday’s trade file. That is Extract. The store-room has not changed yet.",
+              why: "Extract is picking the boxes off the van. You have not wiped them yet.",
             },
             {
-              do: "E, D, A are Transform (reject bad rows, standardise names, replace IDs with warehouse keys). Then C is Load.",
-              why: "Do not look up keys for doomed rows. Do not load facts before keys exist.",
+              do: "E, D, and A are Transform: throw bad qty, rewrite BOM as Mumbai, stamp warehouse keys. Then C is Load.",
+              why: "Wipe dust and write labels before you put boxes on the shelves. Do not load numbers before the labels exist.",
             },
             {
-              do: "Compact order: B → E → D → A → C.",
-              why: "Unpack, throw rotten fruit, rewrite labels, stamp IDs, then fridge.",
+              do: "Write the order: B → E → D → A → C.",
+              why: "Pick boxes, throw rotten ones, rewrite labels, stamp IDs, then put them on the shelves.",
             },
           ],
           result:
@@ -48,16 +51,16 @@ export const notesWarehouse: TopicNote = {
             "New broker BR9 is in today’s fills but not in DIM_BROKER. What if you load FACT_TRADE first?",
           steps: [
             {
-              do: "A real broker_sk that is missing violates the foreign key — the load should fail.",
+              do: "If the fact needs a real broker_sk and BR9 is missing, the load should fail.",
               why: "Facts point at dimension keys the way a marksheet points at a roll number that must exist.",
             },
             {
-              do: "NULL broker_sk (if allowed) dumps BR9 into “unknown” — a silent wrong slice.",
-              why: "The number loaded, but you can no longer cut the cube by broker.",
+              do: "If you allow a blank broker_sk, BR9 piles into “unknown”. The number loaded, but you cannot cut by broker.",
+              why: "A silent unknown shelf is worse than a loud fail. You lost that slice of the cube.",
             },
             {
-              do: "Correct: insert a stub dimension row, then load the fact with that surrogate. Later, fill in the proper name (Type 1 or Type 2).",
-              why: "Late-arriving dimension = the person arrived in the numbers before their ID card.",
+              do: "Correct: put a stub broker row on the shelf first, then load the fact with that key. Later fill in the proper name (Type 1 or Type 2).",
+              why: "Late-arriving dimension = the person showed up in the numbers before their name card.",
             },
           ],
           result:
@@ -69,16 +72,16 @@ export const notesWarehouse: TopicNote = {
             "Monday’s job loaded 1.2 lakh rows for 2026-04-06, then crashed halfway through 2026-04-07. The operator re-runs both dates. How do you avoid double-counting the 6th?",
           steps: [
             {
-              do: "A naive second INSERT would duplicate 2026-04-06 and double every total.",
-              why: "Extract will send the same file again. Load must be a replace, not a pile-on.",
+              do: "A second INSERT of 2026-04-06 would pile the same boxes again and double every total.",
+              why: "The van will send the same file again. Load must replace that date, not stack on top.",
             },
             {
-              do: "DELETE/TRUNCATE those date partitions, then INSERT, or MERGE on (exchange_trade_id, trade_date).",
-              why: "Re-running then yields the same warehouse state — that is idempotent, like wiping a chalkboard date before rewriting it.",
+              do: "DELETE or TRUNCATE that date’s slice, then INSERT, or MERGE on (exchange_trade_id, trade_date).",
+              why: "Wipe that chalkboard date, then rewrite it. A second run should leave the same store-room.",
             },
             {
-              do: "Do not DELETE the whole fact table. Keep other dates. Metadata should record which dates succeeded.",
-              why: "Only the failed slice needs a redo.",
+              do: "Do not empty the whole fact table. Keep other dates. Write in the log which dates succeeded.",
+              why: "Only the failed day’s shelf needs a redo.",
             },
           ],
           result:
@@ -90,24 +93,24 @@ export const notesWarehouse: TopicNote = {
             "Jobs: (F) copy the NSE fill file into a lake folder, (G) reject qty ≤ 0 inside the lake, (H) map “BOM” → “Mumbai” in a lake table, (I) lookup member_sk, (J) INSERT FACT_TRADE. Label ETL vs ELT and order them.",
           steps: [
             {
-              do: "F is still Extract, but in ELT you Load the raw bag next — the lake folder is the landing zone.",
-              why: "ELT unpacks groceries into the fridge first, then chops inside the kitchen. The three jobs are the same; the machine changes.",
+              do: "F is still Extract. In ELT you next dump the raw bag into the lake. That landing is the first Load.",
+              why: "ELT unpacks groceries into the fridge first, then chops inside the kitchen. Same three jobs, different room.",
             },
             {
-              do: "G, H, I are Transform in the platform (reject, conform, keys). J is the modelled Load into the star.",
+              do: "G, H, I are Transform in the lake (reject, rewrite names, stamp keys). J is the modelled Load into the star.",
               why: "Do not look up keys for doomed rows. Do not load facts before keys exist — that rule did not vanish.",
             },
             {
-              do: "ELT order: F → land raw (lake load) → G → H → I → J. Exams still want E-T-L unless they name a lake.",
-              why: "If the stem says “classical warehouse”, write Extract → Transform → Load. If it says “data lake / ELT”, land raw then transform.",
+              do: "ELT order: F → land raw (lake) → G → H → I → J. If they say “classical warehouse”, write Extract → Transform → Load.",
+              why: "Name the lake and they want ELT. Name a warehouse and they still want E-T-L.",
             },
             {
               do: "F is not Transform. Copying bytes is Extract even when the destination is a lake.",
-              why: "Transform is clean/rename/lookup, not “the file moved”.",
+              why: "Transform is clean / rename / lookup, not “the file moved”.",
             },
             {
-              do: "Live OMS position for trading is still OLTP. Yesterday’s lake copy is not the trading book.",
-              why: "Do not mix the jobs. ELT does not make the warehouse a cash market.",
+              do: "Live shop position is still OLTP. Yesterday’s lake copy is not the trading book.",
+              why: "ELT does not turn the store-room into a live till. Do not mix the jobs.",
             },
           ],
           result:
@@ -119,24 +122,24 @@ export const notesWarehouse: TopicNote = {
             "Tonight’s batch: DIM_DATE for 2026-08-21 is missing, new member MP44 is missing, 900 fills wait. In which order do you load, and what if you skip DIM_DATE?",
           steps: [
             {
-              do: "Load DIM_DATE first (the calendar card), then DIM_MEMBER (stub MP44 if the name file is late), then FACT_FILL with those surrogate keys.",
-              why: "Facts store dimension keys the way a marksheet points at roll numbers that must exist.",
+              do: "Load DIM_DATE first (the calendar card), then DIM_MEMBER (stub MP44 if the name file is late), then FACT_FILL with those keys.",
+              why: "Facts store shelf numbers. The calendar shelf and the member shelf must exist first.",
             },
             {
-              do: "If FACT_FILL is loaded with a missing date_sk, the foreign key fails — or worse, every fill piles into Unknown date.",
-              why: "A silent unknown date wrecks every time slice. Fail loud or stub on purpose; do not skip.",
+              do: "If FACT_FILL is loaded with a missing date_sk, the load fails — or every fill piles into Unknown date.",
+              why: "A silent unknown date wrecks every time slice. Fail loud or stub on purpose. Do not skip.",
             },
             {
-              do: "Late-arriving MP44: insert a stub member row (natural key MP44, name = 'Unknown'), load the 900 fills on that member_sk, later Type-1 or Type-2 the proper name.",
-              why: "The person arrived in the numbers before their ID card. Stub first, then the fact.",
+              do: "Late MP44: insert a stub member row (natural key MP44, name = 'Unknown'), load the 900 fills on that member_sk, later Type-1 or Type-2 the proper name.",
+              why: "The person arrived in the numbers before their name card. Stub first, then the fact.",
             },
             {
-              do: "Do not load 900 facts, then dimensions “when you have time”. Replay would then need a rewrite of keys.",
+              do: "Do not load 900 facts and “do dimensions later”. You would have to rewrite every key.",
               why: "Dimensions before facts is the nightly rule, not a preference.",
             },
             {
-              do: "Conformed DIM_DATE is shared with other facts. Build it once, not once per mart.",
-              why: "One calendar spelling is how drill-across stays honest.",
+              do: "One shared DIM_DATE is enough. Other facts reuse it.",
+              why: "One calendar spelling keeps every report honest when they join on date.",
             },
           ],
           result:
@@ -146,17 +149,20 @@ export const notesWarehouse: TopicNote = {
     },
     {
       heading: "Staging and metadata",
-      body: "Staging is the kitchen counter: today’s raw extracts, rejects, maybe a few days of files. It is not for dashboards. Rows may be messy, duplicated, still in source codes.\n\nMetadata is data about the pipeline — the recipe card. Technical: types and source-to-target maps. Business: “one FACT_TRADE row is one fill”. Operational: last run, rows in, rows rejected. Without metadata you have a pile of tables, not a governed warehouse.",
+      body: "Staging is the kitchen counter by the store-room door. Today’s raw boxes land there: messy, maybe duplicated, still in shop codes. It is not for dashboards. Keep a few days of files so you can replay a bad night.\n\nMetadata is the recipe card on the wall — data about the pipeline, not the sales themselves. Technical: types and source-to-target maps. Business: “one FACT_TRADE row is one fill”. Operational: last run, rows in, rows rejected. Without that card you have a pile of tables, not a governed warehouse. extract minus reject should equal loaded. Do not trust job SUCCESS alone.",
       howTo: [
-        "Classify: raw dated copy → staging; surrogate keys + grain → warehouse; run log / wiki grain sentence → metadata.",
-        "Reconcile: extract − reject should equal loaded. Do not trust job SUCCESS alone.",
-        "Rejects are a hospital. If analysts need them, model a warehouse fact, do not cube the reject file.",
-        "Write the unit conversion in metadata (paise → crore) so the next person does not invent a factor.",
+        "Tag the artefact: raw dated copy → staging; keys + grain → warehouse; run log / grain sentence → metadata.",
+        "Check the count: extract − reject should equal loaded.",
+        "Rejects are a hospital. If analysts need them, model a real warehouse fact. Do not cube the reject file.",
+        "Write the unit conversion on the recipe card (paise → crore) so the next person does not invent a factor.",
+        "Persistent staging lets you replay. Transient staging needs the shop to still have yesterday.",
       ],
       bullets: [
-        "Staging: land and check. Warehouse: conformed and keyed. Dashboards query the warehouse.",
-        "Metadata: technical maps, business definitions, operational counts.",
-        "Persistent staging lets you replay; transient staging needs the source to still have yesterday.",
+        "Staging = kitchen counter. Warehouse = labelled shelves. Dashboards query the warehouse.",
+        "Metadata = the recipe card: maps, grain sentences, run counts.",
+        "extract − reject = loaded. SUCCESS alone is not enough.",
+        "Persistent staging keeps the bag so you can replay. Transient staging throws it away.",
+        "Do not point a cube at staging or at rejects.",
       ],
       examples: [
         {
@@ -166,7 +172,7 @@ export const notesWarehouse: TopicNote = {
           steps: [
             {
               do: "(1) staging (2) warehouse fact (3) operational metadata (4) business metadata.",
-              why: "Staging still looks like the source. Facts have warehouse keys. Logs describe the job, not the market. Grain is a definition.",
+              why: "Staging still looks like the shop file. Facts have warehouse keys. Logs describe the job. Grain is a definition.",
             },
             {
               do: "DIM_MEMBER is warehouse data, not metadata, even though it “describes” members.",
@@ -174,7 +180,7 @@ export const notesWarehouse: TopicNote = {
             },
             {
               do: "A dashboard on STG_TRADE is the wrong layer even if a quiet day looks fine.",
-              why: "Unconformed codes will bite on the next synonym (“Bombay” vs “Mumbai”).",
+              why: "Uncleaned shop codes will bite on the next synonym (“Bombay” vs “Mumbai”).",
             },
           ],
           result:
@@ -187,15 +193,15 @@ export const notesWarehouse: TopicNote = {
           steps: [
             {
               do: "Check extract − reject = loaded. 119988 ≠ 0. Fail the SLA.",
-              why: "Exit code 0 is not business success. Operational metadata must reconcile counts.",
+              why: "Exit code 0 is not business success. The recipe card must reconcile counts.",
             },
             {
-              do: "Grain (business metadata) did not change — the run log did.",
+              do: "The grain sentence did not change. The run log did.",
               why: "This is an operational miss, not a modelling miss.",
             },
             {
-              do: "If staging was truncated at the start, you must re-extract to replay. Persistent staging still holds the 120000.",
-              why: "Replay needs either the landing zone or the source.",
+              do: "If staging was emptied at the start, you must re-extract to replay. Persistent staging still holds the 120000.",
+              why: "Replay needs either the kitchen counter or the shop still having yesterday.",
             },
           ],
           result:
@@ -216,7 +222,7 @@ export const notesWarehouse: TopicNote = {
             },
             {
               do: "Operational check: SUM(qty_cr) * 1e9 ≈ SUM(t_qty) for the run.",
-              why: "Metadata plus a sum check catches unit bugs before a SEBI report.",
+              why: "The recipe card plus a sum check catches unit bugs before a report goes out.",
             },
           ],
           result:
@@ -232,19 +238,19 @@ export const notesWarehouse: TopicNote = {
               why: "The kitchen counter kept yesterday’s bag. That is the point of a dated landing zone.",
             },
             {
-              do: "Transient staging that truncated itself at 06:00 cannot replay — the source no longer has Tuesday.",
+              do: "Transient staging that emptied itself at 06:00 cannot replay — the shop no longer has Tuesday.",
               why: "If you throw the bag away, you need the shop to still have the list. Here it does not.",
             },
             {
-              do: "Job SUCCESS on Wednesday does not repair Tuesday’s empty fact partition. Operational metadata should show Tuesday loaded = 0.",
-              why: "Exit code 0 on a later date is not a backfill. Check the run log per business date.",
+              do: "Job SUCCESS on Wednesday does not repair Tuesday’s empty fact shelf. The run log should show Tuesday loaded = 0.",
+              why: "Exit code 0 on a later date is not a backfill. Check the log per business date.",
             },
             {
               do: "Do not cube STG_FILL. Analysts query FACT_FILL after keys and rejects.",
-              why: "Staging may be messy, duplicated, still in source codes. Dashboards belong on the warehouse.",
+              why: "Staging may be messy, duplicated, still in shop codes. Dashboards belong on the warehouse.",
             },
             {
-              do: "Keep a few days of persistent files so a late reject fix can be re-run. Metadata should name the retention.",
+              do: "Keep a few days of persistent files so a late reject fix can be re-run. Metadata should name how long you keep STG.",
               why: "Without the recipe card (how long we keep STG), the next operator guesses.",
             },
           ],
@@ -258,14 +264,14 @@ export const notesWarehouse: TopicNote = {
           steps: [
             {
               do: "The 40 rows sit in a reject file / STG_REJECT — the hospital. extract − reject = 49960 matches loaded.",
-              why: "Operational metadata must reconcile. Do not trust SUCCESS alone.",
+              why: "The recipe card must reconcile. Do not trust SUCCESS alone.",
             },
             {
-              do: "Do not point a cube at STG_REJECT. Codes are unconformed and grain is “failed row”, not “fill”.",
+              do: "Do not point a cube at STG_REJECT. Codes are uncleaned and grain is “failed row”, not “fill”.",
               why: "A dashboard on the kitchen counter will break on the next synonym.",
             },
             {
-              do: "If analysts truly need reject counts, model a small warehouse fact (grain: one rejected extract row) with conformed DIM_BROKER, then mart from that.",
+              do: "If analysts truly need reject counts, model a small warehouse fact (grain: one rejected extract row) with a tidy DIM_BROKER, then mart from that.",
               why: "Promote it on purpose. Do not pretend the reject file is FACT_TRADE.",
             },
             {
@@ -284,17 +290,20 @@ export const notesWarehouse: TopicNote = {
     },
     {
       heading: "Star versus snowflake, fact versus dimension, grain",
-      body: "A star schema puts a fact table (the numbers) in the middle, like a sun, with denormalised dimension tables as rays — city, state, region all sit on DIM_MEMBER. A snowflake normalises those rays: member → city → state. Stars are simpler to query. Exams prefer star unless they stress tidy dimensions.\n\nGrain is a sentence: “one row per fill”, not a pile of column names. Additive facts (value) sum everywhere. Semi-additive (end-of-day position) sum across members on one date, not across dates. Non-additive (a ratio) must be recomputed after you add the parts.",
+      body: "A star puts one fact table in the middle like a sun, with dimension tables as rays. City, state, and region all sit on DIM_MEMBER. A snowflake splits those rays further: member → city → state. Stars are simpler to query. Exams prefer star unless they stress tidy dimensions.\n\nGrain is one sentence: “one row per fill”, not a pile of column names. Additive facts (value) sum everywhere. Semi-additive (end-of-day position) sum across members on one date, not across dates — two photos are not two piles. Non-additive (a ratio) must be recomputed after you add the parts. Fact = the numbers at that grain. Dimension = who / what / where / when.",
       howTo: [
         "Write the grain in one sentence. If two measures need different sentences, split the fact tables.",
         "Star: hierarchy columns on the dimension. Snowflake: extra tables and extra joins. Grain of the fact does not change.",
         "Ask of each measure: can I SUM across this axis? If not, last-of-period or recompute.",
-        "High-cardinality id with no attributes → degenerate (store on the fact). Low-cardinality flags → junk dimension or fact flags.",
+        "High-cardinality id with no attributes → store it on the fact (degenerate). Tiny flags → junk dimension or fact flags.",
+        "Do not answer “snowflake it” when the bug is a mixed grain or a SUM of ratios.",
       ],
       bullets: [
-        "Star: denormalised dimensions. Snowflake: normalised dimension hierarchy.",
+        "Star = one fact table in the middle like a sun. Dimensions are the rays.",
+        "Snowflake = those rays split further (city → state).",
         "Fact = measures at a grain. Dimension = who / what / where / when.",
-        "Additive / semi-additive / non-additive. Grain is a sentence.",
+        "Grain is a sentence: “one row per fill”.",
+        "Additive / semi-additive / non-additive. Sum of ratios ≠ ratio of sums.",
       ],
       examples: [
         {
@@ -311,8 +320,8 @@ export const notesWarehouse: TopicNote = {
               why: "SUM would mean two different things on the same row set.",
             },
             {
-              do: "Split FACT_FILL and FACT_POSITION_DAILY. Share DIM_MEMBER, DIM_ISIN, DIM_DATE (conformed).",
-              why: "You may drill across shared dimensions. You must not UNION mixed grains.",
+              do: "Split FACT_FILL and FACT_POSITION_DAILY. Share DIM_MEMBER, DIM_ISIN, DIM_DATE (same spelling).",
+              why: "You may join on shared dimensions. You must not UNION mixed grains.",
             },
           ],
           result:
@@ -329,11 +338,11 @@ export const notesWarehouse: TopicNote = {
             },
             {
               do: "Snowflake: extra join to DIM_GEO. Mumbai appears once in GEO, not once per member.",
-              why: "Normalising the hierarchy saves space and enforces city–state consistency. It costs a join.",
+              why: "Splitting the ray further saves space and keeps city–state consistent. It costs a join.",
             },
             {
               do: "Fact grain is unchanged. A galaxy is two facts sharing dimensions, not a snowflake.",
-              why: "Do not mix those words. SEBI “star schema” means the first picture.",
+              why: "Do not mix those words. “Star schema” on the paper means the first picture.",
             },
           ],
           result:
@@ -367,22 +376,22 @@ export const notesWarehouse: TopicNote = {
           steps: [
             {
               do: "Put exchange_trade_id on FACT_FILL. That is a degenerate dimension — an id with no dimension table.",
-              why: "A dimension table with only the id would be a shadow of the fact. High-cardinality id, no attributes → store on the fact.",
+              why: "A dimension table with only the id would be a shadow of the fact. High-cardinality id, no extra labels → store on the fact.",
             },
             {
               do: "Do not snowflake a DIM_TRADE_ID with one column. It adds a join and no extra labels.",
-              why: "Snowflake is for a real hierarchy (city → state), not for a lonely ticket number.",
+              why: "Snowflake is for a real split (city → state), not for a lonely ticket number.",
             },
             {
-              do: "Side B/S is low-cardinality. Keep it as a fact flag or pack it in a junk dimension with other flags (odd-lot, auction).",
+              do: "Side B/S is a tiny flag. Keep it on the fact or pack it in a junk dimension with other flags (odd-lot, auction).",
               why: "Tiny flags should not explode into three mini-dimensions. Junk = a grab-bag of leftover codes.",
             },
             {
-              do: "Grain sentence stays “one row per fill”. The degenerate id does not change grain.",
+              do: "Grain sentence stays “one row per fill”. The extra id does not change grain.",
               why: "Grain is a sentence, not a pile of extra columns.",
             },
             {
-              do: "A user still GROUP BYs venue and date; they rarely GROUP BY exchange_trade_id except for drill-to-detail.",
+              do: "A user still GROUP BYs venue and date; they rarely GROUP BY exchange_trade_id except to look up one fill.",
               why: "Degenerate keys are for trace-back to the exchange, not for a region report.",
             },
           ],
@@ -422,17 +431,20 @@ export const notesWarehouse: TopicNote = {
     },
     {
       heading: "Warehouse versus mart, and the cube",
-      body: "A warehouse is the whole school’s shared filing room with one spelling of “Mumbai”. A data mart is one department’s slice (surveillance, HR). Dependent marts are filled from the warehouse and stay consistent. Independent marts built from source systems drift (“Mumbai” vs “Bombay”) and cannot be drilled across.\n\nA cube is a grid of measures indexed by dimensions — Product × Region × Quarter. MOLAP stores the grid; ROLAP is SQL on the star; HOLAP mixes. Slice/dice/roll-up reshape what you see; they do not change the fact grain underneath.",
+      body: "The warehouse is the whole store-room with one spelling of “Mumbai”. A data mart is one department’s smaller room (surveillance, HR). Dependent marts are filled from the warehouse and stay consistent. Independent marts built from the shop files drift (“Mumbai” vs “Bombay”) and cannot be joined fairly. A cube is a 3D box of sales by city / product / month — a grid of measures indexed by dimensions.\n\nMOLAP stores the grid; ROLAP is SQL on the star; HOLAP mixes. Slice, dice, and roll-up reshape what you see; they do not change the fact grain underneath. “Normalised EDW plus departmental stars” is Inmon. “Bus of shared dimensions” is Kimball. A filtered view of the warehouse is still a (logical) dependent mart. It is not staging and not a cube.",
       howTo: [
-        "Disagreeing city names across teams → independent marts. Fix: one conformed DIM_MEMBER, dependent marts.",
-        "“Normalised EDW plus departmental stars” → Inmon. “Bus of conformed dimensions” → Kimball.",
-        "Cube without a stored grid can still be a SQL GROUP BY. Drill to fills needs fill grain, not a pre-summed PRQ cube.",
-        "A filtered view of the warehouse is still a (logical) dependent mart. It is not staging and not a cube.",
+        "Disagreeing city names across teams → independent marts. Fix: one shared DIM_MEMBER, dependent marts.",
+        "“Normalised EDW plus departmental stars” → Inmon. “Bus of shared dimensions” → Kimball.",
+        "Cube without a stored grid can still be a SQL GROUP BY. Drill to fills needs fill grain, not a pre-summed cube.",
+        "A filtered view of the warehouse is still a dependent mart. It is not staging and not a cube.",
+        "Dependent = inherit the store-room spelling. Independent = each room extracts from the shop and drifts.",
       ],
       bullets: [
-        "Warehouse: enterprise, conformed. Mart: subject area. Dependent marts inherit conformity.",
-        "Independent marts from sources cause inconsistent dimensions.",
-        "Cube: measure indexed by dimensions. MOLAP / ROLAP / HOLAP is storage.",
+        "Warehouse = the whole store-room. Mart = one department’s smaller room.",
+        "Dependent marts inherit one spelling. Independent marts from shop files drift.",
+        "Cube = a 3D box of sales by city / product / month.",
+        "MOLAP stores the grid. ROLAP is SQL on the star. HOLAP mixes.",
+        "Slice / dice / roll-up change the view, not the fact grain.",
       ],
       examples: [
         {
@@ -441,16 +453,16 @@ export const notesWarehouse: TopicNote = {
             "Surveillance DIM_MEMBER: M1 city Mumbai. Finance: M1 city Bombay. A board pack joins alerts-by-city to fees-by-city. What breaks?",
           steps: [
             {
-              do: "M1 becomes two cities. Alerts sit in Mumbai, fees in Bombay. Drill-across is wrong.",
-              why: "Each mart is “correct” inside itself. The shared word “city” is not shared meaning.",
+              do: "M1 becomes two cities. Alerts sit in Mumbai, fees in Bombay. The join across rooms is wrong.",
+              why: "Each small room is “correct” inside itself. The shared word “city” is not shared meaning.",
             },
             {
               do: "Fix with one warehouse DIM_MEMBER (city standardised in Transform). Both marts load from it.",
-              why: "Dependent marts inherit the same member_sk and the same city spelling.",
+              why: "Dependent rooms inherit the same member_sk and the same city spelling.",
             },
             {
               do: "A one-off REPLACE('Bombay','Mumbai') in the board pack is not conformity.",
-              why: "The next synonym (“Bom”) breaks it again. Conform in ETL.",
+              why: "The next synonym (“Bom”) breaks it again. Clean the name in ETL.",
             },
           ],
           result:
@@ -462,11 +474,11 @@ export const notesWarehouse: TopicNote = {
             "50 products × 8 regions × 20 quarters. User asks value by Product only (roll-up the other axes). Where is the work?",
           steps: [
             {
-              do: "Base cube is 8000 cells. MOLAP can answer Product-only from a stored aggregate. ROLAP GROUP BYs the star (maybe millions of fills).",
+              do: "Base cube is 8000 cells. MOLAP can answer Product-only from a stored sum. ROLAP GROUP BYs the star (maybe millions of fills).",
               why: "MOLAP did some sums in advance, like a times-table. ROLAP computes on demand.",
             },
             {
-              do: "HOLAP might keep detail relational and store Product-only in MOLAP. This query then hits MOLAP.",
+              do: "HOLAP might keep detail in tables and store Product-only in MOLAP. This query then hits MOLAP.",
               why: "Hybrid is “some cheat-sheets, plus the raw notebook”.",
             },
             {
@@ -483,16 +495,16 @@ export const notesWarehouse: TopicNote = {
             "CREATE VIEW mart_surv_fill AS SELECT … FROM fact_fill JOIN dim_member WHERE member_type = 'Broker'. Extra tables? Cube? Staging?",
           steps: [
             {
-              do: "Dependent logical mart: brokers only, keys still conformed, sourced from the warehouse.",
-              why: "Subject slice + from the warehouse = mart, even with no extra physical tables.",
+              do: "Dependent logical mart: brokers only, keys still shared, sourced from the warehouse.",
+              why: "Subject slice + from the store-room = mart, even with no extra physical tables.",
             },
             {
-              do: "Not a cube (no stored multidimensional sums). Not staging (rows are already tidy warehouse rows).",
-              why: "The FROM clause is the tell. Staging would still look like the source file.",
+              do: "Not a cube (no stored 3D sums). Not staging (rows are already tidy warehouse rows).",
+              why: "The FROM clause is the tell. Staging would still look like the shop file.",
             },
             {
               do: "A physical mart would COPY the filtered star for isolation. Access control on the view is a reason to have a logical mart anyway.",
-              why: "Mart is about subject and governance, not only extra disks.",
+              why: "Mart is about subject and who may see it, not only extra disks.",
             },
           ],
           result:
@@ -504,20 +516,20 @@ export const notesWarehouse: TopicNote = {
             "Team A: “conformed DIM_MEMBER and DIM_DATE shared by FACT_FILL and FACT_FEE (bus).” Team B: “3NF enterprise tables first, then a surveillance star.” Name the schools. Can both still have dependent marts?",
           steps: [
             {
-              do: "Team A is Kimball: a bus of conformed dimensions, facts plug in like bus stops.",
+              do: "Team A is Kimball: a bus of shared dimensions, facts plug in like bus stops.",
               why: "The exam phrase “bus of conformed dimensions” is Kimball’s poster.",
             },
             {
-              do: "Team B is Inmon: a normalised enterprise warehouse (CIF), then departmental stars as marts.",
+              do: "Team B is Inmon: a normalised enterprise warehouse first, then departmental stars as marts.",
               why: "“Normalised EDW plus departmental stars” is Inmon’s poster.",
             },
             {
-              do: "Dependent marts exist in both pictures: they are filled from the shared warehouse (or shared conformed dims), not from raw OMS files.",
+              do: "Dependent marts exist in both pictures: they are filled from the shared store-room, not from raw shop files.",
               why: "Dependent = inherit spelling. Independent = each team extracts from source and drifts.",
             },
             {
-              do: "If surveillance and finance both extract city from two OMS copies, you get Mumbai vs Bombay — independent marts, not either school done well.",
-              why: "The failure mode is source-fed marts, not the Kimball/Inmon slogan.",
+              do: "If surveillance and finance both extract city from two shop copies, you get Mumbai vs Bombay — independent marts, not either school done well.",
+              why: "The failure mode is source-fed small rooms, not the Kimball/Inmon slogan.",
             },
             {
               do: "A cube on top is storage (MOLAP/ROLAP). It does not pick Kimball vs Inmon.",
@@ -534,23 +546,23 @@ export const notesWarehouse: TopicNote = {
           steps: [
             {
               do: "Both marts store the same date_sk from one DIM_DATE. 2026-08-21 is one row, one key.",
-              why: "Conformed dimension = shared meaning, shared surrogate. Drill-across is a join on that key.",
+              why: "Shared dimension = shared meaning, shared key. Drill-across is a join on that key.",
             },
             {
               do: "The earlier Mumbai/Bombay split was two independent member dimensions. Here date was not independently rebuilt.",
-              why: "Dependent marts inherit the warehouse calendar. Independent marts invent their own.",
+              why: "Dependent rooms inherit the store-room calendar. Independent rooms invent their own.",
             },
             {
-              do: "You still cannot UNION alert rows with fee rows — different grains. You join aggregates on date_sk.",
+              do: "You still cannot UNION alert rows with fee rows — different grains. You join sums on date_sk.",
               why: "Drill-across is “same dimensions, separate facts”, not “one mixed-grain fact”.",
             },
             {
               do: "If MART_FEE had used load_date instead of business date_sk, 21 Aug fees could sit on 22 Aug and the pack would lie.",
-              why: "Conform the grain of time too: event date, not the ETL postmark, unless the report is about load lag.",
+              why: "Share the grain of time too: event date, not the ETL postmark, unless the report is about load lag.",
             },
             {
               do: "A filtered view of FACT_FEE for one desk is still a dependent logical mart. Extra disks are optional.",
-              why: "Mart is subject + governance, not only extra tables.",
+              why: "Mart is subject + who may see it, not only extra tables.",
             },
           ],
           result:
@@ -560,17 +572,20 @@ export const notesWarehouse: TopicNote = {
     },
     {
       heading: "OLAP: slice, dice, roll-up, drill-down",
-      body: "Hold this toy cube. Product {Equity, Debt, MF} × Region {East, West} × Quarter {Q1, Q2}. Measure = turnover. Cells: Equity-East 12,15; Equity-West 8,10; Debt-East 6,7; Debt-West 9,11; MF-East 4,5; MF-West 3,6. Grand total 96.\n\nSlice fixes one dimension to one value (cut one layer of a cake) and drops that axis. Dice keeps a subcube by restricting two or more dimensions (a smaller box). Roll-up sums up a hierarchy or drops an axis (quarters → year). Drill-down is the inverse. Pivot rotates axes; numbers do not change.",
+      body: "Hold a cube: a 3D box of sales by product, region, and quarter. Product {Equity, Debt, MF} × Region {East, West} × Quarter {Q1, Q2}. Measure = turnover. Cells: Equity-East 12,15; Equity-West 8,10; Debt-East 6,7; Debt-West 9,11; MF-East 4,5; MF-West 3,6. Grand total 96. A slice is one face of the cube — fix one dimension to one value and drop that axis.\n\nDice keeps a smaller box by restricting two or more dimensions. Roll-up sums up a hierarchy or drops an axis (quarters → year). Drill-down is the inverse. Pivot rotates axes; numbers do not change. Write the surviving cells, then add. One equality on one dimension → slice. Two filters or a list/range → dice. Roll-up of an additive measure keeps the grand total. Slice/filter changes it. SQL: WHERE is slice/dice; GROUP BY with fewer columns is roll-up.",
       howTo: [
         "Write the surviving cells, then add. Vocabulary without the number scores poorly.",
-        "One equality on one dimension → slice. Two filters or a list/range → dice.",
+        "One equality on one dimension → slice (one face). Two filters or a list/range → dice (smaller box).",
         "Roll-up of an additive measure keeps the grand total. Slice/filter changes it.",
         "SQL: WHERE is slice/dice; GROUP BY with fewer columns is roll-up.",
+        "Pivot only turns the page. If the total left 96 you rolled up or pivoted; if it shrank you sliced.",
       ],
       bullets: [
-        "Slice: one dimension fixed to one value. Dice: restrict ≥2 dimensions.",
-        "Roll-up: coarser hierarchy or drop an axis (SUM). Drill-down: finer.",
-        "Pivot changes layout, not cell values. This page’s cube totals 96.",
+        "Cube = a 3D box of sales by city / product / month (here Product × Region × Quarter = 96).",
+        "Slice = one face of the cube. One dimension fixed to one value.",
+        "Dice = a smaller box. Restrict two or more dimensions.",
+        "Roll-up = coarser hierarchy or drop an axis (SUM). Drill-down = finer.",
+        "Pivot changes layout, not cell values.",
       ],
       examples: [
         {
@@ -580,7 +595,7 @@ export const notesWarehouse: TopicNote = {
           steps: [
             {
               do: "Four cells: East-Q1=12, East-Q2=15, West-Q1=8, West-Q2=10. Total 45.",
-              why: "You fixed Product to one value and dropped that axis — a 2-D layer, like one cake slice.",
+              why: "You cut one face of the cube: Product = Equity. That axis drops. A 2-D layer remains.",
             },
             {
               do: "Debt and MF (51) are gone. Grand total is no longer 96.",
@@ -600,11 +615,11 @@ export const notesWarehouse: TopicNote = {
           steps: [
             {
               do: "Cells: Equity-West 8,10 and Debt-West 9,11. Total 38.",
-              why: "Two dimensions restricted → dice. MF-West 3+6 = 9 was excluded by the product list.",
+              why: "Two dimensions restricted → dice, a smaller box. MF-West 3+6 = 9 was excluded by the product list.",
             },
             {
               do: "Slice Region = West alone would keep MF too: 38+9 = 47.",
-              why: "Dice is the smaller box. Slice West is “one layer including MF”.",
+              why: "Dice is the smaller box. Slice West is “one face including MF”.",
             },
             {
               do: "If the paper wants numbers, compute cells first; do not argue slice vs dice vocabulary without the total.",
@@ -628,7 +643,7 @@ export const notesWarehouse: TopicNote = {
             },
             {
               do: "East slice total is 12+15+6+7+4+5 = 49, because West is discarded, not summed in.",
-              why: "If the grand total left 96, you rolled up or pivoted. If it became 49, you sliced/filtered. Pivot would keep every cell 12, 15, … and still 96.",
+              why: "If the grand total left 96, you rolled up or pivoted. If it became 49, you sliced. Pivot would keep every cell 12, 15, … and still 96.",
             },
           ],
           result:
@@ -641,11 +656,11 @@ export const notesWarehouse: TopicNote = {
           steps: [
             {
               do: "Q1 cells: Equity East 12 West 8, Debt East 6 West 9, MF East 4 West 3. Total 12+8+6+9+4+3 = 42.",
-              why: "You fixed Quarter to one value and dropped that axis — a 2-D layer.",
+              why: "You cut one face: Quarter = Q1. That axis drops. A 2-D layer remains.",
             },
             {
               do: "Q2 (15+10+7+11+5+6 = 54) is gone. Grand total is no longer 96.",
-              why: "A slice filters. The missing layer is discarded, not folded in.",
+              why: "A slice filters. The missing face is discarded, not folded in.",
             },
             {
               do: "Roll-up Quarter → Year would keep both Q1 and Q2 and still total 96.",
@@ -673,7 +688,7 @@ export const notesWarehouse: TopicNote = {
             },
             {
               do: "MF-only slice (both quarters, both regions): East 4+5, West 3+6 = 18.",
-              why: "Slice Product = MF keeps Q1 as well (4 and 3). Dice dropped those.",
+              why: "Slice Product = MF is one face; it keeps Q1 as well (4 and 3). Dice dropped those.",
             },
             {
               do: "If you instead rolled up Region on this dice, you would get one number 11 (MF-Q2).",
@@ -694,17 +709,20 @@ export const notesWarehouse: TopicNote = {
     },
     {
       heading: "Slowly changing dimensions Type 1 and Type 2",
-      body: "Dimensions change: a broker moves city. Slowly changing dimension (SCD) policy says what the warehouse does. Type 1 overwrites the attribute — history of that label is lost; old facts now wear the new city, like correcting a spelling on a name-tag. Type 2 inserts a new dimension row with a new surrogate key, closes the old row, and leaves old facts on the old key — like issuing a new library card when you move house, and keeping old loans on the old card.\n\nFacts store the surrogate that was current at event time, not the natural key. Lookup is (natural key + business date), never “always the is_current row” for historical fills.",
+      body: "A broker moves city. Slowly changing dimension (SCD) policy says what the store-room does. Type 1 overwrites the old address — history of that label is lost; old facts now wear the new city, like correcting a spelling on a name-tag. Type 2 keeps the old address and the new one, each with dates, and a new surrogate key — like issuing a new library card when you move house, and keeping old loans on the old card.\n\nFacts store the surrogate that was current at event time, not the natural key. Lookup is (natural key + business date), never “always the is_current row” for historical fills. Does history of the attribute matter? Yes → Type 2. Typo / “never was true” → Type 1. Stamp facts by trade_date between effective_from and effective_to — not by load_date. Do not Type-2 a fact table. Fills already are history.",
       howTo: [
         "Does history of the attribute matter for the report? Yes → Type 2. Typo / “never was true” → Type 1.",
-        "Type 2: close old row (end_date, is_current=N), insert new sk, same natural key, new city.",
+        "Type 1: overwrite the old address on the same row. Old facts now wear the new label.",
+        "Type 2: close the old row (end_date, is_current=N), insert a new key, same natural key, new city and dates.",
         "Stamp facts by trade_date between effective_from and effective_to — not by load_date.",
         "Do not Type-2 a fact table. Fills already are history.",
       ],
       bullets: [
-        "Type 1: overwrite; old facts appear under the new label.",
-        "Type 2: new row + new surrogate; old facts keep the old version.",
+        "Type 1 = overwrite the old address. Old facts appear under the new label.",
+        "Type 2 = keep old and new address with dates, and a new surrogate key.",
         "Facts point at surrogate keys if you want Type-2 history to work.",
+        "Lookup = natural key + event date in the window, not always is_current.",
+        "Load date is the postmark. Event date chooses the version.",
       ],
       examples: [
         {
@@ -714,7 +732,7 @@ export const notesWarehouse: TopicNote = {
           steps: [
             {
               do: "UPDATE city = 'Mumbai' on sk 7. Still one row. Facts untouched.",
-              why: "Type 1 is a sticker change. No new library card.",
+              why: "Type 1 overwrites the old address. No new library card.",
             },
             {
               do: "Both trades now display Mumbai. GROUP BY city: Mumbai 30, Pune 0.",
@@ -735,15 +753,15 @@ export const notesWarehouse: TopicNote = {
           steps: [
             {
               do: "Close sk 7 (Pune, end 30 Apr). Insert sk 88 (Mumbai, from 1 May, current).",
-              why: "Two cards, same legal name BR1, different cities and dates.",
+              why: "Type 2 keeps old and new address with dates. Two cards, same legal name BR1.",
             },
             {
               do: "1 Jan fact stays on 7. 1 Jun fact uses 88. GROUP BY city: Pune 10, Mumbai 20. Natural key BR1 still sums to 30.",
-              why: "Event-time geography is preserved. You can still roll up the legal entity on broker_id.",
+              why: "Event-time geography is kept. You can still roll up the legal entity on broker_id.",
             },
             {
               do: "A lookup that always uses is_current = Y would wrongly hang January on Mumbai.",
-              why: "Point-in-time lookup is natural key + trade_date in the effective range.",
+              why: "Point-in-time lookup is natural key + trade_date in the date window.",
             },
           ],
           result:
@@ -756,7 +774,7 @@ export const notesWarehouse: TopicNote = {
           steps: [
             {
               do: "15 Mar 2026 is in the Pune window → stamp sk 7.",
-              why: "Type-2 lookup is when the trade happened, not when the file showed up. Load date is the postmark, not the exam date.",
+              why: "Type-2 lookup is when the trade happened, not when the file showed up. Load date is the postmark.",
             },
             {
               do: "Using load_date 1 Jun would stamp 88 and rewrite March geography — a sloppy Type-1 corruption.",
@@ -776,15 +794,15 @@ export const notesWarehouse: TopicNote = {
           steps: [
             {
               do: "(a) Typo “never was Nashik” → Type 1 overwrite city = Surat on sk 21. Both facts now display Surat. GROUP BY: Surat 19.",
-              why: "Type 1 is a sticker change for “never true”. History of the wrong label should die.",
+              why: "Type 1 overwrites the old address for “never true”. History of the wrong label should die.",
             },
             {
               do: "(b) Real move → Type 2: close sk 21 (Nashik until 30 Jun), insert sk 90 (Surat from 1 Jul).",
-              why: "Two library cards, same legal name BR4. Old loans stay on the old card.",
+              why: "Keep old and new address with dates. Two library cards, same legal name BR4.",
             },
             {
               do: "3 Feb stays on 21 (Nashik 5). 9 Aug uses 90 (Surat 14). GROUP BY city: Nashik 5, Surat 14. Natural key BR4 still sums to 19.",
-              why: "Event-time geography is preserved. You can still roll up the legal entity on broker_id.",
+              why: "Event-time geography is kept. You can still roll up the legal entity on broker_id.",
             },
             {
               do: "Do not Type-2 the fact table. The two fills already are history. Only the dimension versions.",

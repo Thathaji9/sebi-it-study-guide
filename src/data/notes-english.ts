@@ -2,13 +2,13 @@ import type { TopicNote } from "@/data/notes";
 
 export const notesEnglish: TopicNote = {
   topic: "english",
-  title: "English — techniques (beginner)",
+  title: "English — simple notes",
   blurb:
-    "Seven simple techniques for exam English. Match the verb to the real subject. Pick a, an, or the. Find the one error. Fill a blank in a money sentence. Put jumbled sentences in order. In a passage, split fact, inference, and tone. For a precis, cut extra stories, keep the numbers, keep the main claim.",
+    "Class-10 class notes on exam English, plus five tiny examples per topic. Pictures first: matching shoes, a/an versus the, sentence cards, a shrunk page. Then the exam rule.",
   blocks: [
     {
       heading: "Subject–verb agreement",
-      body: "The verb must match the real subject, not the nearest noun. A phrase in the middle does not steal the number. In ‘The quality of the reports is poor’, the head word is quality (one thing), so the verb is is, not are.\n\nIgnore tails like along with, together with, as well as, and besides. ‘The Chairperson, along with the members, has signed’ — Chairperson is still one person, so has is right.\n\nWords like each, every, everyone, neither, and either take a singular verb in this exam. ‘Neither of the reports is complete.’ When two names are joined by or or nor, the verb follows the nearer name: ‘Neither the trustees nor the AMC has’ but ‘Neither the AMC nor the trustees have’.\n\nA number of means many, so the verb is plural. The number of is one figure, so the verb is singular.",
+      body: "Picture a pair of shoes. The verb must match the subject the way the left shoe matches the left foot. Do not match the verb to the nearest noun in the hallway. In ‘The quality of the reports is poor’, the head is quality (one thing), so the verb is is, not are.\n\nExam rule: ignore tails like along with, together with, as well as, and besides. ‘The Chairperson, along with the members, has signed’ — Chairperson is still one person, so has is right. Words like each, every, everyone, neither, and either take a singular verb in this exam. ‘Neither of the reports is complete.’ When two names are joined by or or nor, the verb follows the nearer name: ‘Neither the trustees nor the AMC has’ but ‘Neither the AMC nor the trustees have’. A number of means many, so the verb is plural. The number of is one figure, so the verb is singular.",
       howTo: [
         "Underline the real subject. Cross out of-phrases and along-with tails.",
         "Ask: is that head word one thing or many?",
@@ -17,6 +17,7 @@ export const notesEnglish: TopicNote = {
         "Check the pair a number of (plural) versus the number of (singular).",
       ],
       bullets: [
+        "Verb and subject match like a pair of shoes.",
         "The verb agrees with the head, not the nearest noun.",
         "along with / together with / as well as do not make a plural subject.",
         "neither / either / each are singular here.",
@@ -67,7 +68,7 @@ export const notesEnglish: TopicNote = {
             },
             {
               do: "Keep (B): …has signed the order.",
-              why: "has matches Chairperson. The commas around along with also mark it as extra, not a compound subject.",
+              why: "has matches Chairperson. The commas around along with also mark it as extra, not a joined subject.",
             },
           ],
           result:
@@ -164,7 +165,7 @@ export const notesEnglish: TopicNote = {
     },
     {
       heading: "Articles — a, an, the",
-      body: "Use a or an for one non-unique countable thing. Use a before a consonant sound (a circular, a union, a SEBI report). Use an before a vowel sound (an order, an hour, an IPO). The letter that starts the word is not the test — the sound is. hour starts with a vowel sound, so an hour. union starts with a ‘y’ sound, so a union.\n\nUse the when the listener can tell which one you mean: a unique thing (the SEBI Act), something already named, or the only one in that context (the Chairperson of SEBI).\n\nUse no article for a general plural or a general mass noun: Investors need disclosure. Information is power. Do not write the investors when you mean investors in general.\n\nA unique law takes the, not a: the SEBI Act, 1992 — not a SEBI Act.",
+      body: "Picture two pencils. a or an is one unnamed thing — ‘a pencil from the box’. the is the specific one we already know — ‘the pencil you borrowed yesterday’. Use no article when you mean people or stuff in general: Investors need disclosure.\n\nExam rule: use a or an for one non-unique countable thing. Use a before a consonant sound (a circular, a union, a SEBI report). Use an before a vowel sound (an order, an hour, an IPO). The letter that starts the word is not the test — the sound is. hour starts with a vowel sound, so an hour. union starts with a ‘y’ sound, so a union. Use the when the listener can tell which one you mean: a unique thing (the SEBI Act), something already named, or the only one in that context (the Chairperson of SEBI). A unique law takes the, not a: the SEBI Act, 1992 — not a SEBI Act. Do not write the investors when you mean investors in general.",
       howTo: [
         "Ask: is this one countable thing, a unique named thing, or a general group?",
         "One new countable thing → a or an. Unique or already known → the. General plural/mass → no article.",
@@ -173,9 +174,11 @@ export const notesEnglish: TopicNote = {
         "Read the full sentence. Do not pick an article that fights the meaning.",
       ],
       bullets: [
-        "a / an = one, not unique. the = this one, unique or already named.",
+        "a / an = one unnamed thing. the = the specific one we already know.",
         "Sound, not spelling: an hour, a union, an IPO.",
         "the SEBI Act (unique law). investors with no article (people in general).",
+        "an before a vowel sound; a before a consonant sound.",
+        "Mass nouns like information usually take no article (not an information).",
       ],
       examples: [
         {
@@ -322,7 +325,7 @@ export const notesEnglish: TopicNote = {
     },
     {
       heading: "Error spotting — find the one error",
-      body: "These items hide one fault, not three. Read the sentence once for sense, once for agreement, once for articles, once for a wrong small word (preposition), and once for a broken list.\n\nCommon small-word traps: comply with a rule (not comply to); issued to the people who must follow it; issued by the author; issued under a law; issued for a purpose; prohibit someone from doing; eligible for; consist of.\n\nLists must keep the same shape. After shall you want three verbs: protect, promote, and regulate — not protect, promoting, and regulation. After not only … but also, keep two verbs or two nouns, not a mix.\n\nIf a part looks fine, it may be the ‘no error’ option — but that is rarer than students hope. When two faults exist, the paper usually underlines one slot. Fix that slot.",
+      body: "Picture a wall with one broken brick. These items hide one fault, not three. Read the sentence once for sense, once for agreement (matching shoes), once for articles (a/an/the), once for a wrong small word (preposition), and once for a broken list.\n\nExam rule: common small-word traps — comply with a rule (not comply to); issued to the people who must follow it; issued by the author; issued under a law; issued for a purpose; prohibit someone from doing; eligible for; consist of. Lists must keep the same shape. After shall you want three verbs: protect, promote, and regulate — not protect, promoting, and regulation. After not only … but also, keep two verbs or two nouns, not a mix. If a part looks fine, it may be the ‘no error’ option — but that is rarer than students hope. When two faults exist, the paper usually underlines one slot. Fix that slot.",
       howTo: [
         "Read the whole sentence. Do not stop at the first odd word.",
         "Check the verb against the real subject.",
@@ -335,6 +338,8 @@ export const notesEnglish: TopicNote = {
         "One error is the game. Do not hunt for a second unless two parts are marked.",
         "comply with; issued to / by / under / for; prohibit from.",
         "A list after and must stay parallel: three verbs, or three nouns, not a mix.",
+        "not only … but also must join two matching shapes.",
+        "eligible for; consist of — more small-word pairs to remember.",
       ],
       examples: [
         {
@@ -471,10 +476,10 @@ export const notesEnglish: TopicNote = {
     },
     {
       heading: "Fillers and vocabulary in a financial sentence",
-      body: "A blank in a money or market sentence is three tests in one. First the grammar must fit on both sides. Then the meaning must fit. Then the word must sound official, not slang.\n\naims to prohibit is fine. aims at prohibit is not (you need aims at prohibiting, or aims to prohibit). disclose material events is the official pair. hide trivial events is both illegal and the wrong tone.\n\nUseful words: mitigate means reduce a risk (mitigate counterparty risk). disclosure means telling the market a fact you must tell. surveillance means watching trades for tricks. material means important enough to move a decision or a price. prudent means carefully wise.\n\nConnectors: although + a full clause; despite + a noun; however often starts a new sentence; because shows cause, not contrast.",
+      body: "Picture a missing brick in a wall. The blank must fit the bricks on both sides (grammar), then match the meaning, then sound official, not slang. aims to prohibit is fine. aims at prohibit is not (you need aims at prohibiting, or aims to prohibit).\n\nExam rule: disclose material events is the official pair. hide trivial events is both illegal and the wrong tone. Useful words: mitigate means reduce a risk (mitigate counterparty risk). disclosure means telling the market a fact you must tell. surveillance means watching trades for tricks. material means important enough to move a decision or a price. prudent means carefully wise. Connectors: although + a full clause; despite + a noun; however often starts a new sentence; because shows cause, not contrast.",
       howTo: [
         "Read the whole sentence before you open the options.",
-        "Kill any option that breaks grammar, even if the fact sounds true.",
+        "Drop any option that breaks grammar, even if the fact sounds true.",
         "Then pick the word that matches the meaning (risk, disclosure, watch, contrast).",
         "Prefer dry official words: disclose, material, mitigate — not juicy, hide, fix up.",
         "For two blanks, solve the easier blank first.",
@@ -482,7 +487,9 @@ export const notesEnglish: TopicNote = {
       bullets: [
         "Grammar first, meaning second, official tone third.",
         "mitigate a risk; disclose a material event; surveillance watches trades.",
-        "although + clause; despite + noun; however is not a clause-linker in the middle of one sentence.",
+        "prudent means carefully wise.",
+        "although + clause; despite + noun.",
+        "however is not a clause-linker in the middle of one sentence.",
       ],
       examples: [
         {
@@ -523,7 +530,7 @@ export const notesEnglish: TopicNote = {
               why: "Official English uses material — important to price or to an investor’s choice.",
             },
             {
-              do: "Kill (A), (C), and (D).",
+              do: "Drop (A), (C), and (D).",
               why: "hide trivial is the opposite. mitigate festive mixes a risk-verb with a party word. surveil edible is nonsense.",
             },
             {
@@ -602,11 +609,11 @@ export const notesEnglish: TopicNote = {
               why: "prudent means carefully wise. That matches a rule-following intermediary, not a party word.",
             },
             {
-              do: "Kill (A). festive is not official English, and disclosure is the company’s job.",
+              do: "Drop (A). festive is not official English, and disclosure is the company’s job.",
               why: "Exchanges watch; companies disclose. Do not swap the verbs.",
             },
             {
-              do: "Kill (C) and (D) as nonsense tone.",
+              do: "Drop (C) and (D) as nonsense tone.",
               why: "edible and comic are not market words. repo is an RBI tool, not an order-book watch.",
             },
             {
@@ -625,18 +632,20 @@ export const notesEnglish: TopicNote = {
     },
     {
       heading: "Para jumbles — opener, then pair, then closer",
-      body: "Do not try all 24 orders. Use three tests.\n\nFirst find the opener. It names the topic. It does not start with this, these, such, that, therefore, hence, or however (those words look backward). A definition or a plain problem sentence is a good start.\n\nSecond find a mandatory pair. Two sentences must sit together because of a pronoun (that stack), a repeated noun with the, or a cause word (that is why). If B names shortening settlement and C says that operational stack, C cannot come before B.\n\nThird find the closer. therefore, hence, thus, or a practical path (so they phased the change) usually ends the paragraph.\n\nThen drop leftover sentences into the holes. Read the full order once. If a pronoun has no home, the order is wrong. A true market fact can still sit in the wrong slot.",
+      body: "Picture four sentence cards on a desk. A jumble asks you to reorder the cards. The first card names the topic. A card that starts with this, that, therefore, or however cannot go first — it points at a card you have not placed yet.\n\nExam rule: do not try all 24 orders. Three tests. First find the opener: a definition or a plain problem sentence, with no this, these, such, that, therefore, hence, or however. Second find a mandatory pair: two sentences must sit together because of a pronoun (that stack), a repeated noun with the, or a cause word (that is why). If B names shortening settlement and C says that operational stack, C cannot come before B. Third find the closer: therefore, hence, thus, or a practical path (so they phased the change) usually ends the paragraph. Then drop leftover sentences into the holes. Read the full order once. If a pronoun has no home, the order is wrong. A true market fact can still sit in the wrong slot.",
       howTo: [
         "Find the opener: no this / therefore / hence / however to an unseen claim.",
         "Find a pair: a pointing word (that, such, this) must follow the sentence it points to.",
         "Find the closer: therefore / hence / the practical path.",
         "Place leftovers in the remaining holes.",
-        "Read the paragraph aloud. Kill any order that strands a pronoun.",
+        "Read the paragraph aloud. Drop any order that strands a pronoun.",
       ],
       bullets: [
+        "Jumble = reorder sentence cards.",
         "Opener names the topic and looks forward, not back.",
         "Pair = pronoun or that is why glued to the line it needs.",
         "Closer = therefore / hence / the method they chose.",
+        "A true fact can still sit in the wrong slot.",
       ],
       examples: [
         {
@@ -766,7 +775,7 @@ export const notesEnglish: TopicNote = {
               why: "D’s That mix points at the SEBI/RBI mix. Therefore then closes: ‘SEBI’s repo’ is wrong.",
             },
             {
-              do: "Read B–A–D–C. Kill any order that strands These or That.",
+              do: "Read B–A–D–C. Drop any order that strands These or That.",
               why: "A true RBI fact in A does not make A first. A pointing word still needs a home.",
             },
           ],
@@ -776,18 +785,20 @@ export const notesEnglish: TopicNote = {
     },
     {
       heading: "Reading comprehension — fact, inference, tone",
-      body: "A fact question is answered by a line you can point to: a date, a name, a definition. If the passage says T+1 became the default from 27 January 2023, that date is the fact — not a date you remember from class.\n\nAn inference must follow from the passage, but it is not printed as a ready sentence. Take one small logical step. Do not add outside knowledge. From ‘optional T+0 is a limited extra path, not a replacement’, you may infer that T+0 is not treated as already compulsory for every stock. You may not infer that the author wants T+0 banned.\n\nTone is the author’s attitude: cautious, critical, approving, calm-and-diagnostic. Official prose is usually calm analysis, not a rant and not a cheer. Mentioning a reform is not a celebration of that reform.\n\nExtreme words (always, never, must, only) are often wrong unless the passage was that strong. The main idea covers the whole argument, not one detail and not your own reform plan.",
+      body: "Picture a page you must trust. A fact is a line you can point at — a date, a name, a definition. An inference is one small step from that line, not a new story from class. Tone is the author’s mood: calm, angry, cheering, or careful.\n\nExam rule: if the passage says T+1 became the default from 27 January 2023, that date is the fact — not a date you remember from elsewhere. From ‘optional T+0 is a limited extra path, not a replacement’, you may infer that T+0 is not treated as already compulsory for every stock. You may not infer that the author wants T+0 banned. Official prose is usually calm analysis, not a rant and not a cheer. Mentioning a reform is not a celebration of that reform. Extreme words (always, never, must, only) are often wrong unless the passage was that strong. The main idea covers the whole argument, not one detail and not your own reform plan.",
       howTo: [
         "Label the question: fact, inference, tone, or main idea.",
         "Fact: point to a line. Copy the date or name as printed.",
         "Inference: write the small step. If you needed extra GK, it is not an inference.",
         "Tone: pick the attitude word that matches the heat of the prose (calm vs angry vs happy).",
-        "Kill options that add a new policy, a new product, or always / never.",
+        "Drop options that add a new policy, a new product, or always / never.",
       ],
       bullets: [
         "Fact = in the passage. Inference = one necessary step, no extra GK.",
         "Tone = attitude, not the topic name.",
         "Main idea = the whole claim. A true detail can still be too small.",
+        "Do not import Chairperson names or dates the passage did not print.",
+        "always / never / must / only are often traps unless the passage is that strong.",
       ],
       examples: [
         {
@@ -926,7 +937,7 @@ export const notesEnglish: TopicNote = {
     },
     {
       heading: "Precis — cut examples, keep numbers, keep the main claim",
-      body: "A precis is a short faithful copy of the author’s point. Same stance. Same order of ideas. About one third of the words. No ‘I think’. No new advice.\n\nCut examples and stories. If the passage uses a kettle or a list of office names only to prove a claim, keep the claim and drop the props.\n\nKeep numbers and dates that carry the claim (T+1 from 27 January 2023; a basket of 25 stocks). You may drop a decorative figure. You may not change 25 into 250, and you may not invent a year.\n\nKeep the main claim. If the author says T+0 should stay optional, your precis may not say it must be made compulsory. Title the precis with a plain noun phrase of the issue, not a slogan like ‘T+0 forever’.",
+      body: "Picture shrinking a page to about one-third without losing the main claim — like folding a long letter into a short note that still says the same thing. Same stance. Same order of ideas. No ‘I think’. No new advice.\n\nExam rule: cut examples and stories. If the passage uses a kettle or a list of office names only to prove a claim, keep the claim and drop the props. Keep numbers and dates that carry the claim (T+1 from 27 January 2023; a basket of 25 stocks). You may drop a decorative figure. You may not change 25 into 250, and you may not invent a year. If the author says T+0 should stay optional, your precis may not say it must be made compulsory. Title the precis with a plain noun phrase of the issue, not a slogan like ‘T+0 forever’.",
       howTo: [
         "List the idea units in order (problem, how it works, risk, policy, warning).",
         "Drop examples, jokes, and extra names that do not carry the claim.",
@@ -935,9 +946,11 @@ export const notesEnglish: TopicNote = {
         "Check: did I add a must / should the author did not say? If yes, cut it.",
       ],
       bullets: [
+        "Precis = shrink a page to about one-third; keep the main claim.",
         "Cut examples. Keep the claim the example was proving.",
         "Keep numbers that change the meaning. Never replace a figure with a guess.",
         "Same stance, shorter words, no ‘I think’.",
+        "Title with a plain noun phrase, not a slogan.",
       ],
       examples: [
         {
@@ -950,11 +963,11 @@ export const notesEnglish: TopicNote = {
               why: "It keeps the caution and the mechanism. That is precis work.",
             },
             {
-              do: "Kill (B).",
+              do: "Drop (B).",
               why: "It turns optional into compulsory. That changes the main claim.",
             },
             {
-              do: "Kill (C).",
+              do: "Drop (C).",
               why: "First person and a new feeling are not in the passage.",
             },
           ],
@@ -1029,11 +1042,11 @@ export const notesEnglish: TopicNote = {
               why: "Those tests carry the claim. Cutting them leaves only a slogan.",
             },
             {
-              do: "Kill Ban all apps.",
+              do: "Drop Ban all apps.",
               why: "The author asked useful questions. The author did not order a ban. Same-stance rule.",
             },
             {
-              do: "Kill A kettle … is a SEBI product.",
+              do: "Drop A kettle … is a SEBI product.",
               why: "That invents a product and a regulator fact the passage did not state.",
             },
             {

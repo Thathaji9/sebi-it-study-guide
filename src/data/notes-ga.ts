@@ -2,24 +2,26 @@ import type { TopicNote } from "@/data/notes";
 
 export const notesGa: TopicNote = {
   topic: "ga",
-  title: "Financial GA — techniques (beginner)",
+  title: "Financial GA — simple notes",
   blurb:
-    "Ten simple techniques for financial general awareness. Who SEBI is. Who regulates what. Primary versus secondary market. How a cash-equity trade settles. What depositories do. Insider trading in one page. Mutual funds and NAV. Circuit breakers. Chairpersons by year so 2022 and 2025 never mix. RBI tools in one sentence each.",
+    "Class-10 class notes on the securities market, plus five tiny examples per topic. Pictures first: umpire, ticket window, locker-bank, secret exam paper, fuse. Then the exam rule.",
   blocks: [
     {
       heading: "Who is SEBI",
-      body: "SEBI is the Securities and Exchange Board of India. It is the statutory regulator of India’s securities market. Its own law is the SEBI Act, 1992. SEBI had existed from 12 April 1988 without that statute; 1992 gave it legal powers. Headquarters are in Mumbai (Bandra Kurla Complex), not New Delhi.\n\nSEBI’s job in plain words: protect investors in securities, help the securities market grow, and regulate that market. It registers brokers and other intermediaries, watches listed-company disclosure, runs rules against insider trading and market fraud, and oversees mutual funds, depositories, and stock exchanges.\n\nSEBI is not the central bank. It does not set the repo rate, CRR, or SLR. It does not issue Union government bonds. The Companies Act, 2013 did not create SEBI. The stock-exchange recognition law is a different Act (SCRA, 1956).",
+      body: "Picture SEBI as the umpire on the share-market field. The umpire does not print rupees or set the repo rate — that is RBI, the money printer and the banks’ bank. SEBI watches brokers, listed companies, mutual funds, depositories, and stock exchanges so the game stays fair for investors.\n\nExam rule: SEBI is the Securities and Exchange Board of India. Its own law is the SEBI Act, 1992. It existed from 12 April 1988 without that statute; 1992 gave it legal powers. Headquarters are in Mumbai (Bandra Kurla Complex), not New Delhi. Its job is to protect investors in securities, help the securities market grow, and regulate that market. The Companies Act, 2013 did not create SEBI. SCRA, 1956 is the stock-exchange recognition law, not SEBI’s own Act.",
       howTo: [
         "Ask: is this about SEBI’s own law, its city, or its job?",
-        "Law: SEBI Act, 1992. City: Mumbai. Job: securities market — investors, development, regulation.",
-        "Kill options that give RBI tools (repo, CRR) or New Delhi as HQ.",
-        "Kill ‘created by the Companies Act’ or ‘created by the RBI Act’.",
-        "If the stem mixes two statutes, pick the one that actually created the Board.",
+        "Law: SEBI Act, 1992. City: Mumbai. Job: protect, develop, and regulate the securities market.",
+        "Drop options that give RBI tools (repo, CRR, SLR) or New Delhi as HQ.",
+        "Drop ‘created by the Companies Act’ or ‘created by the RBI Act’.",
+        "If two laws appear, pick the one that actually made SEBI a statutory board.",
       ],
       bullets: [
         "SEBI Act, 1992. HQ: Mumbai. Started 1988; became a statutory board in 1992.",
-        "Protects investors, develops the securities market, regulates that market.",
-        "Not RBI. Not MCA. Not the body that sets repo.",
+        "Three jobs: protect investors, develop the market, regulate the market.",
+        "SEBI is the umpire. RBI is the money printer. Do not swap them.",
+        "Not MCA. Not the body that sets repo, CRR, or SLR.",
+        "New Delhi is a regional office, not HQ.",
       ],
       examples: [
         {
@@ -28,8 +30,8 @@ export const notesGa: TopicNote = {
             "SEBI got statutory powers under which law? (A) Companies Act, 2013 (B) SEBI Act, 1992 (C) SCRA, 1956 only (D) RBI Act, 1934.",
           steps: [
             {
-              do: "Ask what the question wants: the Board’s own constitutive Act.",
-              why: "Many laws touch listed companies. Only one law created SEBI as a statutory body.",
+              do: "Ask what the question wants: SEBI’s own law.",
+              why: "Many laws mention listed companies. Only one law made SEBI a statutory board.",
             },
             {
               do: "Drop (A), (C), and (D).",
@@ -37,7 +39,7 @@ export const notesGa: TopicNote = {
             },
             {
               do: "Pick (B) SEBI Act, 1992.",
-              why: "1988 was non-statutory SEBI. 1992 is the statute that gave it powers.",
+              why: "1988 was SEBI without its own Act. 1992 is the statute that gave it powers.",
             },
           ],
           result: "SEBI Act, 1992. HQ is a separate fact: Mumbai.",
@@ -53,11 +55,11 @@ export const notesGa: TopicNote = {
             },
             {
               do: "Treat New Delhi as a trap.",
-              why: "New Delhi is a regional office and a common guess because many Union bodies sit there. It is not HQ.",
+              why: "New Delhi is a regional office. Many Union bodies sit there, so people guess it. It is not HQ.",
             },
             {
               do: "Kolkata and Hyderabad are also not HQ.",
-              why: "Kolkata is another regional office. Hyderabad is a frequent distractor in regulator questions.",
+              why: "Kolkata is another regional office. Hyderabad is a common wrong city in regulator questions.",
             },
           ],
           result: "(C) Mumbai. New Delhi is not SEBI HQ.",
@@ -68,16 +70,16 @@ export const notesGa: TopicNote = {
             "Which is a SEBI job rather than an RBI job? (A) Setting the repo rate (B) Registering stock brokers and prohibiting insider trading (C) Issuing Union government bonds (D) Fixing CRR.",
           steps: [
             {
-              do: "Tick anything that is a security-market licence or a market-integrity rule.",
-              why: "Brokers and insider trading sit in SEBI’s statute. That is (B).",
+              do: "Tick anything that is a share-market licence or a fair-play rule.",
+              why: "Brokers and insider trading sit in SEBI’s law. That is (B).",
             },
             {
               do: "Drop repo, CRR, and Union G-secs.",
-              why: "Those are RBI / government money-and-debt tools, not SEBI’s constitutive work.",
+              why: "Those are RBI / government money-and-debt tools, not SEBI’s work.",
             },
             {
               do: "If an option says ‘SEBI sets repo’, reject the whole option.",
-              why: "One false regulator word poisons a sentence that otherwise sounds official.",
+              why: "One wrong referee word spoils a sentence that otherwise sounds official.",
             },
           ],
           result:
@@ -102,7 +104,7 @@ export const notesGa: TopicNote = {
             },
             {
               do: "Write the fix for (ii): became statutory under the SEBI Act, 1992.",
-              why: "One constitutive Act. Do not swap in SCRA or the RBI Act either.",
+              why: "One own Act. Do not swap in SCRA or the RBI Act either.",
             },
             {
               do: "If a follow-up asks HQ, answer Mumbai, not New Delhi.",
@@ -123,7 +125,7 @@ export const notesGa: TopicNote = {
           steps: [
             {
               do: "Recall the three-part job: protect, develop, regulate the securities market.",
-              why: "That is the plain-English reading of SEBI’s own Act. Pick (B).",
+              why: "That is the plain reading of SEBI’s own Act. Pick (B).",
             },
             {
               do: "Drop (A).",
@@ -139,7 +141,7 @@ export const notesGa: TopicNote = {
             },
             {
               do: "If an option keeps the three jobs but adds ‘and sets the repo rate’, reject the whole option.",
-              why: "One false regulator word poisons an otherwise official sentence.",
+              why: "One false referee word spoils an otherwise official sentence.",
             },
             {
               do: "Write a margin split: securities market → SEBI; banks and rupees → RBI.",
@@ -153,18 +155,20 @@ export const notesGa: TopicNote = {
     },
     {
       heading: "Who regulates what — SEBI vs RBI vs IFSCA",
-      body: "Use a decision tree. Do not guess from the brand name of the group.\n\nIs it a security, a stock exchange, a broker, a mutual fund, a listed-company filing, an FPI, or insider trading? → SEBI.\n\nIs it a bank deposit, a bank licence, payments, the repo rate, CRR, SLR, or the primary issue of Union government securities? → RBI.\n\nIs it a financial product, service, or institution inside an IFSC (GIFT City, Gandhinagar)? → IFSCA, the unified IFSC regulator (IFSCA Act, 2019).\n\nOverlaps are real. A listed NBFC answers to RBI as an NBFC and to SEBI for listing and disclosure. FDI policy sits with the government; FPI registration is still SEBI. Insurance is IRDAI. Pensions / NPS are PFRDA. If two regulators could be argued, pick the one that actually licences or conducts the activity named in the stem.",
+      body: "Picture different games with different referees. Share-market play — brokers, listed companies, mutual funds, insider trading — goes to the SEBI umpire. Bank money, cash ratios, and government-bond issue go to RBI, the money printer. A shop inside GIFT City (an IFSC) goes to IFSCA.\n\nExam rule: security, stock exchange, broker, mutual fund, listed-company filing, FPI, or insider trading → SEBI. Bank deposit, bank licence, payments, repo, CRR, SLR, or primary issue of Union government securities → RBI. A product, service, or institution inside an IFSC (GIFT City, Gandhinagar) → IFSCA, the unified IFSC regulator (IFSCA Act, 2019). A listed NBFC answers to RBI as an NBFC and to SEBI for listing and disclosure. FDI policy sits with the government; FPI registration is still SEBI. Insurance is IRDAI. Pensions / NPS are PFRDA. If two referees could be argued, pick the one that actually licences the activity named in the question.",
       howTo: [
-        "Name the activity in the stem, not the group’s famous parent.",
+        "Name the activity in the question, not the group’s famous parent.",
         "Securities / listing / brokers / funds / FPIs → SEBI.",
         "Banks / payments / repo / CRR / SLR / G-sec issuance → RBI.",
         "Inside GIFT City IFSC → IFSCA.",
-        "If the stem has two slices (listed NBFC, IFSC unit), give two labels. Do not force one regulator for the whole group.",
+        "If the stem has two slices (listed NBFC, IFSC unit), give two labels. Do not force one referee for the whole group.",
       ],
       bullets: [
         "SEBI: securities market. RBI: banks and money. IFSCA: IFSC / GIFT City.",
         "Listed NBFC = RBI + SEBI. FPI registration = SEBI.",
         "Who sets repo? Always RBI. Who registers brokers? Always SEBI.",
+        "Insurance → IRDAI. Pensions / NPS → PFRDA. FDI policy → government.",
+        "IFSCA’s own law is the IFSCA Act, 2019.",
       ],
       examples: [
         {
@@ -174,7 +178,7 @@ export const notesGa: TopicNote = {
           steps: [
             {
               do: "Name the activity: buying Indian securities as a portfolio investor.",
-              why: "That is securities-market activity, so the registration certificate is SEBI’s.",
+              why: "That is share-market activity, so the registration certificate is SEBI’s.",
             },
             {
               do: "Drop IRDAI, PFRDA, and CCI.",
@@ -234,7 +238,7 @@ export const notesGa: TopicNote = {
             "A broker-dealer unit inside GIFT City IFSC is licensed for that IFSC business by: (A) SEBI only, because all brokers are always SEBI (B) IFSCA (C) IRDAI (D) PFRDA.",
           steps: [
             {
-              do: "Name the geography: inside an IFSC (GIFT City, Gandhinagar).",
+              do: "Name the place: inside an IFSC (GIFT City, Gandhinagar).",
               why: "Place beats the brand word broker. Inside IFSC → IFSCA.",
             },
             {
@@ -255,7 +259,7 @@ export const notesGa: TopicNote = {
             },
             {
               do: "If the next line names a domestic NSE cash trade by the parent, label that slice SEBI.",
-              why: "One group can have two labels. Do not force one regulator for the whole brand.",
+              why: "One group can have two labels. Do not force one referee for the whole brand.",
             },
           ],
           result:
@@ -276,7 +280,7 @@ export const notesGa: TopicNote = {
             },
             {
               do: "(iii) FPI certificate → SEBI.",
-              why: "Buying listed securities as a portfolio investor is securities-market conduct. FEMA/RBI still matter for forex, but the FPI registration is SEBI’s.",
+              why: "Buying listed securities as a portfolio investor is share-market conduct. FEMA/RBI still matter for forex, but the FPI registration is SEBI’s.",
             },
             {
               do: "(iv) FDI policy → the government (exam English: government / DPIIT path), not IRDAI.",
@@ -298,18 +302,20 @@ export const notesGa: TopicNote = {
     },
     {
       heading: "Primary versus secondary market",
-      body: "The primary market is where securities are born or issued again by the company: IPO, FPO, rights issue, preferential allotment, QIP. The company (or selling shareholders in some offers) puts paper into the market. Fresh capital for the company is the usual primary story.\n\nThe secondary market is where those already-issued securities trade later: NSE, BSE, and other exchanges. The company does not receive that money. You buy from another investor.\n\nAn Offer for Sale (OFS) of already-issued shares on the exchange is a sale by existing holders. It is not a fresh issue of capital, even though it uses exchange pipes. A QIP is still primary: the company issues new paper to institutions.\n\nDo not call the unofficial IPO grey market a SEBI market.",
+      body: "Picture a first-day ticket window. The company selling new shares is that window: fresh tickets, and the theatre keeps the money. The secondary market is people reselling used tickets in the street. The theatre does not get that cash.\n\nExam rule: the primary market is where securities are born or issued again by the company — IPO, FPO, rights issue, preferential allotment, QIP. Fresh capital for the company is the usual primary story. The secondary market is where those already-issued securities trade later on NSE, BSE, and other exchanges. An Offer for Sale (OFS) of already-issued shares is a sale by existing holders, not a fresh issue, even though it uses exchange pipes. A QIP is still primary: the company issues new paper to institutions. Do not call the unofficial IPO grey market a SEBI market.",
       howTo: [
-        "Ask: is new paper coming from the company (or a further issue), or are old shares changing hands?",
+        "Ask: is new paper coming from the company, or are old shares changing hands?",
         "New / further issue → primary. Later exchange trade → secondary.",
         "OFS of existing shares → secondary sale, not an IPO.",
         "QIP / rights / IPO allotment of fresh capital → primary.",
         "If the company does not get the money, it is usually not a primary issue.",
       ],
       bullets: [
-        "Primary: IPO / FPO / rights / QIP / preferential — paper is issued.",
-        "Secondary: exchange trading of paper that already exists.",
+        "Primary = first-day ticket window. Company issues paper (IPO / FPO / rights / QIP / preferential).",
+        "Secondary = used tickets. Exchange trading of paper that already exists.",
         "OFS ≠ IPO. QIP is still primary.",
+        "If the company does not receive the cheque, it is usually secondary.",
+        "The unofficial IPO grey market is not a SEBI-recognised exchange.",
       ],
       examples: [
         {
@@ -348,7 +354,7 @@ export const notesGa: TopicNote = {
             },
             {
               do: "Pick (B).",
-              why: "The seller (via broker / clearing) gets the funds. The company is not the counterparty.",
+              why: "The seller (via broker / clearing) gets the funds. The company is not the other side of the trade.",
             },
             {
               do: "Drop (A), (C), and (D).",
@@ -369,7 +375,7 @@ export const notesGa: TopicNote = {
             },
             {
               do: "Say what OFS is: a special window to sell existing shares.",
-              why: "It uses exchange infrastructure, so it looks ‘primary-like’, but the company does not receive fresh capital from those old shares.",
+              why: "It uses exchange pipes, so it looks ‘primary-like’, but the company does not receive fresh capital from those old shares.",
             },
             {
               do: "Keep QIP on the primary side if it appears in the next option.",
@@ -448,7 +454,7 @@ export const notesGa: TopicNote = {
     },
     {
       heading: "How a trade settles — T+1 walk-through",
-      body: "Settlement is the day funds and shares actually change hands after you trade. For ordinary listed cash equity in India, the default cycle is T+1 from 27 January 2023. T is the trade date. +1 is the next settlement (business) day, not always the next calendar day.\n\nWalk-through: you buy on Monday in the regular session. If Tuesday is a working settlement day, pay-in and pay-out happen Tuesday — your demat is credited, the seller is paid. If Tuesday is a settlement holiday, completion moves to Wednesday. The trade is still a Monday trade.\n\nBefore that, cash equities ran T+2 (including in 2020). T+1 was phased through 2022 and finished market-wide on 27 January 2023. Optional T+0 from 28 March 2024 is a narrower same-day path for a limited basket. It runs beside T+1. It is not the default for every stock.\n\nA clearing corporation still sits in the middle (novation). T+1 did not abolish clearing.",
+      body: "Picture this clock: you trade today, and the money and the shares swap on the next working day. That is T+1. T is the trade date. +1 is the next settlement day — not always the next calendar day, because Sundays and holidays do not count.\n\nExam rule: for ordinary listed cash equity in India, the default cycle is T+1 from 27 January 2023. Walk-through: you buy on Monday in the regular session; if Tuesday is a working settlement day, pay-in and pay-out happen Tuesday. If Tuesday is a settlement holiday, completion moves to Wednesday; the trade is still a Monday trade. Before that, cash equities ran T+2 (including in 2020). T+1 was phased through 2022 and finished market-wide on 27 January 2023. Optional T+0 from 28 March 2024 is a narrower same-day path for a limited basket. It runs beside T+1. It is not the default for every stock. A clearing corporation still sits in the middle (novation). T+1 did not abolish clearing.",
       howTo: [
         "Write T = trade date. Ask what the default cycle is for that paper’s year.",
         "For today’s default cash equity, add one settlement day (T+1).",
@@ -457,9 +463,11 @@ export const notesGa: TopicNote = {
         "Keep the year labels: 2020 = T+2; 27 Jan 2023 onwards = T+1 default; Mar 2024 = optional T+0 extra path.",
       ],
       bullets: [
-        "T+1 = next settlement day after the trade, from 27 January 2023 for cash equity.",
-        "Holiday on T+1 slides completion; it does not re-book the trade date.",
-        "Optional T+0 is extra and limited, not a replacement of T+1.",
+        "T+1 = trade today, money and shares swap next working (settlement) day.",
+        "Default cash equity from 27 January 2023.",
+        "A holiday on T+1 slides completion; it does not rewrite the trade date.",
+        "2020 default was still T+2. Optional T+0 from 28 March 2024 is extra and limited.",
+        "The clearing corporation still stands in the middle. T+1 did not abolish it.",
       ],
       examples: [
         {
@@ -598,7 +606,7 @@ export const notesGa: TopicNote = {
     },
     {
       heading: "Depositories — NSDL and CDSL",
-      body: "A depository keeps shares in electronic (demat) form. India has two: NSDL (National Securities Depository Limited) and CDSL (Central Depository Services (India) Limited). The law is the Depositories Act, 1996. Both depositories are in Mumbai.\n\nYou do not usually walk into NSDL or CDSL yourself. You open a demat account through a Depository Participant (DP) — often a bank or a broker. The depository is the registered owner on the books; you are the beneficial owner. Units of the same share (same ISIN) are fungible: they are interchangeable balances, not unique paper certificate numbers.\n\nClearing corporations (such as NSE Clearing or ICCL) are a different layer. They stand between buyer and seller for settlement risk. Depositories then move the securities when instructed. A DP is not the company’s auditor. Depositories do not set the repo rate.",
+      body: "Picture a locker-bank for shares. You do not keep paper certificates in a drawer. The depository holds electronic (demat) balances, the way a bank holds rupees in an account, not coins in your pocket.\n\nExam rule: India has two depositories — NSDL (National Securities Depository Limited) and CDSL (Central Depository Services (India) Limited). The law is the Depositories Act, 1996. Both are in Mumbai. You open a demat account through a Depository Participant (DP), often a bank or a broker. The depository is the registered owner on the books; you are the beneficial owner. Units of the same share (same ISIN) are fungible: interchangeable balances, not unique paper serial numbers. Clearing corporations (such as NSE Clearing or ICCL) are a different layer: they stand between buyer and seller for settlement risk. Depositories then move the securities when instructed. A DP is not the company’s auditor. Depositories do not set the repo rate.",
       howTo: [
         "Ask: holding shares in demat, or guaranteeing a trade, or setting a policy rate?",
         "Demat holding → NSDL or CDSL, via a DP. Law: Depositories Act, 1996.",
@@ -607,8 +615,10 @@ export const notesGa: TopicNote = {
         "Fungible = same-ISIN units are interchangeable book-entry amounts.",
       ],
       bullets: [
-        "Two depositories: NSDL and CDSL. Access via DPs. Act: 1996.",
-        "Investor = beneficial owner. Holdings of one ISIN are fungible.",
+        "Depository = locker-bank for shares. Two names: NSDL and CDSL. Both in Mumbai.",
+        "Access via a DP. Law: Depositories Act, 1996.",
+        "Investor = beneficial owner. Depository = registered owner.",
+        "Holdings of one ISIN are fungible (interchangeable balances).",
         "Depository ≠ clearing corporation ≠ RBI.",
       ],
       examples: [
@@ -660,11 +670,11 @@ export const notesGa: TopicNote = {
           steps: [
             {
               do: "Clearing corporation (e.g. NSE Clearing) stands in the middle.",
-              why: "That substitution is novation. One member’s default is the CCP’s problem, not a hunt for the original counterparty.",
+              why: "That substitution is novation. One member’s default is the CCP’s problem, not a hunt for the original other side.",
             },
             {
               do: "NSDL or CDSL then move the securities on instructions.",
-              why: "Depositories are the book-entry pipes, not the trade-guarantee layer.",
+              why: "Depositories are the locker-bank pipes, not the trade-guarantee layer.",
             },
             {
               do: "Do not merge the two in one option.",
@@ -685,7 +695,7 @@ export const notesGa: TopicNote = {
             },
             {
               do: "Name the law: Depositories Act, 1996.",
-              why: "Not the RBI Act and not the Companies Act as the constitutive depository statute.",
+              why: "Not the RBI Act and not the Companies Act as the depository’s own statute.",
             },
             {
               do: "Name the city: both depositories are in Mumbai.",
@@ -744,17 +754,19 @@ export const notesGa: TopicNote = {
     },
     {
       heading: "Insider trading / PIT — one page",
-      body: "Insider trading, in exam English, is trading in a company’s securities while you have unpublished price-sensitive information (UPSI) — news that can move the price and is not yet public (for example, unpublished quarterly results).\n\nThe main SEBI code is the PIT Regulations, 2015 (Prohibition of Insider Trading). Connected people (directors, officers, employees, some advisers) and often their immediate relatives sit in the net. Designated persons also face a trading window: typically closed from quarter-end until 48 hours after results. A closed-window trade can breach the code even if nobody proves a profit.\n\nYou may share UPSI only for a real work or legal need, on a need-to-know basis, with records. An oral ‘I promise not to trade’ is not a safe harbour. A private chat group is still communication.\n\nPIT is not the same as market fraud on the order book (circular trades, spoofing, front-running a client order). That is mainly PFUTP. Front-running uses the client’s coming order, not issuer UPSI. Late company disclosure of a signed material deal is mainly LODR, not PIT by itself.",
+      body: "Picture someone who already saw the school exam paper, then bets on who will top the class. That is the insider picture: secret news that can move a price, then a trade. The secret is unpublished company news, not a guess from the newspaper.\n\nExam rule: insider trading, in exam English, is trading in a company’s securities while you have unpublished price-sensitive information (UPSI). The main SEBI code is the PIT Regulations, 2015 (Prohibition of Insider Trading). Connected people (directors, officers, employees, some advisers) and often their immediate relatives sit in the net. Designated persons also face a trading window: typically closed from quarter-end until 48 hours after results. A closed-window trade can breach the code even if nobody proves a profit. You may share UPSI only for a real work or legal need, on a need-to-know basis, with records. An oral ‘I promise not to trade’ is not a safe harbour. PIT is not the same as market fraud on the order book (circular trades, spoofing, front-running a client order) — that is mainly PFUTP. Late company disclosure of a signed material deal is mainly LODR, not PIT by itself.",
       howTo: [
         "Ask: did someone trade (or tip) on unpublished company news that can move the price? → PIT.",
         "Ask: did someone trick the market (fake volume, jump a client order)? → PFUTP, not PIT first.",
         "Ask: did the company stay silent on a material event? → LODR disclosure, not PIT first.",
         "Trading window closed for designated persons → code problem even without a proven profit.",
-        "Kill ‘oral promise’ and ‘I own only 50 shares’ as defences.",
+        "Drop ‘oral promise’ and ‘I own only 50 shares’ as defences.",
       ],
       bullets: [
-        "PIT 2015: no trading on UPSI; careful communication only for a real need.",
+        "Insider = secret exam paper, then a trade. The secret is UPSI.",
+        "PIT 2015: no trading on UPSI; share only for a real need, with records.",
         "Connected persons + trading window + contra-trade rules.",
+        "Window typically closed from quarter-end until 48 hours after results.",
         "PIT ≠ PFUTP (fraud on the market) ≠ LODR (company must tell the market).",
       ],
       examples: [
@@ -765,7 +777,7 @@ export const notesGa: TopicNote = {
           steps: [
             {
               do: "Name the information: unpublished results.",
-              why: "That is classic UPSI.",
+              why: "That is classic UPSI — the secret exam paper.",
             },
             {
               do: "Name the people: CFO is connected / designated; spouse is usually in the immediate-relative net.",
@@ -868,7 +880,7 @@ export const notesGa: TopicNote = {
             },
             {
               do: "Drop (A). ‘Only 50 shares’ is not a safe harbour in this exam story.",
-              why: "The notes already kill ‘I own only 50 shares’ as a defence.",
+              why: "Size is not a defence. The notes already drop ‘I own only 50 shares’.",
             },
             {
               do: "Drop (C). A spouse / immediate-relative account is usually still in the net.",
@@ -890,17 +902,19 @@ export const notesGa: TopicNote = {
     },
     {
       heading: "Mutual funds and the NAV idea",
-      body: "A mutual fund pools many investors’ money to buy a portfolio. SEBI regulates mutual funds (Mutual Funds Regulations, 1996). AMFI is the industry association, not the regulator.\n\nThree layers: Sponsor (promotes the fund house) → Trustees (oversee) → Asset Management Company or AMC (manages the money). A custodian holds securities. An RTA processes unit transactions.\n\nNAV (net asset value) per unit is (assets − liabilities) / number of units. If assets are ₹5,200 crore, liabilities ₹80 crore, and units 160 crore, NAV = (5,200 − 80) / 160 = ₹32.\n\nOpen-ended schemes issue and redeem on an ongoing basis at NAV (subject to cut-off times). Close-ended schemes do not redeem daily; liquidity is often on the exchange, at a market price that can differ from NAV.",
+      body: "Picture a shared pizza of stocks and cash. NAV is the price of one slice — one mutual-fund unit. Many people pool money; the fund house buys a portfolio; each unit’s price is that pizza divided fairly.\n\nExam rule: SEBI regulates mutual funds (Mutual Funds Regulations, 1996). AMFI is the industry association, not the regulator. Three layers: Sponsor (promotes the fund house) → Trustees (oversee) → Asset Management Company or AMC (manages the money). A custodian holds securities. An RTA processes unit transactions. NAV per unit is (assets − liabilities) / number of units. If assets are ₹5,200 crore, liabilities ₹80 crore, and units 160 crore, NAV = (5,200 − 80) / 160 = ₹32. Open-ended schemes issue and redeem on an ongoing basis at NAV (subject to cut-off times). Close-ended schemes do not redeem daily; liquidity is often on the exchange, at a market price that can differ from NAV.",
       howTo: [
         "Regulator first: SEBI, not AMFI.",
         "Sketch Sponsor → Trustee → AMC.",
         "NAV = (assets − liabilities) / units. Subtract before you divide.",
         "Open-ended = ongoing buy/sell at NAV. Close-ended = no daily redeem at NAV.",
-        "Kill options that say ‘AMFI regulates’ or that treat NAV as a stock-exchange last-traded price of the AMC.",
+        "Drop options that say ‘AMFI regulates’ or that treat NAV as the AMC’s stock-exchange last-traded price.",
       ],
       bullets: [
+        "NAV = price of one mutual-fund unit = (assets − liabilities) / units.",
         "SEBI regulates; AMFI is the trade body.",
-        "NAV per unit = (assets − liabilities) / units.",
+        "Sponsor promotes; trustees oversee; AMC manages; custodian holds securities.",
+        "Open-ended: ongoing NAV flow. Close-ended: typically listed, no daily NAV redeem.",
         "Open-ended versus close-ended is about daily NAV flow, not about ‘safe versus unsafe’.",
       ],
       examples: [
@@ -1035,7 +1049,7 @@ export const notesGa: TopicNote = {
     },
     {
       heading: "Circuit breakers",
-      body: "A market-wide circuit breaker can halt the whole cash and derivatives market when Nifty 50 or Sensex moves 10%, 15%, or 20% from the previous close. It is an index shock brake, not a single-stock band.\n\nClock time matters. A 10% move before 1:00 p.m. typically brings a 45-minute halt. Between 1:00 p.m. and 2:30 p.m., a 10% move is a shorter (15-minute) halt. After 2:30 p.m., a 10% move does not halt the market under the standard timetable. A 20% move stops trading for the rest of the day at any time.\n\nStock-specific price bands (2%, 5%, 10%, 20% on individual shares) are a different tool. They limit one scrip. They are not the Nifty 10% market-wide halt.\n\nA circuit breaker is not novation (that is the clearing corporation becoming the central counterparty). It is not the PIT insider-trading window.",
+      body: "Picture a fuse in the wall. When the whole market jumps too hard, the fuse trips and trading stops for a while. That is a market-wide circuit breaker — not a cap on one share, and not the money printer’s job.\n\nExam rule: a market-wide circuit breaker can halt the whole cash and derivatives market when Nifty 50 or Sensex moves 10%, 15%, or 20% from the previous close. Clock time matters. A 10% move before 1:00 p.m. typically brings a 45-minute halt. Between 1:00 p.m. and 2:30 p.m., a 10% move is a shorter (15-minute) halt. After 2:30 p.m., a 10% move does not halt the market under the standard timetable. A 20% move stops trading for the rest of the day at any time. Stock-specific price bands (2%, 5%, 10%, 20% on individual shares) are a different tool. They limit one scrip. They are not the Nifty 10% market-wide halt. A circuit breaker is not novation (that is the clearing corporation becoming the central counterparty). It is not the PIT insider-trading window.",
       howTo: [
         "Ask: whole market on Nifty/Sensex, or one stock’s band?",
         "Whole market → 10 / 15 / 20% versus previous close.",
@@ -1044,9 +1058,11 @@ export const notesGa: TopicNote = {
         "Reject options that call the halt ‘PIT’ or ‘novation’.",
       ],
       bullets: [
-        "MWCB: 10%, 15%, 20% on Nifty 50 or Sensex versus previous close.",
-        "20% = rest of the day. Late-day 10% = no halt.",
-        "Stock bands ≠ market-wide circuit breaker.",
+        "Circuit breaker = a fuse. Whole-market halt on a big Nifty 50 or Sensex jump.",
+        "MWCB: 10%, 15%, 20% versus previous close.",
+        "20% = rest of the day at any hour. Late-day 10% (after 2:30 p.m.) = no halt.",
+        "Stock bands (2 / 5 / 10 / 20% on one scrip) ≠ market-wide circuit breaker.",
+        "Not novation. Not the PIT window.",
       ],
       examples: [
         {
@@ -1097,7 +1113,7 @@ export const notesGa: TopicNote = {
           steps: [
             {
               do: "Define the halt: a pause (or close) of trading after a large index move.",
-              why: "That is the circuit breaker.",
+              why: "That is the circuit breaker — the fuse.",
             },
             {
               do: "Define novation: the clearing corporation becomes buyer to every seller and seller to every buyer.",
@@ -1181,18 +1197,20 @@ export const notesGa: TopicNote = {
     },
     {
       heading: "Chairpersons — keep the years apart",
-      body: "Do not treat ‘who is SEBI Chairperson?’ as a timeless fact. The correct name depends on the paper’s year.\n\nAjay Tyagi was Chairperson from 1 March 2017 until 28 February 2022. For a 2020 paper, Tyagi is the answer. Buch and Pandey had not yet taken charge.\n\nMadhabi Puri Buch took charge on 1 March 2022 (SEBI’s first woman Chairperson) and served until 28 February 2025. For 2022 after 1 March, 2023, and all of calendar 2024, Buch is the Chairperson. Do not back-date Pandey into 2024.\n\nTuhin Kanta Pandey assumed charge on 1 March 2025. For a 2025 paper, Pandey is the Chairperson. Buch did not start a second consecutive term. Shaktikanta Das was RBI Governor in that era, not SEBI Chair.\n\nWrite the labels: Tyagi until Feb 2022 · Buch Mar 2022–Feb 2025 · Pandey from Mar 2025.",
+      body: "Picture a class prefect who changes each year. You would not write last year’s prefect on this year’s form. SEBI Chairperson is the same kind of fact: read the paper’s year before you write the name.\n\nExam rule: Ajay Tyagi was Chairperson from 1 March 2017 until 28 February 2022. For a 2020 paper, Tyagi is the answer. Madhabi Puri Buch took charge on 1 March 2022 (SEBI’s first woman Chairperson) and served until 28 February 2025. For 2022 after 1 March, 2023, and all of calendar 2024, Buch is the Chairperson. Do not back-date Pandey into 2024. Tuhin Kanta Pandey assumed charge on 1 March 2025. For a 2025 paper, Pandey is the Chairperson. Buch did not start a second consecutive term. Shaktikanta Das was RBI Governor in that era, not SEBI Chair. Labels: Tyagi until Feb 2022 · Buch Mar 2022–Feb 2025 · Pandey from Mar 2025.",
       howTo: [
         "Read the question’s year (or the date in the stem) before you name anyone.",
         "Until 28 Feb 2022 → Tyagi. 1 Mar 2022–28 Feb 2025 → Buch. From 1 Mar 2025 → Pandey.",
-        "Kill RBI Governor names in a SEBI Chair question.",
-        "Kill ‘Buch throughout 2025’ and ‘Pandey in 2022’.",
+        "Drop RBI Governor names in a SEBI Chair question.",
+        "Drop ‘Buch throughout 2025’ and ‘Pandey in 2022’.",
         "First woman Chairperson attaches to Buch (March 2022), not to a later Chair.",
       ],
       bullets: [
         "Tyagi: Mar 2017 – Feb 2022 (correct for 2020).",
         "Buch: Mar 2022 – Feb 2025; first woman Chairperson (correct for 2024).",
         "Pandey: from Mar 2025 (correct for 2025 papers).",
+        "Shaktikanta Das was RBI Governor, not SEBI Chair.",
+        "Do not invent new years. Do not mix 2022 and 2025 names.",
       ],
       examples: [
         {
@@ -1330,7 +1348,7 @@ export const notesGa: TopicNote = {
     },
     {
       heading: "RBI tools — repo, CRR, SLR",
-      body: "Learn each tool as one sentence. Do not mix them with SEBI.\n\nRepo: the repo rate is the rate at which RBI lends rupees to banks against eligible collateral (usually government securities) to inject short-term liquidity.\n\nCRR (cash reserve ratio): the share of a bank’s deposits (NDTL) that it must keep as cash with RBI. That cash is not lent out. A CRR hike drains liquidity.\n\nSLR (statutory liquidity ratio): the share of deposits a bank must hold in eligible safe liquid assets — mainly government securities, and as the rules allow, cash and gold. SLR is not a SEBI listing rule.\n\nSEBI does not set repo, CRR, or SLR. Quoted percentages change; learn the instrument, not a stale number as if it were in the Act.",
+      body: "Picture RBI as the money printer and the banks’ bank. SEBI is still only the market umpire. Do not give the umpire the printing press. Repo, CRR, and SLR are RBI tools, one sentence each.\n\nExam rule: the repo rate is the rate at which RBI lends rupees to banks against eligible collateral (usually government securities) to inject short-term liquidity. CRR (cash reserve ratio) is the share of a bank’s deposits (NDTL) that it must keep as cash with RBI. That cash is not lent out. A CRR hike drains liquidity. SLR (statutory liquidity ratio) is the share of deposits a bank must hold in eligible safe liquid assets — mainly government securities, and as the rules allow, cash and gold. SLR is not a SEBI listing rule. SEBI does not set repo, CRR, or SLR. Quoted percentages change; learn the instrument, not a stale number as if it were in the Act.",
       howTo: [
         "Read the stem: lending against collateral, cash parked at RBI, or a slice in G-secs?",
         "Against collateral, RBI → banks → repo.",
@@ -1339,9 +1357,11 @@ export const notesGa: TopicNote = {
         "If the option says SEBI sets any of the three, it is wrong.",
       ],
       bullets: [
+        "RBI = money printer / banks’ bank. SEBI = umpire. Do not swap them.",
         "Repo: RBI lends to banks against collateral (liquidity in).",
-        "CRR: cash with RBI as a share of deposits (cannot be lent).",
+        "CRR: cash with RBI as a share of deposits (cannot be lent). A hike drains liquidity.",
         "SLR: share of deposits in eligible liquid assets, mainly G-secs.",
+        "SEBI does not set repo, CRR, or SLR. Learn the tool, not a stale percentage.",
       ],
       examples: [
         {
@@ -1351,7 +1371,7 @@ export const notesGa: TopicNote = {
           steps: [
             {
               do: "Repo: RBI lends to banks against eligible securities at the repo rate.",
-              why: "That is liquidity injection, collateralised. Direction: rupees out from RBI to banks.",
+              why: "That is liquidity injection, with collateral. Direction: rupees out from RBI to banks.",
             },
             {
               do: "CRR: banks must keep a stated share of deposits as cash with RBI.",
@@ -1363,7 +1383,7 @@ export const notesGa: TopicNote = {
             },
             {
               do: "Label the setter: RBI for all three.",
-              why: "SEBI does not run monetary-policy ratios.",
+              why: "SEBI does not run money-policy ratios.",
             },
           ],
           result:
@@ -1404,7 +1424,7 @@ export const notesGa: TopicNote = {
             },
             {
               do: "If an option mixes ‘SEBI’s repo’ with a true broker sentence, reject it.",
-              why: "One wrong regulator word is enough.",
+              why: "One wrong referee word is enough.",
             },
           ],
           result:
@@ -1458,7 +1478,7 @@ export const notesGa: TopicNote = {
             },
             {
               do: "Drop (C). RBI sets CRR and SLR.",
-              why: "SEBI does not run monetary-policy ratios.",
+              why: "SEBI does not run money-policy ratios.",
             },
             {
               do: "Drop (D). SLR assets are a required holding, not a same-day personal-loan pool.",

@@ -2,23 +2,26 @@ import type { TopicNote } from "@/data/notes";
 
 export const notesSecurity: TopicNote = {
   topic: "security",
-  title: "Security — techniques (beginner)",
+  title: "Security — simple notes",
   blurb:
-    "Security is keeping secrets, spotting tampering, and staying open for honest users. Tag every incident with C, I, or A first. Then pick hashing versus encryption, and know what ransomware actually breaks. Name the control that restores that letter. SQL injection is user text glued into a query; parameter binding keeps that text as data.",
+    "We explain security like class notes a Class-10 student can read: a locked box with a wax seal, a fingerprint versus a padlock, and a fake school notice. Then we solve five tiny examples in each topic.",
   blocks: [
     {
       heading: "CIA triad",
-      body: "Confidentiality is “only the right people may read it” — a lock on a diary. Integrity is “nobody silently changed it” — a wax seal. Availability is “it works when we need it” — the library stays open.\n\nEncryption, passwords, and TLS serve C. Hashes, MACs, and signatures serve I. Backups, spare servers, and DDoS defence serve A. Authentication is “who are you?”. Authorisation is “what may you do?”. Do not mix them. Ransomware usually breaks I and A, and sometimes C if a copy was stolen.",
+      body: "Picture a locked box (C — only the right people may open it), a wax seal that is not torn (I — nobody silently changed it), and the box still there when you need it (A). Encryption, passwords, and TLS serve C. Hashes, MACs, and signatures serve I. Backups, spare servers, and DDoS defence serve A.\n\nAuthentication is “who are you?”. Authorisation is “what may you do?”. Do not mix them. Ransomware usually breaks I and A, and sometimes C if a copy was stolen. Tag every incident with C, I, or A first, then name the control that restores that letter.",
       howTo: [
         "Read the stem. Tag C, I, A (or a pair). Then pick the control that restores that tag.",
+        "Picture locked box (C), wax seal (I), box still there (A).",
         "Encryption without backups does not restore A after ransomware. A hash without a secret does not prove who sent it.",
         "A firewall does not restore a wiped disk. MFA does not fix a missing owner check (IDOR).",
         "Authn succeeded ≠ authz succeeded. Empty logs break accountability, a cousin of I.",
       ],
       bullets: [
-        "C: secrecy — encryption, ACL, TLS. Failure = leak.",
-        "I: no silent change — hash, MAC, signature. Failure = tamper.",
-        "A: usable when needed — backup, HA, DDoS defence. Failure = down. Ransomware typically I+A, sometimes C too.",
+        "C: secrecy — encryption, ACL, TLS. Failure = leak. Locked box.",
+        "I: no silent change — hash, MAC, signature. Failure = tamper. Wax seal.",
+        "A: usable when needed — backup, HA, DDoS defence. Failure = down. Box still there.",
+        "Authn = who are you. Authz = what may you do.",
+        "Ransomware typically I+A, sometimes C too.",
       ],
       examples: [
         {
@@ -28,7 +31,7 @@ export const notesSecurity: TopicNote = {
           steps: [
             {
               do: "(i) C eavesdrop (ii) I silent change (iii) A DoS (iv) I+A, plus C if the stolen copy matters (v) C+I+A via excess privilege.",
-              why: "Open mail is a diary without a lock. A flipped figure is a broken seal. A flood shuts the library. Ransomware both seals files in a box you cannot open and may photocopy them. Standing admin is a master key left with a visitor.",
+              why: "Open mail is a diary without a lock. A flipped figure is a torn wax seal. A flood means the box is not there when you need it. Ransomware both padlocks the homework and may photocopy it. Standing admin is a master key left with a visitor.",
             },
             {
               do: "Fix C with TLS; I with a signature or hash; A with SYN cookies; ransomware A with offline backups; (v) with least privilege.",
@@ -49,7 +52,7 @@ export const notesSecurity: TopicNote = {
           steps: [
             {
               do: "Disk encryption → C. Digest check → I. Backups → A. MFA → authn (protects C of the path). Extra AZ → A.",
-              why: "A stolen laptop cannot be read (C) but the owner still lost use (A). Backups do not encrypt the live database.",
+              why: "A stolen laptop cannot be read (locked box) but the owner still lost use (A). Backups do not lock the live database.",
             },
             {
               do: "Do not credit a backup as a confidentiality control, or disk encryption as an availability control.",
@@ -91,7 +94,7 @@ export const notesSecurity: TopicNote = {
           steps: [
             {
               do: "Authentication succeeded (the intern is a known user). Authorisation failed (payroll is not their role). That is IDOR / missing owner check.",
-              why: "‘Who are you?’ is not ‘what may you do?’. MFA would not fix this URL.",
+              why: "“Who are you?” is not “what may you do?”. MFA would not fix this URL.",
             },
             {
               do: "C of payroll is gone (they read it). I could follow if they can POST. A is fine.",
@@ -112,11 +115,11 @@ export const notesSecurity: TopicNote = {
           steps: [
             {
               do: "(1) I (bytes changed) + A (cannot open files). C only if a copy was stolen. Restore A with offline backups; I of live files is gone until restore.",
-              why: "The lock on the diary was replaced by the attacker’s lock. Backups rebuild availability.",
+              why: "A padlock on the homework until you pay. Backups rebuild availability. Paying is not the plan.",
             },
             {
               do: "(2) A only. Disks are intact (I holds) and nobody read secrets (C holds). Restore A with SYN cookies, capacity, anycast — not with backups of the HTML.",
-              why: "The library closed; the books were not rewritten.",
+              why: "The box is not there; the seal and lock were not touched.",
             },
             {
               do: "Do not tick ‘encryption’ as the A control for (1), or ‘backup’ as the A control for (2).",
@@ -130,17 +133,20 @@ export const notesSecurity: TopicNote = {
     },
     {
       heading: "Hashing versus encryption versus MAC versus signature",
-      body: "A hash (SHA-256) is a fingerprint: one-way, fixed length, no key. You cannot “decrypt” it. Anyone can recompute it, so a hash beside a message is not authenticity.\n\nEncryption is a locked box: reversible with a key. Symmetric (AES) uses one secret; asymmetric (RSA) uses public to lock, private to unlock. A MAC is a keyed stamp among friends who share a secret — detects tampering, not courtroom non-repudiation (either friend could have stamped). A digital signature uses a private key to sign and a public key to verify — anyone can check, only the holder could have signed. Exam grid: hide → encrypt; detect only → hash; shared-secret authenticity → MAC; public verify / non-repudiation → signature.",
+      body: "A hash (SHA-256) is a fingerprint: one-way, fixed length, no key. You cannot “decrypt” it. Anyone can recompute it, so a hash beside a message is not authenticity. Encryption is a lock with a key: reversible. Symmetric (AES) uses one secret; asymmetric (RSA) uses public to lock, private to unlock.\n\nA MAC is a keyed stamp among friends who share a secret — detects tampering, not courtroom non-repudiation (either friend could have stamped). A digital signature uses a private key to sign and a public key to verify — anyone can check, only the holder could have signed. Exam grid: hide → encrypt; detect only → hash; shared-secret authenticity → MAC; public verify / non-repudiation → signature.",
       howTo: [
         "Need secrecy → encrypt (prefer AEAD: ciphertext + tag). Need detect-tamper, no key yet → hash.",
         "Need detect-tamper among key-holders → MAC. Need any citizen to verify SEBI sent it → signature.",
         "Password storage → slow KDF, not reversible encryption, not raw SHA-256.",
         "Bare hash(M) next to M is circular: the attacker re-hashes. That is why TLS uses MAC/AEAD.",
+        "Picture fingerprint (hash) versus a lock with a key (encrypt).",
       ],
       bullets: [
-        "Hash: one-way, no key, integrity of content, not authenticity.",
-        "Encrypt: reversible with a key, confidentiality. Prefer AEAD.",
-        "MAC: keyed tag among friends. Signature: private sign, public verify, non-repudiation.",
+        "Hash: fingerprint — one-way, no key, integrity of content, not authenticity.",
+        "Encrypt: lock with a key — reversible, confidentiality. Prefer AEAD.",
+        "MAC: keyed tag among friends. Either friend could have stamped.",
+        "Signature: private sign, public verify, non-repudiation.",
+        "Hide → encrypt. Detect only → hash. Shared secret → MAC. Public verify → signature.",
       ],
       examples: [
         {
@@ -192,7 +198,7 @@ export const notesSecurity: TopicNote = {
           steps: [
             {
               do: "Confidentiality can hold (random IV). Integrity and authenticity are missing. Bit-flips and padding oracles follow.",
-              why: "A locked box whose seal you can peel and restick is not a sealed box. CBC does not detect a modified ciphertext.",
+              why: "A locked box whose wax seal you can peel and restick is not a sealed box. CBC does not detect a modified ciphertext.",
             },
             {
               do: "Use AES-GCM or ChaCha20-Poly1305: ciphertext + auth tag. Decrypt refuses garbage if the tag fails.",
@@ -258,11 +264,14 @@ export const notesSecurity: TopicNote = {
         "SQLi defence to write: prepared statements / bound parameters, plus least-privilege DB account.",
         "XSS: context-aware output encoding + CSP. HttpOnly stops JS reading the cookie; the browser still sends it.",
         "CSRF needs the victim logged in. XSS can steal the session even without a third-site form. Do not mix the names.",
+        "Name the confused parser: database, browser HTML, or cookie jar.",
       ],
       bullets: [
         "SQLi: concat SQL + input. Fix: bound parameters.",
         "XSS: attacker script in others’ browsers. Fix: encode output, CSP, HttpOnly.",
         "CSRF: forged request with victim cookies. Fix: CSRF token, SameSite.",
+        "Different sinks: database vs browser vs cookie auto-send.",
+        "Do not mix the three names. Each has its own 2-marker fix.",
       ],
       examples: [
         {
@@ -366,7 +375,7 @@ export const notesSecurity: TopicNote = {
             },
             {
               do: "Escaping quotes by hand is a weaker cousin and fails odd encodings. Bound parameters are the named fix. Least-privilege DB user is defence in depth.",
-              why: "The 2-marker is ‘parameterised query / prepared statement’, not ‘sanitize’.",
+              why: "The 2-marker is “parameterised query / prepared statement”, not “sanitize”.",
             },
           ],
           result:
@@ -376,17 +385,20 @@ export const notesSecurity: TopicNote = {
     },
     {
       heading: "Phishing, MITM, and ransomware",
-      body: "Phishing is a fake trusted message that steals passwords or drops malware — a forged note from “the school office”. Spear-phishing is targeted. MFA that is not origin-bound (SMS OTP) can still be relayed live. FIDO2 binds the answer to the real site name.\n\nMITM sits on the path (rogue Wi-Fi, ARP spoof) and can read, change, or drop traffic. TLS with a checked certificate turns them into someone who can only delay packets.\n\nRansomware locks files (or locks and steals them) and sells the key. Integrity of the bytes is gone, availability is gone, confidentiality may be gone (double extortion). Restore from offline/immutable backups; paying is not a control.",
+      body: "Phishing is a fake school notice that steals passwords or drops malware. Spear-phishing is targeted. MFA that is not origin-bound (SMS OTP) can still be relayed live. FIDO2 binds the answer to the real site name. MITM is someone in the middle of a phone call (rogue Wi-Fi, ARP spoof) who can read, change, or drop traffic. TLS with a checked certificate turns them into someone who can only delay packets.\n\nRansomware is a padlock on your homework until you pay (or a lock plus a stolen copy). Integrity of the bytes is gone, availability is gone, confidentiality may be gone (double extortion). Restore from offline/immutable backups; paying is not a control.",
       howTo: [
         "Name the primary attack the stem described, then CIA letters, then one prevent and one recover control.",
         "Look-alike domain + form → phishing (C of the password). Padlock on the wrong name is not “TLS failed”.",
         "HTTP on a rogue AP → C and I fail. HTTPS + valid cert + HSTS → AP cannot read or forge the page.",
         "Ransomware tabletop: isolate first, rotate credentials, notify, restore from a backup that was not mounted. Never “pay” as the A plan.",
+        "Picture fake school notice, middle of a phone call, padlock on homework.",
       ],
       bullets: [
-        "Phishing: fake trust to steal or infect. MFA + DMARC + training. FIDO2 is phishing-resistant; SMS OTP is not.",
-        "MITM: on-path read/alter. TLS with validation, HSTS.",
-        "Ransomware: I+A (often C). Immutable backups, least privilege, EDR. Payment is not the availability plan.",
+        "Phishing: fake school notice to steal or infect. MFA + DMARC + training.",
+        "FIDO2 is phishing-resistant; SMS OTP is not.",
+        "MITM: someone in the middle of a phone call. TLS with validation, HSTS.",
+        "Ransomware: padlock on homework — I+A (often C). Immutable backups, least privilege, EDR.",
+        "Payment is not the availability plan.",
       ],
       examples: [
         {
@@ -396,7 +408,7 @@ export const notesSecurity: TopicNote = {
           steps: [
             {
               do: "Confidentiality of the password is lost. A valid TLS padlock on sebi-gov.in only proves the attacker owns that host.",
-              why: "Users must check the name, not only the lock. HSTS on the real name does not protect a different name.",
+              why: "A fake school notice can still have a real lock on the wrong door. Users must check the name, not only the lock. HSTS on the real name does not protect a different name.",
             },
             {
               do: "SMS/email OTP is phishable: the fake page asks for the OTP and a proxy submits password+OTP to the real site in seconds.",
@@ -417,11 +429,11 @@ export const notesSecurity: TopicNote = {
           steps: [
             {
               do: "HTTP: AP sees and can modify everything (C and I fail). HTTPS validated: AP sees IPs, maybe SNI, sizes — not the HTTP body. Forgery breaks the AEAD tag.",
-              why: "Cleartext is a postcard. TLS with the right name is a locked, sealed envelope. The AP can still drop packets (A).",
+              why: "Cleartext is a postcard. TLS with the right name is a locked, sealed envelope. Someone in the middle of the call can still hang up (A).",
             },
             {
               do: "HSTS stops SSL-strip (rewriting https links to http). Clicking through a cert warning undoes the model.",
-              why: "“Accept this cert” is volunteering to talk to the MITM.",
+              why: "“Accept this cert” is volunteering to talk to the person in the middle.",
             },
             {
               do: "A corporate inspect-proxy the laptop trusts is an intentional MITM versus the cafe, not versus the company.",
@@ -438,7 +450,7 @@ export const notesSecurity: TopicNote = {
           steps: [
             {
               do: "I: bytes are not the originals. A: staff cannot open files. C: stolen copy is a leak even if you restore.",
-              why: "Ransomware is a CIA incident, not “just malware”. Double extortion is C plus the lock.",
+              why: "A padlock on the homework until you pay, plus a photocopy. Double extortion is C plus the lock.",
             },
             {
               do: "Isolate first so the restore is not re-encrypted. Rotate credentials the actor may have. Notify as required. Restore from an offline/immutable backup; test a sample file.",
@@ -459,7 +471,7 @@ export const notesSecurity: TopicNote = {
           steps: [
             {
               do: "Both steal credentials or drop malware → C of the password (then more). Spear-phishing is targeted; bulk is sprayed.",
-              why: "The trick is still a fake trusted note. The spear just used extra homework.",
+              why: "The trick is still a fake school notice. The spear just used extra homework.",
             },
             {
               do: "FIDO2 / origin-bound MFA still beats both. Training plus a report button plus DMARC help the bulk wave more than the perfect spear.",
@@ -480,7 +492,7 @@ export const notesSecurity: TopicNote = {
           steps: [
             {
               do: "They sit on the path (MITM). HTTP: read and change pages (C and I fail). They can also drop packets (A).",
-              why: "ARP lies about the van envelope. The postcard HTTP has no seal.",
+              why: "ARP lies about the van envelope. Someone in the middle of the call hears a postcard with no seal.",
             },
             {
               do: "HTTPS to the real name with a checked cert: they can delay or drop, not read the body. Forging the page breaks the AEAD tag unless the user clicks through a warning.",
@@ -504,11 +516,14 @@ export const notesSecurity: TopicNote = {
         "Code fix first: fgets(buf, sizeof buf, stdin) / snprintf, not “enable ASLR” alone.",
         "Canary detects before jump. NX stops executing the spilled bytes. ASLR makes a guessed jump miss. Bounds check prevents the write.",
         "Java/Python growing lists are a different bug class. They can still have injection.",
+        "Picture too much water in a cup spoiling the papers beside it.",
       ],
       bullets: [
         "Overflow: write past a buffer, smash adjacent state (often the return address).",
+        "Too much water in a cup spoils the papers beside it.",
         "Impact: I of control flow, A (crash), sometimes C.",
-        "Fix: bounded copies, safe languages, canaries, NX, ASLR. gets/strcpy on untrusted input is the trigger.",
+        "Fix: bounded copies, safe languages, canaries, NX, ASLR.",
+        "gets/strcpy on untrusted input is the trigger.",
       ],
       examples: [
         {
@@ -608,11 +623,11 @@ strcpy(buf, argv[1]);  /* unbounded if src is long */
           steps: [
             {
               do: "Valid indexes are 0..7. i==8 writes buf[8], one past the end. Adjacent memory (often a saved flag or canary) changes.",
-              why: "Overflow is ‘past the rim’, not only ‘a megabyte past the rim’.",
+              why: "Overflow is “past the rim”, not only “a megabyte past the rim”. The cup still spilled, just a drop.",
             },
             {
               do: "Loop should be i < 8 or i < sizeof buf. Off-by-one is a famous C class: the extra equals.",
-              why: "The cup still spilled, just a drop.",
+              why: "The extra equals is the whole bug.",
             },
             {
               do: "Java would throw on a[8] if length is 8. C does not. Same moral as the 16-byte gets example, smaller spill.",
@@ -626,17 +641,20 @@ strcpy(buf, argv[1]);  /* unbounded if src is long */
     },
     {
       heading: "Authentication, MFA, and password KDFs",
-      body: "Authentication factors: something you know (password), have (token, phone, FIDO key), are (fingerprint). MFA means two different categories — two passwords are not MFA. Password + TOTP is MFA (still phishable). Smart card + PIN is textbook MFA. FIDO2 is phishing-resistant.\n\nNever store reversible AES(password) with a key in config. Never store raw SHA-256(password): fast, unsalted, rainbow-tableable. Use a slow KDF (Argon2id, bcrypt, scrypt, PBKDF2) with a unique random salt per user. Salt is not secret; it makes every row a different lock. A pepper is a secret kept off the database (KMS). Stretching makes each guess expensive.",
+      body: "Authentication factors: something you know (password), have (token, phone, FIDO key), are (fingerprint). MFA means two different categories — two passwords are not MFA. Password + TOTP is MFA (still phishable). Smart card + PIN is textbook MFA. FIDO2 is phishing-resistant.\n\nNever store reversible AES(password) with a key in config. Never store raw SHA-256(password): fast, unsalted, rainbow-tableable. Use a slow KDF (Argon2id, bcrypt, scrypt, PBKDF2) with a unique random salt per user. Salt is not secret; it makes every row a different lock. A pepper is a secret kept off the database (KMS). Stretching makes each guess expensive. Verify by recomputing, not decrypting.",
       howTo: [
         "MFA test: two different categories, independent. know+know or are+are is not MFA.",
         "Stolen dump → salted slow KDF + pepper. Live guessing → lockout, rate-limit, MFA.",
         "Verify by recomputing the KDF, not by decrypting. You never need the plaintext password.",
         "TLS still required so the password is not sniffed. The KDF protects the file at rest, not the wire.",
+        "Picture: a lock you can open (AES) is the wrong tool; a slow unique fingerprint (KDF) is the right one.",
       ],
       bullets: [
-        "Factors: know / have / are. MFA = two different categories. FIDO2 resists phishing; SMS OTP does not.",
+        "Factors: know / have / are. MFA = two different categories.",
+        "FIDO2 resists phishing; SMS OTP does not.",
         "Store Argon2id/bcrypt/scrypt/PBKDF2(password, salt, cost). Never raw hash, never AES(password) in app config.",
-        "Salt: per-user, unique, not secret. Pepper: secret, off-DB. Stretching slows guesses.",
+        "Salt: per-user, unique, not secret. Pepper: secret, off-DB.",
+        "Stretching slows guesses. Verify by recomputing.",
       ],
       examples: [
         {
@@ -736,7 +754,7 @@ ok = secrets.compare_digest(digest, stored)`,
           steps: [
             {
               do: "Load salt and stored digest. Run the same KDF on the typed password and that salt. Compare in constant time.",
-              why: "You never need the old plaintext. Match means ‘same password’, not ‘open the box’.",
+              why: "You never need the old plaintext. Match means “same password”, not “open the box”.",
             },
             {
               do: "Wrong password → different digest → reject. There is no decrypt() to try.",
@@ -760,11 +778,14 @@ ok = secrets.compare_digest(digest, stored)`,
         "TLS jobs in order: TCP, Hello (cipher), cert validate (server authenticity), ephemeral keys, AEAD records (C+I of HTTP).",
         "Browser must check name, expiry, chain. Otherwise you encrypted to the wrong party.",
         "Write findings as condition, CIA impact, owner, remediation, retest — not the adjective “insecure”.",
+        "TLS is a locked sealed envelope to a named door, not a universal control.",
       ],
       bullets: [
         "Network audit: firewalls, segmentation, ports, Wi-Fi, VPN, flows.",
         "Systems audit: OS patches, accounts, EDR, logs, app/DB config, backups.",
-        "TLS: C+I in transit + server authenticity if the cert is validated. Not anti-phish for the wrong hostname, not authz.",
+        "TLS: C+I in transit + server authenticity if the cert is validated.",
+        "TLS is not anti-phish for the wrong hostname, not authz.",
+        "HTTPS = HTTP over TLS on 443.",
       ],
       examples: [
         {
@@ -837,7 +858,7 @@ ok = secrets.compare_digest(digest, stored)`,
           steps: [
             {
               do: "The crypto may lock the bytes to whoever holds evil.example’s key — often the MITM. If the client does not check the name, C is toward the attacker.",
-              why: "TLS authenticity is ‘this key matches this name’. The name must be the one in the URL.",
+              why: "TLS authenticity is “this key matches this name”. The name must be the one in the URL.",
             },
             {
               do: "A normal browser shows a warning. Clicking through undoes the model. HSTS on bank.example would refuse the bad name.",
@@ -882,11 +903,14 @@ ok = secrets.compare_digest(digest, stored)`,
         "Do not build column/table names from raw user strings either — whitelist those, still bind values.",
         "Login example: parse SELECT … WHERE name=? AND pass=? first, then setString. A tautology in the name field stays a name.",
         "Defence in depth: KDF for passwords, least-privilege DB user, no stacked queries. The named 2-marker is still bound parameters.",
+        "Picture: fill the blank on a printed form; do not let the visitor rewrite the printed words.",
       ],
       bullets: [
         "SQLi: concat SQL + input; attacker changes grammar (OR, UNION, comment).",
         "Fix: prepared statement / bound parameters — parse first, bind later.",
-        "Escaping quotes by hand is weaker. Binding is the technique. Least privilege is extra.",
+        "Escaping quotes by hand is weaker. Binding is the technique.",
+        "Least privilege is extra, not a substitute.",
+        "A bound value cannot add OR or UNION to an already-parsed shape.",
       ],
       examples: [
         {

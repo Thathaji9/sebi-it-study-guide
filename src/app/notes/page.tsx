@@ -8,10 +8,9 @@ export default function NotesIndexPage() {
       <header>
         <h1 className="font-heading text-3xl">Worked notes</h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Every official syllabus topic is here — Database through Reasoning,
-          not only Quant. Each technique has a short “how to solve” recipe and
-          several exam examples. Every example uses numbered steps: what to do,
-          then why.
+          Every official syllabus topic is here, written like class notes a
+          beginner can read: a short “in simple words” picture, then five tiny
+          examples walked one line, one row, or one number at a time.
         </p>
       </header>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -26,7 +25,7 @@ export default function NotesIndexPage() {
               <p className="font-heading text-lg">{n.title}</p>
               <p className="mt-1 text-sm text-muted-foreground">{n.blurb}</p>
               <p className="mt-3 text-xs font-medium text-primary">
-                Worked examples with steps · {stats.sections} techniques ·{" "}
+                Worked examples with steps · {stats.sections} sections ·{" "}
                 {stats.examples} examples
               </p>
             </Link>

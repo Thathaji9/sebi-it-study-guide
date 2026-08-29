@@ -2,23 +2,27 @@ import type { TopicNote } from "@/data/notes";
 
 export const notesPython: TopicNote = {
   topic: "python",
-  title: "Python — techniques (beginner)",
+  title: "Python — simple notes",
   blurb:
-    "Draw a number line for every slice. b = a on a list is two names for one list. A default list in a def is made once. File mode w wipes; r needs the file; a writes at the end. search looks anywhere; match only at the start; fullmatch needs the whole string.",
+    "We explain Python like class notes a Class-10 student can read: a number line with a fence, two name-stickers on one notebook, a shared lunchbox. Then we walk five tiny examples in each topic, one line at a time.",
   blocks: [
     {
-      heading: "Slicing [start:stop) on a number line",
-      body: "s[start:stop] takes indexes start, start+1, …, stop-1. The stop index is a fence. You never take the letter sitting at stop. This is the same half-open rule as range(start, stop).\n\nWrite the letters. Put 0, 1, 2, … above them. Put −n … −1 below. Index −1 is the last letter. Convert a negative once: −k is n−k. Then use [start, stop). Out-of-range slice bounds clip. A single s[i] off the end is IndexError. An empty slice is legal.",
+      heading: "What is a slice?",
+      body: "A slice is a piece of a word or a list, read off a number line with a fence. s[start:stop] takes the boxes start, start+1, …, stop-1. The stop index is a fence. You never take the letter sitting at the fence. This is the same half-open rule as range(start, stop).\n\nWrite the letters. Put 0, 1, 2, … above them. Put −n … −1 below. Index −1 is the last letter. Convert a negative once: −k is n−k. Then use [start, stop). Out-of-range slice bounds clip to the ends. A single s[i] off the end is IndexError. An empty slice is legal.",
       howTo: [
         "Write the letters on one row. Write 0, 1, 2, … above. Write −n … −1 below.",
         "Circle start. Draw a fence at stop. Take every index i with start ≤ i < stop.",
         "If an index is negative, rewrite it as n + index first.",
         "If start ≥ stop and step is +1, the result is empty. That is not an error.",
+        "A slice may change a list in place. A single s[i] off the end is IndexError.",
       ],
       bullets: [
+        "Stop is a fence. You never take the letter sitting at the fence.",
         "Length of s[i:j] is j − i when 0 ≤ i ≤ j ≤ n.",
         "s[i] is one element. s[i:i+1] is a one-element sequence.",
         "s[1:1] and s[5:2] (positive step) are empty.",
+        "Slice bounds clip. A single index off the end does not.",
+        "a[1:4] = [9, 9] can change the length of the list.",
       ],
       examples: [
         {
@@ -30,7 +34,7 @@ print(s[1:3], s[0:4], s[1:1], s[2:])`,
           steps: [
             {
               do: "Number line:  0 1 2 3   letters S E B I   negatives −4 −3 −2 −1. n=4.",
-              why: "The stop fence sits after a letter. You never take the letter at stop.",
+              why: "The stop fence sits after a letter. You never take the letter at the fence.",
             },
             {
               do: "s[1:3]: indexes 1 and 2 (not 3) → E,B → 'EB'.",
@@ -56,7 +60,7 @@ print(s[-4:-1], s[-1], s[-5], s[-4:4])`,
           steps: [
             {
               do: "Number line:  0 1 2 3 4   G R A D E    −5 −4 −3 −2 −1. n=5.",
-              why: "Convert each negative once, then use the half-open rule.",
+              why: "Convert each negative once, then use the fence rule.",
             },
             {
               do: "−4 → 1 (R). −1 → 4 (E). −5 → 0 (G).",
@@ -64,7 +68,7 @@ print(s[-4:-1], s[-1], s[-5], s[-4:4])`,
             },
             {
               do: "s[-4:-1]: start 1, stop 4, take 1,2,3 → RAD. The fence −1 leaves E out.",
-              why: "Stop is exclusive even when it is written as a negative.",
+              why: "Stop is a fence even when it is written as a negative.",
             },
             {
               do: "s[-1] is the character E (not a slice). s[-5] is G. s[-4:4] is RAD. print RAD E G RAD.",
@@ -84,7 +88,7 @@ print(s[0:99], s[-99:1])`,
           steps: [
             {
               do: "List line: index 0 1 2 3 4 5  values 0 1 2 3 4 5.",
-              why: "The same [start, stop) rule holds with a step.",
+              why: "The same fence rule holds with a step.",
             },
             {
               do: "a[1:5:2] takes 1, then 3 (5 is the fence) → [1, 3]. a[::-1] is [5, 4, 3, 2, 1, 0]. a[4:1:-1] takes 4,3,2 (not 1) → [4, 3, 2].",
@@ -92,7 +96,7 @@ print(s[0:99], s[-99:1])`,
             },
             {
               do: "s='IT', n=2. s[0:99] clips stop to 2 → 'IT'. s[-99:1] clips start to 0 → 'I'.",
-              why: "Slice bounds clip. They do not raise IndexError.",
+              why: "Slice bounds clip to the ends. They do not raise IndexError.",
             },
             {
               do: "Two print lines: [1, 3] [5, 4, 3, 2, 1, 0] [4, 3, 2] then IT I.",
@@ -110,7 +114,7 @@ print(s[::2], s[1::2], s[::-2])`,
           steps: [
             {
               do: "Number line:  0 1 2 3 4   G R A D E. n=5.",
-              why: "A step of 2 still uses the half-open idea, but it skips boxes.",
+              why: "A step of 2 still uses the fence idea, but it skips boxes.",
             },
             {
               do: "s[::2] means start 0, stop 5, step +2. Take 0, 2, 4 → G, A, E → 'GAE'.",
@@ -160,7 +164,7 @@ print(b)`,
             },
             {
               do: "Two lines: [0, 9, 9, 4] then [0, 7, 1, 2]. The name a still points at the same list object.",
-              why: "Slice assignment mutates. It does not rebind a to a brand-new list.",
+              why: "Slice assignment writes in the same list. It does not move a onto a brand-new list.",
             },
           ],
           result: "[0, 9, 9, 4]\n[0, 7, 1, 2]",
@@ -168,18 +172,22 @@ print(b)`,
       ],
     },
     {
-      heading: "Alias vs copy",
-      body: "b = a on a list copies the arrow, not the cells. Two names, one list. b.append and b[0]= change a as well. b = a[:] or b = list(a) makes a new outer list. Nested lists inside are still shared (shallow copy).\n\n+= on a list extends in place. a = a + [x] builds a new list and moves only the name a. is tests the same object. == tests the same letters/numbers inside.",
+      heading: "What is an alias vs a copy?",
+      body: "An alias is two name-stickers on one notebook. b = a on a list copies the sticker, not the pages. Two names, one list. b.append and b[0]= change a as well. A copy is a second notebook with the same writing. b = a[:] or b = list(a) makes a new outer list. Nested lists inside are still shared (a shallow copy).\n\n+= on a list writes extra pages in the same notebook. a = a + [x] prints a new notebook and moves only the sticker a. is tests the same notebook. == tests the same letters/numbers inside.",
       howTo: [
-        "Circle the statement: does it move a name (=, +) or change the object (append, +=, a[i]=)?",
-        "If b = a, draw one box and two arrows.",
-        "If b = a[:], draw two boxes with copied values.",
-        "After a mutation, ask which arrows still point at that box.",
+        "Circle the statement: does it move a sticker (=, +) or write in the notebook (append, +=, a[i]=)?",
+        "If b = a, draw one notebook and two name-stickers.",
+        "If b = a[:], draw two notebooks with copied writing.",
+        "After a change, ask which stickers still sit on that notebook.",
+        "A shallow copy shares nested lists inside.",
       ],
       bullets: [
-        "+= on a list is extend (same object). + builds a new list.",
+        "b = a is two stickers on one notebook.",
+        "b = a[:] is a second notebook (outer list only).",
+        "+= on a list is extend (same notebook). + builds a new list.",
         "After b=a, a is b is True. After b=a[:], a is b is False.",
         "A shallow copy shares nested lists.",
+        "is is same notebook. == is same writing inside.",
       ],
       examples: [
         {
@@ -192,20 +200,20 @@ b.append(3)
 print(a, b, a is b)`,
           steps: [
             {
-              do: "a → list box L=[1, 2].",
-              why: "A list value is an object. The name holds an arrow.",
+              do: "a → notebook L=[1, 2].",
+              why: "A list value is an object. The name holds a sticker, not the pages.",
             },
             {
-              do: "b = a. b → L. Still one box.",
-              why: "Assignment copies the arrow, not the cells.",
+              do: "b = a. b → L. Still one notebook.",
+              why: "Assignment copies the sticker, not the pages.",
             },
             {
               do: "b.append(3) writes L to [1, 2, 3]. a sees it. a is b is True.",
-              why: "append mutates the object both names share.",
+              why: "append writes in the notebook both names share.",
             },
             {
               do: "print [1, 2, 3] [1, 2, 3] True.",
-              why: "Two names, one list.",
+              why: "Two stickers, one notebook.",
             },
           ],
           result: "[1, 2, 3] [1, 2, 3] True",
@@ -221,19 +229,19 @@ print(a, b, a is b, a == b)`,
           steps: [
             {
               do: "a → L1=[1, 2]. a[:] builds L2=[1, 2]. b → L2.",
-              why: "A slice of a list allocates a new outer list.",
+              why: "A slice of a list makes a new outer notebook.",
             },
             {
               do: "b.append(3) writes only L2 → [1, 2, 3]. L1 stays [1, 2].",
-              why: "The copy is a different object, so append does not touch a.",
+              why: "The copy is a different notebook, so append does not touch a.",
             },
             {
               do: "a is b is False. a == b is False (contents differ).",
-              why: "is is identity. == is contents.",
+              why: "is is same notebook. == is same writing.",
             },
             {
               do: "print [1, 2] [1, 2, 3] False False.",
-              why: "Copy first, then mutate, and the original stays.",
+              why: "Copy first, then write, and the original stays.",
             },
           ],
           result: "[1, 2] [1, 2, 3] False False",
@@ -251,15 +259,15 @@ print(a, b, c)`,
           steps: [
             {
               do: "After the three assignments, a, b, and c all → L=[1].",
-              why: "Each = copies the same arrow.",
+              why: "Each = copies the same sticker.",
             },
             {
-              do: "a += [2] extends L in place. L is [1, 2]. b still → L, so b is [1, 2].",
-              why: "List += is mutate, not rebind. Aliases see it.",
+              do: "a += [2] writes extra pages in L. L is [1, 2]. b still → L, so b is [1, 2].",
+              why: "List += writes in the same notebook. It does not move the sticker. Aliases see it.",
             },
             {
-              do: "c = c + [3] builds a new list [1, 2, 3] and moves only c. L stays [1, 2].",
-              why: "+ always allocates. Only the name on the left of = moves.",
+              do: "c = c + [3] builds a new list [1, 2, 3] and moves only sticker c. L stays [1, 2].",
+              why: "+ always makes a new notebook. Only the name on the left of = moves.",
             },
             {
               do: "print [1, 2] [1, 2] [1, 2, 3].",
@@ -278,11 +286,11 @@ b[0].append(9)
 print(a, b, a is b, a[0] is b[0])`,
           steps: [
             {
-              do: "a → outer list L1 whose slots hold arrows to inner lists [1] and [2].",
-              why: "A list of lists is one outer box plus inner boxes.",
+              do: "a → outer notebook L1 whose slots hold stickers to inner lists [1] and [2].",
+              why: "A list of lists is one outer notebook plus inner notebooks.",
             },
             {
-              do: "b = a[:] builds a new outer list L2. L2 copies the arrows, not the inner boxes. a is b is False.",
+              do: "b = a[:] builds a new outer notebook L2. L2 copies the stickers, not the inner notebooks. a is b is False.",
               why: "A slice copy is shallow. Only the outer list is new.",
             },
             {
@@ -291,7 +299,7 @@ print(a, b, a is b, a[0] is b[0])`,
             },
             {
               do: "b[0].append(9) writes that shared inner list. It becomes [1, 9]. a sees it too.",
-              why: "append mutates the object both outers share at slot 0.",
+              why: "append writes in the notebook both outers share at slot 0.",
             },
             {
               do: "print [[1, 9], [2]] [[1, 9], [2]] False True.",
@@ -311,22 +319,22 @@ print(a, b, a is b)`,
           steps: [
             {
               do: "Start: a and b both → L=[1, 2]. a is b is True.",
-              why: "b = a copied the arrow.",
+              why: "b = a copied the sticker.",
             },
             {
-              do: "a = a + [3] builds a new list [1, 2, 3] and moves only the name a.",
-              why: "+ always allocates. The assignment rebinds a, it does not write into L.",
+              do: "a = a + [3] builds a new list [1, 2, 3] and moves only the sticker a.",
+              why: "+ always makes a new notebook. The assignment moves a; it does not write into L.",
             },
             {
               do: "b still → L, which is still [1, 2]. a is b is now False.",
-              why: "b was never on the left of that =, so its arrow did not move.",
+              why: "b was never on the left of that =, so its sticker did not move.",
             },
             {
               do: "print [1, 2, 3] [1, 2] False.",
-              why: "Contrast with a += [3], which would have mutated L and been seen by b.",
+              why: "Contrast with a += [3], which would have written in L and been seen by b.",
             },
             {
-              do: "Exam phrase: = with + rebinds. append / += mutates.",
+              do: "Exam phrase: = with + moves the sticker. append / += writes in the notebook.",
               why: "Circle the operator before you decide what b still sees.",
             },
           ],
@@ -335,17 +343,21 @@ print(a, b, a is b)`,
       ],
     },
     {
-      heading: "Mutable default arguments",
-      body: "def f(x, acc=[]): makes one list when Python reads the def, not on every call. Every call that omits acc gets that same list. That is why f(1) then f(2) prints [1, 2] [1, 2], not [1] [2].\n\nThe safe pattern is acc=None, then if acc is None: acc = [] inside the function. A new list is born on each call. Immutable defaults (None, 0, \"\") do not have this bug, because you do not append into them.",
+      heading: "What is a mutable default?",
+      body: "A default list in a def is one shared lunchbox reused. def f(x, acc=[]): makes one list when Python reads the def, not on every call. Every call that omits acc gets that same lunchbox. That is why f(1) then f(2) prints [1, 2] [1, 2], not [1] [2].\n\nThe safe pattern is acc=None, then if acc is None: acc = [] inside the function. A new lunchbox is born on each call. Immutable defaults (None, 0, \"\") do not have this bug, because you do not append into them.",
       howTo: [
         "Find a default that is a list, dict, or set. Circle it. That object is born once.",
-        "For each call that omits the argument, reuse that same object.",
+        "For each call that omits the argument, reuse that same lunchbox.",
         "Dry-run appends onto one box across calls.",
         "If the default is None and the body does acc = [], draw a fresh box each call.",
+        "An explicit argument skips the default lunchbox.",
       ],
       bullets: [
+        "Default list = one shared lunchbox, made when the def is read.",
         "Never write def f(a, bucket=[]) in real code.",
         "print(f(1), f(2)) evaluates f(1) first, then f(2), then prints both returns.",
+        "Safe pattern: acc=None, then if acc is None: acc = [] inside.",
+        "A default dict is shared the same way as a default list.",
         "A tuple cannot do t[0]=1, but t[0].append(1) is allowed if t[0] is a list.",
       ],
       examples: [
@@ -359,12 +371,12 @@ print(a, b, a is b)`,
 print(f(1), f(2))`,
           steps: [
             {
-              do: "At def time one list L=[] is stored as the default for acc.",
+              do: "At def time one lunchbox L=[] is stored as the default for acc.",
               why: "Default objects are built when the function is defined, not when it is called.",
             },
             {
               do: "f(1): acc is L, append 1, L=[1], return L.",
-              why: "Omitting acc means ‘use the stored default’.",
+              why: "Omitting acc means ‘use the stored lunchbox’.",
             },
             {
               do: "f(2): acc omitted, same L. append 2, L=[1, 2], return L.",
@@ -390,7 +402,7 @@ print(g(1), g(2))`,
           steps: [
             {
               do: "Default acc is None. None is not a list.",
-              why: "The shared default is an immutable sentinel. We do not append into None.",
+              why: "The shared default is a special empty mark. We do not append into None.",
             },
             {
               do: "g(1): acc is None, so acc = [] makes a new list. append 1. Return [1].",
@@ -398,7 +410,7 @@ print(g(1), g(2))`,
             },
             {
               do: "g(2): acc is None again, another new []. append 2. Return [2].",
-              why: "Each omitted call builds its own list.",
+              why: "Each omitted call builds its own lunchbox.",
             },
             {
               do: "print [1] [2].",
@@ -419,7 +431,7 @@ print(f(1, mine), f(2), mine)`,
           steps: [
             {
               do: "mine = [] is a separate box M=[]. The default L=[] still exists.",
-              why: "The default is used only when the caller omits acc.",
+              why: "The default lunchbox is used only when the caller omits acc.",
             },
             {
               do: "f(1, mine): acc is M, append 1, M=[1]. Return M.",
@@ -447,11 +459,11 @@ print(f("a"), f("b"))`,
           steps: [
             {
               do: "At def time one dict D={} is stored as the default for d.",
-              why: "dict is mutable. The default object is born once, like a default list.",
+              why: "dict can be rewritten in place. The default object is born once, like a default list.",
             },
             {
               do: "f(\"a\"): d is D. D has no 'a', so get returns 0, then D['a']=1. Return D.",
-              why: "Omitting d means ‘use the stored default’.",
+              why: "Omitting d means ‘use the stored lunchbox’.",
             },
             {
               do: "f(\"b\"): same D. D['b']=1. D is now {'a': 1, 'b': 1}. Return D.",
@@ -463,7 +475,7 @@ print(f("a"), f("b"))`,
             },
             {
               do: "Safe pattern is d=None, then if d is None: d = {} inside the function.",
-              why: "None is immutable. A new dict is born on each omitted call.",
+              why: "None cannot be rewritten in place. A new dict is born on each omitted call.",
             },
           ],
           result: "{'a': 1, 'b': 1} {'a': 1, 'b': 1}",
@@ -480,7 +492,7 @@ print(f(1, mine), f(2, mine), f(3))`,
           steps: [
             {
               do: "mine = [] is box M. The default L=[] still exists unused for the first two calls.",
-              why: "An explicit acc skips the default.",
+              why: "An explicit acc skips the default lunchbox.",
             },
             {
               do: "f(1, mine): append 1 onto M. M=[1]. Return M.",
@@ -488,7 +500,7 @@ print(f(1, mine), f(2, mine), f(3))`,
             },
             {
               do: "f(2, mine): same M. append 2. M=[1, 2]. Return M.",
-              why: "Passing the same list twice is an alias, on purpose here.",
+              why: "Passing the same list twice is two stickers on one notebook, on purpose here.",
             },
             {
               do: "f(3): acc omitted, so acc is L. append 3. L=[3]. Return L.",
@@ -504,18 +516,21 @@ print(f(1, mine), f(2, mine), f(3))`,
       ],
     },
     {
-      heading: "File modes r / r+ / w / w+ / a",
-      body: "Mode picks three things: must the file already exist, do we wipe it, and where do writes go. r reads, file must exist, no wipe, pointer at 0. r+ reads and writes, must exist, no wipe, pointer at 0; writes overlay from the pointer. w writes, creates if missing, wipes to empty. w+ is w plus read. a appends, creates if missing, writes at the end. a+ is append plus read.\n\nStart with HELLO. w then write BYE leaves BYE. r+ then write BYE leaves BYELO. a then write BYE leaves HELLOBYE.",
+      heading: "What are file modes?",
+      body: "File mode w is wiping the blackboard, then writing. Mode picks three things: must the file already exist, do we wipe it, and where do writes go. r reads, file must exist, no wipe, pointer at 0. r+ reads and writes, must exist, no wipe, pointer at 0; writes overlay from the pointer. w writes, creates if missing, wipes to empty. w+ is w plus read. a appends, creates if missing, writes at the end. a+ is append plus read.\n\nStart with HELLO. w then write BYE leaves BYE. r+ then write BYE leaves BYELO. a then write BYE leaves HELLOBYE.",
       howTo: [
-        "Does the question need the old bytes? If yes, do not pick w / w+ (they wipe).",
+        "Does the question need the old letters? If yes, do not pick w / w+ (they wipe the blackboard).",
         "Must the path already exist? If yes, r / r+. If missing, those raise FileNotFoundError.",
         "Should new text go at the end? Pick a / a+.",
         "Dry-run from the starting letters. Overlay from index 0 for r+, replace all for w, glue at the end for a.",
+        "After a write, the pointer sits after the new letters. seek(0) to read from the start.",
       ],
       bullets: [
-        "w / w+ truncate. r / r+ require an existing file. a / a+ write at EOF.",
+        "w / w+ wipe the blackboard. r / r+ need an existing file. a / a+ write at the end.",
         "r+ does not wipe. That is the usual trap against w+.",
+        "Start HELLO: w+BYE → BYE. r++BYE → BYELO. a+BYE → HELLOBYE.",
         "Text mode is the exam default. b means binary.",
+        "a+ can read, but only after you move the pointer back to 0.",
       ],
       examples: [
         {
@@ -527,10 +542,10 @@ print(open("f.txt").read())`,
           steps: [
             {
               do: "Start file: H E L L O (5 letters).",
-              why: "Write down the old bytes before open.",
+              why: "Write down the old letters before open.",
             },
             {
-              do: "open w: wipe to empty, pointer 0. Create the file if it was missing.",
+              do: "open w: wipe the blackboard empty, pointer 0. Create the file if it was missing.",
               why: "w means ‘replace the whole file’.",
             },
             {
@@ -555,7 +570,7 @@ print(f.read())`,
           steps: [
             {
               do: "r+: file must exist, not wiped. Contents HELLO, pointer 0.",
-              why: "r+ keeps the old bytes and lets you write on top of them.",
+              why: "r+ keeps the old letters and lets you write on top of them.",
             },
             {
               do: "write BYE overwrites the first 3 letters. File is B Y E L O.",
@@ -588,7 +603,7 @@ except FileNotFoundError:
           steps: [
             {
               do: "Mode a: HELLO is kept. write BYE adds at the end → HELLOBYE.",
-              why: "Append writes always go to EOF.",
+              why: "Append writes always go to the end of the file.",
             },
             {
               do: "First print is HELLOBYE.",
@@ -615,8 +630,8 @@ f.seek(0)
 print(f.read())`,
           steps: [
             {
-              do: "Start file: HELLO. Mode w+ means wipe first, then allow read and write.",
-              why: "The + adds reading. The w still truncates. HELLO is gone before write.",
+              do: "Start file: HELLO. Mode w+ means wipe the blackboard first, then allow read and write.",
+              why: "The + adds reading. The w still wipes. HELLO is gone before write.",
             },
             {
               do: "After open, the file is empty and the pointer is 0. write HI stores two letters.",
@@ -648,7 +663,7 @@ f.seek(0)
 print(f.read())`,
           steps: [
             {
-              do: "a+: HELLO is kept. The pointer for writes sits at EOF (after O).",
+              do: "a+: HELLO is kept. The pointer for writes sits at the end (after O).",
               why: "Append mode always adds at the end, even with +.",
             },
             {
@@ -656,7 +671,7 @@ print(f.read())`,
               why: "After a write in a+, there is nothing left to the right of the pointer.",
             },
             {
-              do: "f.read() from EOF returns ''. First print is here '' .",
+              do: "f.read() from the end returns ''. First print is here '' .",
               why: "repr shows the empty string so you can see it. A silent print would look like a blank.",
             },
             {
@@ -673,18 +688,22 @@ print(f.read())`,
       ],
     },
     {
-      heading: "Regex: search, match, fullmatch, groups",
-      body: "\\d is a digit. \\w is a letter, digit, or underscore. . is any character except newline. ^ is start. $ is end. + means one or more.\n\nre.search looks for the pattern anywhere. re.match tries only at index 0 (it does not need to eat the whole string). re.fullmatch must eat the whole string. Parentheses capture a group. \\1 in the pattern means ‘the same text group 1 already matched’. findall returns every non-overlapping match.",
+      heading: "What is search vs match vs fullmatch?",
+      body: "search is finding a word anywhere on the page. match is finding it only at the start of the line. fullmatch needs the whole line to be the word. \\d is a digit. \\w is a letter, digit, or underscore. . is any character except newline. ^ is start. $ is end. + means one or more.\n\nre.search looks for the pattern anywhere. re.match tries only at index 0 (it does not need to eat the whole string). re.fullmatch must eat the whole string. Parentheses capture a group. \\1 in the pattern means ‘the same text group 1 already matched’. findall returns every non-overlapping match.",
       howTo: [
         "Write the string and put a cursor at 0.",
         "Ask: must it start at 0 (match)? Must it fill the whole string (fullmatch)? Or may it sit in the middle (search)?",
         "Walk the class: \\d vs \\w vs [A-Z].",
         "If there are groups, write group(0) = whole match and group(1) = first pair of ().",
+        "findall with one pair of parentheses returns the group, not the whole match.",
       ],
       bullets: [
+        "search = find the word anywhere. match = only at the start. fullmatch = the whole string.",
         "search vs match vs fullmatch is the standing MCQ.",
         "findall with one pair of parentheses returns the group, not group 0.",
         "Java String.matches is a full match. Python re.match is only ‘at index 0’.",
+        "\\d is a digit. \\w is a letter, digit, or underscore. + means one or more.",
+        "\\1 means ‘copy group 1’, not ‘any second word of the same shape’.",
       ],
       examples: [
         {
@@ -697,7 +716,7 @@ print(re.findall(r"\\d", "a12b3"))`,
           steps: [
             {
               do: "Pattern \\d+ means one or more digits. Scan a12b3cd45 from the left.",
-              why: "findall walks left to right and does not overlap matches.",
+              why: "findall walks left to right and does not reuse letters already taken.",
             },
             {
               do: "Skip a. At 1 the + takes 12. Skip b. Take 3. Skip cd. Take 45. Result ['12', '3', '45'].",
@@ -727,11 +746,11 @@ print(bool(re.search(r"\\d+", s)),
           steps: [
             {
               do: "s = SEBI2024. search \\d+ finds 2024 in the middle → True.",
-              why: "search may start at any index.",
+              why: "search may start at any index. Find the word anywhere.",
             },
             {
               do: "match \\d+ must start at index 0. Index 0 is S, not a digit → False.",
-              why: "match is anchored at the start, not a full-string test.",
+              why: "match is only at the start, not a whole-string test.",
             },
             {
               do: "fullmatch \\d+ needs the whole string to be digits → False.",
@@ -784,7 +803,7 @@ print(bool(re.match(r"\\d+", s)),
           steps: [
             {
               do: "s = 2024SEBI. match \\d+ must start at index 0. Index 0 is 2, a digit. + takes 2024.",
-              why: "match is ‘anchored at 0’. It does not have to consume SEBI.",
+              why: "match is ‘only at the start’. It does not have to consume SEBI.",
             },
             {
               do: "So match returns a match object → True. The leftover letters are fine for match.",
@@ -796,7 +815,7 @@ print(bool(re.match(r"\\d+", s)),
             },
             {
               do: "search [A-Z]+ may start anywhere. It finds SEBI → True.",
-              why: "search is the ‘somewhere in the middle’ tool.",
+              why: "search is the ‘find the word anywhere’ tool.",
             },
             {
               do: "print True False True.",
@@ -815,7 +834,7 @@ print(re.findall(r"[A-Z](\\d+)", "A12-B3"))`,
           steps: [
             {
               do: "First pattern \\d+ has no parentheses. findall returns the whole matches: ['12', '3'].",
-              why: "Zero groups → list of group-0 strings.",
+              why: "Zero groups → list of whole-match strings.",
             },
             {
               do: "Second pattern [A-Z](\\d+): a letter, then capture the following digits.",
@@ -839,19 +858,22 @@ print(re.findall(r"[A-Z](\\d+)", "A12-B3"))`,
       ],
     },
     {
-      heading: "Dictionaries and sets (key lookup, unique, mutable keys trap)",
-      body: "A dict maps a key to a value. d['SEBI'] jumps to that key. If the key is missing, d[k] raises KeyError. d.get(k) returns None (or a default you pass). The same key cannot sit twice: a later write overwrites the old value.\n\nA set is a bag of unique keys with no values. set([1,1,2]) is {1, 2}. Membership k in s is the usual exam use.\n\nKeys of a dict and members of a set must be hashable: numbers, strings, tuples of hashables. A list is mutable, so it is not a legal key. Using a list as a dict key is TypeError. If you need a compound key, use a tuple.",
+      heading: "What is a dict and a set?",
+      body: "A dict is a school register: a roll number (the key) jumps you to a name (the value). d['SEBI'] jumps to that key. If the key is missing, d[k] raises KeyError. d.get(k) returns None (or a default you pass). The same key cannot sit twice: a later write overwrites the old value.\n\nA set is a bag of unique keys with no values. set([1,1,2]) is {1, 2}. Membership k in s is the usual exam use. Keys of a dict and members of a set must be hashable: numbers, strings, tuples of hashables. A list is a notebook you can rewrite, so it is not a legal key. Using a list as a dict key is TypeError. If you need a compound key, use a tuple.",
       howTo: [
         "Draw the dict as a table of key → value. A later write to the same key replaces the value.",
         "d[k] needs the key to exist. d.get(k) is safe. k in d tests membership of the key.",
         "A set keeps each value once. Build it from a list when the question asks ‘unique’.",
         "If the key is a list or a dict, it is not hashable → TypeError. Switch to a tuple.",
+        "in on a dict tests keys, not values.",
       ],
       bullets: [
-        "dict: key → value. Missing d[k] is KeyError. get is safe.",
+        "dict: key → value, like a school register. Missing d[k] is KeyError. get is safe.",
         "set: unique membership. {1, 1, 2} has length 2.",
         "Keys must be hashable. list is not a key. tuple can be.",
         "Overwrite: d['a']=1 then d['a']=9 leaves {'a': 9}.",
+        "1 in d is False if 1 is only a value, not a key.",
+        "(1, 2) and (2, 1) are different set members.",
       ],
       examples: [
         {
@@ -867,7 +889,7 @@ except KeyError:
           steps: [
             {
               do: "Table: A→1, B→2. d[\"A\"] is 1.",
-              why: "[] looks up the key and returns the value.",
+              why: "[] looks up the roll number and returns the value.",
             },
             {
               do: "d.get(\"C\") is None because C is missing and no default was given.",
@@ -902,7 +924,7 @@ print(len(a), len(s), sorted(s), 2 in s, 4 in s)`,
             },
             {
               do: "set(a) keeps {1, 2, 3}. Length 3.",
-              why: "A set stores each hashable value once.",
+              why: "A set stores each frozen value once.",
             },
             {
               do: "sorted(s) is [1, 2, 3] so the print is stable. A raw set print order is not a good exam bet.",
@@ -910,7 +932,7 @@ print(len(a), len(s), sorted(s), 2 in s, 4 in s)`,
             },
             {
               do: "2 in s is True. 4 in s is False.",
-              why: "Membership is the usual O(1) exam use of a set.",
+              why: "Membership is the usual exam use of a set.",
             },
             {
               do: "print 5 3 [1, 2, 3] True False.",
@@ -937,7 +959,7 @@ print(d[(1, 2)], (1, 2) in d)`,
               why: "Dict keys must be hashable so Python can jump to a bucket.",
             },
             {
-              do: "A list is mutable (append can change it), so it is not hashable. TypeError. print ok is skipped. print T.",
+              do: "A list is a notebook you can rewrite (append can change it), so it is not hashable. TypeError. print ok is skipped. print T.",
               why: "If the key could change later, the bucket would be a lie.",
             },
             {
@@ -967,7 +989,7 @@ print(d["A"], len(d), list(d.keys()))`,
           steps: [
             {
               do: "First write: A→1. Second: B→2. Table has two keys.",
-              why: "New keys add a row.",
+              why: "New keys add a row in the register.",
             },
             {
               do: "d[\"A\"] = 9 finds the existing key A and replaces 1 with 9. It does not add a second A.",

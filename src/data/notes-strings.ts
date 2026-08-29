@@ -2,23 +2,26 @@ import type { TopicNote } from "@/data/notes";
 
 export const notesStrings: TopicNote = {
   topic: "strings",
-  title: "String manipulation — techniques (beginner)",
+  title: "Strings — simple notes",
   blurb:
-    "Java substring(i, j) and Python s[i:j] take letters from i up to but not including j. C++ substr(pos, len) takes a length, not an end index. That mix-up is the whole topic. Draw a number line. Count. Translate before you pick an option.",
+    "We explain strings like class notes a Class-10 student can read: pictures of letter tiles, fence posts, a wanted-poster pattern, and laminated paper. Then we solve five tiny examples in each topic, one slice or one search at a time.",
   blocks: [
     {
-      heading: "Java substring(i, j) vs Python s[i:j] vs C++ substr(pos, len)",
-      body: "Java s.substring(i, j) copies indexes i, i+1, …, j-1. The length is j − i. Python s[i:j] is the same half-open rule. The second number is a fence, not a count.\n\nC++ s.substr(pos, count) starts at pos and takes count letters. s.substr(1, 3) on \"SEBI\" is \"EBI\" (three letters). Java substring(1, 3) on the same word is \"EB\". Translate: Java/Python [1:3] equals C++ substr(1, 2).\n\nJava throws if i < 0, j > length, or i > j. Python clips wild slice bounds. C++ throws only if pos is past size(); a huge count just clips to the end.",
+      heading: "What is Java substring vs Python slice vs C++ substr?",
+      body: "A string is a row of letter tiles. Index numbers sit on the fence posts between tiles, not on the tiles themselves. A substring is cutting tiles from fence i to fence j: you take the tiles that sit between those posts, and you leave the tile that starts at j.\n\nJava s.substring(i, j) and Python s[i:j] copy indexes i, i+1, …, j−1. The length is j − i. The second number is a fence, not a count. C++ s.substr(pos, count) starts at pos and takes count letters. s.substr(1, 3) on \"SEBI\" is \"EBI\". Java substring(1, 3) on the same word is \"EB\". Translate: Java/Python [1:3] equals C++ substr(1, 2). Java throws if i < 0, j > length, or i > j. Python clips wild slice bounds. C++ throws only if pos is past size(); a huge count just clips to the end.",
       howTo: [
-        "Write the word. Put a number before each letter and one after the last letter.",
-        "Ask which language. Java/Python: second number is exclusive index. C++: second number is how many letters.",
+        "Write the word as letter tiles. Put a fence-post number before each letter and one after the last letter.",
+        "Ask which language. Java/Python: second number is exclusive index (a fence). C++: second number is how many letters.",
         "Length check: Java/Python result length is j − i. C++ result length is count (or less if the string ends).",
         "Wild bounds: Java substring throws. Python slice clips. C++ throws only when pos > size().",
+        "Translate: Java/Python [i, j) equals C++ substr(i, j−i).",
       ],
       bullets: [
-        "Java/Python (i, j) = letters i .. j-1. C++ (pos, len) = letters pos .. pos+len-1.",
+        "A string is a row of letter tiles. Indexes are fence posts.",
+        "Java/Python (i, j) = letters i .. j−1. C++ (pos, len) = letters pos .. pos+len−1.",
         "Java substring(1,3) on SEBI is EB. C++ substr(1,3) on SEBI is EBI.",
         "Python clips. Java substring throws. C++ throws only if pos is past the end.",
+        "Cut tiles from fence i to fence j. Do not take the tile at j.",
       ],
       examples: [
         {
@@ -34,11 +37,11 @@ export const notesStrings: TopicNote = {
           steps: [
             {
               do: "Number line: 0 S 1 E 2 B 3 I 4. n=4.",
-              why: "Put a fence before each letter and one after the last letter.",
+              why: "Put a fence post before each letter tile and one after the last letter.",
             },
             {
               do: "substring(1, 3) takes fences 1 to 3 → E,B → \"EB\". Letter I at 3 is not taken.",
-              why: "The second argument is an exclusive index, not a length.",
+              why: "The second argument is an exclusive index, not a length. Cut tiles between the posts.",
             },
             {
               do: "substring(2) means [2, 4) → \"BI\". substring(1, 1) is empty, length 0.",
@@ -60,7 +63,7 @@ print(s[1:3], s[-3:-1], s[3:1], s[2:99])`,
           steps: [
             {
               do: "Number line:  0 1 2 3   S E B I    −4 −3 −2 −1.",
-              why: "Python uses the same [start, stop) idea as Java substring.",
+              why: "Python uses the same [start, stop) idea as Java substring. Same fence posts.",
             },
             {
               do: "s[1:3] takes indexes 1,2 → EB. s[-3:-1]: −3→1, −1→3, same [1,3) → EB.",
@@ -95,7 +98,7 @@ int main() {
           steps: [
             {
               do: "s = SEBI, size 4. Indexes 0:S 1:E 2:B 3:I.",
-              why: "C++ still 0-based, but the second argument is a length.",
+              why: "C++ still 0-based, but the second argument is a length (how many tiles), not a fence.",
             },
             {
               do: "substr(1, 2): start 1, take 2 letters → EB. This matches Java substring(1, 3), not substring(1, 2).",
@@ -168,7 +171,7 @@ int main() {
           steps: [
             {
               do: "Java/Python second number is an exclusive index. Length of the piece is j − i.",
-              why: "substring(1, 3) takes 3−1 = 2 letters, so EB.",
+              why: "substring(1, 3) takes 3−1 = 2 letters, so EB. Two tiles between fence 1 and fence 3.",
             },
             {
               do: "C++ second number is a count. Matching call is substr(1, 2), which is substr(1, 3-1).",
@@ -192,29 +195,32 @@ int main() {
       ],
     },
     {
-      heading: "Length and 0-based index — count the fences",
-      body: "The first letter sits at index 0. Length is how many letters, so the last index is length − 1. “SEBI” has length 4 and last index 3.\n\nThe exam trap is asking for the character at index 2 and hoping you pick the third letter as ‘index 3’. Draw a number line: 0 under the first letter.",
+      heading: "What is length and a 0-based index?",
+      body: "A string is a row of letter tiles. The index numbers are fence posts: the first post is 0, standing before the first tile. Length counts the tiles (the panels between posts). “SEBI” has four tiles, so length is 4, and the last tile sits at index 3.\n\nThe first letter sits at index 0. Length is how many letters, so the last index is length − 1. The exam trap is asking for the character at index 2 and hoping you pick the third letter as ‘index 3’. Draw a number line: 0 under the first letter.",
       howTo: [
-        "Write the string with a number under each letter, starting at 0.",
-        "Length = count of letters. Last index = length − 1.",
+        "Write the string with a fence-post number under each letter, starting at 0.",
+        "Length = count of letter tiles. Last index = length − 1.",
         "charAt(i) / s[i] is the letter sitting on number i.",
         "If i is length or more, Java/C++ throw or are undefined; Python s[i] raises IndexError, but slices clip.",
+        "Index 0 is the first tile. Index equal to length is the fence after the last tile, not a letter.",
       ],
       bullets: [
-        "Index starts at 0. Length is a count, not a last-index.",
+        "Index starts at 0. Length is a count of tiles, not a last-index.",
+        "Fence posts vs panels: n tiles have n+1 posts (0 … n).",
         "Last letter of a string of n letters is at n − 1.",
         "Empty string has length 0 and no valid index.",
+        "A single wild index errors. A Python slice clips.",
       ],
       examples: [
         {
           title: "Index of each letter",
           prompt: "String s = \"SEBI\". What are length, char at 0, char at 2, last index?",
           steps: [
-            { do: "Write S E B I. Put 0 1 2 3 under them.", why: "0-based means the first letter is 0, not 1." },
-            { do: "Count letters: 4. That is length.", why: "Length is a count of boxes, not the last number." },
+            { do: "Write S E B I. Put 0 1 2 3 under them.", why: "0-based means the first letter is 0, not 1. Those numbers are fence posts." },
+            { do: "Count letters: 4. That is length.", why: "Length is a count of tiles, not the last fence number." },
             { do: "Letter at 0 is S. Letter at 2 is B.", why: "Read the number under the letter. 2 is the third box." },
             { do: "Last index = 4 − 1 = 3, letter I.", why: "Last index is always length minus one." },
-            { do: "There is no letter at 4.", why: "Index 4 is the fence after I, not a letter." },
+            { do: "There is no letter at 4.", why: "Index 4 is the fence after I, not a letter tile." },
           ],
           result: "length 4; s[0]=S; s[2]=B; last index 3 (I).",
         },
@@ -226,7 +232,7 @@ int main() {
 # s[2]  → IndexError
 print(s[2:9])`,
           steps: [
-            { do: "s has letters I,T at 0,1. Length 2.", why: "Only two boxes exist." },
+            { do: "s has letters I,T at 0,1. Length 2.", why: "Only two tiles exist." },
             { do: "s[2] asks for a box that does not exist → IndexError.", why: "A single index must land on a letter." },
             { do: "s[2:9] is a slice. Start 2 is at the end fence. Result is empty, not an error.", why: "Slices clip. They do not throw for wild stop values." },
             { do: "print shows a blank line.", why: "The empty string prints as nothing." },
@@ -244,7 +250,7 @@ System.out.print(s.charAt(s.length() - 1));`,
             { do: "length() is 2.", why: "Two letters: A and M." },
             { do: "s.length() - 1 = 1.", why: "Last index formula." },
             { do: "charAt(1) is M.", why: "0 is A, 1 is M." },
-            { do: "charAt(2) would throw.", why: "2 equals length, so it is past the last letter." },
+            { do: "charAt(2) would throw.", why: "2 equals length, so it is the fence after M, not a letter." },
             { do: "print M.", why: "The last-letter recipe is always charAt(length - 1)." },
           ],
           result: "M",
@@ -260,7 +266,7 @@ System.out.print(s.length());
           steps: [
             {
               do: "Count letters: there are none. length is 0.",
-              why: "Length is a count of boxes. Zero boxes is a legal string.",
+              why: "Length is a count of tiles. Zero tiles is a legal string.",
             },
             {
               do: "Last index would be length − 1 = −1. There is no letter there.",
@@ -311,7 +317,7 @@ int main() {
             },
             {
               do: "s[3] would be undefined. Last letter is s[1] or s.at(1), which is M.",
-              why: "Index equal to length is not a letter in the exam sense.",
+              why: "Index equal to length is a fence post, not a letter in the exam sense.",
             },
             {
               do: "Output 2 1 X. Prefer at or s[n-1] in answers about the last character.",
@@ -323,18 +329,21 @@ int main() {
       ],
     },
     {
-      heading: "Search — indexOf, find, and ‘not found’",
-      body: "Searching asks: from the left, where does this piece first sit? Java indexOf returns −1 if missing. C++ find returns npos if missing. Python str.find returns −1; str.index raises if missing.\n\nThe trap is treating −1 as index 0, or forgetting that search is case-sensitive: \"sebi\" does not find \"SEBI\".",
+      heading: "What is search and not found?",
+      body: "A string is a row of letter tiles. Searching is sliding a small strip of tiles along that row from the left, until every letter matches. If the strip never fits, the language says “not found”.\n\nSearching asks: from the left, where does this piece first sit? Java indexOf returns −1 if missing. C++ find returns npos if missing. Python str.find returns −1; str.index raises if missing. The trap is treating −1 as index 0, or forgetting that search is case-sensitive: \"sebi\" does not find \"SEBI\".",
       howTo: [
-        "Write the haystack with indexes.",
+        "Write the haystack as letter tiles with indexes.",
         "Slide the needle from the left until every letter matches.",
         "The answer is the starting index of that match.",
         "If it never matches, write the language’s ‘missing’ value (−1, npos, or exception).",
+        "Search is case-sensitive unless you lower both sides first.",
       ],
       bullets: [
         "First match from the left. Case-sensitive unless you lower both sides.",
         "Java/Python find: −1 means missing. C++: npos means missing.",
         "indexOf(\"\") is 0 in Java (empty needle sits at the start).",
+        "Do not treat −1 as index 0.",
+        "lastIndexOf walks from the right. Missing is still −1.",
       ],
       examples: [
         {
@@ -361,7 +370,7 @@ auto a = s.find("AT");
 auto b = s.find("XYZ");
 std::cout << a << " " << (b == std::string::npos);`,
           steps: [
-            { do: "G A T E at 0 1 2 3.", why: "Same 0-based line." },
+            { do: "G A T E at 0 1 2 3.", why: "Same 0-based line of letter tiles." },
             { do: "\"AT\" starts at 1. find returns 1.", why: "find returns the start index." },
             { do: "\"XYZ\" never appears. find returns npos.", why: "npos is C++ for ‘not found’, not −1 as an int you print blindly." },
             { do: "b == npos is true, printed as 1.", why: "Compare with npos. Do not assume the missing value is −1." },
@@ -447,25 +456,28 @@ System.out.print(s.indexOf("") + " " + s.lastIndexOf("") + " " + s.indexOf("SEBI
       ],
     },
     {
-      heading: "Regex — start, end, digit, and a back-reference",
-      body: "A regex is a pattern. ^ means start of the string. $ means end. \\d means one digit. . means one character (not newline). * means ‘repeat the previous thing 0 or more times’.\n\nA back-reference \\1 means ‘the same text that group 1 captured’. Group 1 is the first pair of parentheses.",
+      heading: "What is a regex?",
+      body: "A regex is a wanted-poster pattern. The poster does not name one person. It says “starts with a digit, then anything, then that same digit again”, the way a poster might say “red cap, any height”. You hold the poster against the whole word.\n\nA regex is a pattern. ^ means start of the string. $ means end. \\d means one digit. . means one character (not newline). * means ‘repeat the previous thing 0 or more times’. A back-reference \\1 means ‘the same text that group 1 captured’. Group 1 is the first pair of parentheses.",
       howTo: [
         "Read left to right. Write what each token eats.",
         "If you see ^, the match must start at letter 0.",
         "If you see $, the match must finish at the last letter.",
         "If you see ( ), that is a group. \\1 must copy that group later.",
+        "Hold the wanted-poster against the whole word. Name each token before you say yes or no.",
       ],
       bullets: [
+        "Regex = a wanted-poster pattern, not one fixed word.",
         "^ start, $ end, \\d digit, . any char, * repeat.",
         "Same digit at both ends: ^(\\d).*\\1$",
         "Python raw strings r\"\\d\" keep the backslash honest.",
+        ". is any character. \\d is only a digit. \\. is a real dot.",
       ],
       examples: [
         {
           title: "Starts and ends with the same digit",
           prompt: "Which strings match ^(\\d).*\\1$  —  121, 11, 12, a1a ?",
           steps: [
-            { do: "Pattern: ^ start, (\\d) capture first digit as group 1, .* any middle, \\1 that same digit, $ end.", why: "Read tokens in order." },
+            { do: "Pattern: ^ start, (\\d) capture first digit as group 1, .* any middle, \\1 that same digit, $ end.", why: "Read tokens in order. This is the wanted poster." },
             { do: "121: first 1 captured, middle 2, last 1 copies group 1. Match.", why: "Ends equal the captured start digit." },
             { do: "11: first 1, middle empty (.* allows nothing), last 1. Match.", why: ".* can be zero characters." },
             { do: "12: last 2 ≠ captured 1. No match.", why: "\\1 is not ‘any digit’; it is the same digit." },
@@ -562,20 +574,22 @@ print(bool(re.search(r"^SE", "SEBI")),
       ],
     },
     {
-      heading: "replace / concatenation / immutability (Java String vs StringBuilder)",
-      body: "A Java String cannot change its letters. replace, concat, substring, and toUpperCase build a new String. If you ignore the result, the old variable still points at the old letters. s.replace(\"a\",\"x\") without s = leaves s unchanged. s = s + \"x\" rebinds s to a new object.\n\nStringBuilder is a mutable box. append, reverse, and setCharAt write the same object. Two variables that point at one builder see each other’s edits. Building a long string in a loop with + makes many throw-away String objects. A builder appends into one box.\n\n== on String tests the same object. equals tests the same letters. Python strings are immutable too: s.replace returns a new str. Use a list and join if you must build in a loop.",
+      heading: "What is replace, concat, and immutability?",
+      body: "A Java String is laminated paper. You cannot erase a letter. replace, concat, and toUpperCase print a new sheet. If you ignore that new sheet, the old page is still on the desk. StringBuilder is a pencil on paper: append, reverse, and setCharAt write on the same page. Two names pointing at one builder see each other’s edits.\n\nA Java String cannot change its letters. If you ignore the result, the old variable still points at the old letters. s.replace(\"a\",\"x\") without s = leaves s unchanged. s = s + \"x\" rebinds s to a new object. Building a long string in a loop with + makes many throw-away String objects. A builder appends into one box. == on String tests the same object. equals tests the same letters. Python strings are immutable too: s.replace returns a new str. Use a list and join if you must build in a loop.",
       howTo: [
-        "Ask: String or StringBuilder (or Python str vs list)?",
+        "Ask: String or StringBuilder (or Python str vs list)? Laminated paper, or pencil on paper?",
         "String method → new object. If you do not assign, the old variable is unchanged.",
         "StringBuilder method → same object changes. append returns this, so chaining is one box.",
         "s = s + t rebinds s. That is concatenation with a new String, not an in-place write.",
         "== is identity. equals (Python ==) is letters for content questions.",
       ],
       bullets: [
-        "String is immutable. replace/concat must be assigned.",
-        "s = s + \"x\" rebinds. StringBuilder.append mutates.",
+        "Java String is laminated. replace/concat must be assigned.",
+        "StringBuilder is a pencil on paper. append mutates.",
+        "s = s + \"x\" rebinds. It does not edit the old sheet.",
         "Loop of s = s + piece builds many Strings. A builder is one buffer.",
         "== on Java String is identity. equals is letters.",
+        "Python str is laminated too. Build with a list and join.",
       ],
       examples: [
         {
@@ -593,11 +607,11 @@ print(bool(re.search(r"^SE", "SEBI")),
           steps: [
             {
               do: "s points at \"banana\".",
-              why: "The object’s letters cannot change.",
+              why: "The object’s letters cannot change. The page is laminated.",
             },
             {
               do: "s.replace(\"a\", \"o\") builds \"bonono\" and throws it away. s is still \"banana\".",
-              why: "Ignoring the return does not write s.",
+              why: "Ignoring the return does not write s. The new sheet was not kept.",
             },
             {
               do: "t = s.replace(\"a\", \"o\") keeps the new \"bonono\". s is still \"banana\".",
@@ -633,7 +647,7 @@ print(bool(re.search(r"^SE", "SEBI")),
             },
             {
               do: "s.concat(\"BI\") builds \"SEBI\" and throws it away. s is still \"SE\".",
-              why: "concat is a String method. No assign → no change.",
+              why: "concat is a String method. No assign → no change. Laminated paper.",
             },
             {
               do: "s = s + \"BI\" builds a new \"SEBI\" and moves the name s.",
@@ -666,7 +680,7 @@ print(bool(re.search(r"^SE", "SEBI")),
           steps: [
             {
               do: "sb → builder holding SE. tb = sb copies the arrow. One object.",
-              why: "tb = sb does not copy the letters.",
+              why: "tb = sb does not copy the letters. One pencil, one page.",
             },
             {
               do: "sb.append(\"BI\") mutates to SEBI. tb sees SEBI too.",
@@ -682,7 +696,7 @@ print(bool(re.search(r"^SE", "SEBI")),
             },
             {
               do: "If these had been String, reverse would not exist, and concat would have needed assign.",
-              why: "Mutable vs immutable is the whole heading.",
+              why: "Mutable vs immutable is the whole heading: pencil vs laminated paper.",
             },
           ],
           result: "IBES true",
@@ -699,7 +713,7 @@ System.out.print(s + " " + b.toString());`,
           steps: [
             {
               do: "First loop: s starts \"\". Trip 0 builds \"ab\". Trip 1 builds \"abab\". Trip 2 builds \"ababab\". Each trip throws away the old String.",
-              why: "s = s + \"ab\" allocates a new object every time. The old one becomes garbage.",
+              why: "s = s + \"ab\" allocates a new object every time. The old laminated sheet becomes garbage.",
             },
             {
               do: "Three trips made three String objects (plus the empty start). Only the last is kept in s.",
@@ -707,7 +721,7 @@ System.out.print(s + " " + b.toString());`,
             },
             {
               do: "Second loop: one builder. append three times into the same buffer: ab, then abab, then ababab.",
-              why: "StringBuilder is mutable. One box, growing letters.",
+              why: "StringBuilder is a pencil on paper. One box, growing letters.",
             },
             {
               do: "Both end with letters ababab. print ababab ababab.",
@@ -735,7 +749,7 @@ print("".join(parts))`,
           steps: [
             {
               do: "s is \"banana\". s.replace(\"a\", \"o\") returns \"bonono\" and nobody stores it. s stays \"banana\".",
-              why: "Python str is immutable, like Java String.",
+              why: "Python str is immutable, like Java String. Laminated paper again.",
             },
             {
               do: "t = s.replace(...) keeps \"bonono\". print banana bonono.",

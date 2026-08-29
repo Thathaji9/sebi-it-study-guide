@@ -2,25 +2,27 @@ import type { TopicNote } from "@/data/notes";
 
 export const notesQuant: TopicNote = {
   topic: "quant",
-  title: "Quant — techniques (beginner)",
+  title: "Quant — simple notes",
   blurb:
-    "Paper 1 Quant is short timed sums. Each section below is one technique. Read the two-line idea, follow the recipe, then copy the five worked examples onto paper. Every step shows the arithmetic and the reason, so you never have to guess a missing line.",
+    "We explain Paper-1 Quant like class notes a Class-10 student can read: a queue of jobs, a pizza in parts, a shop tag, a pile of rupees. Then we solve five tiny examples in each topic, one number at a time.",
   blocks: [
     {
-      heading: "BODMAS / left-to-right (× and ÷ same rank)",
-      body: "BODMAS is the order of work: Brackets, Orders (squares and roots), Division and Multiplication, Addition and Subtraction.\n\nThe exam gives one mixed line such as 36 ÷ 4 × 6 + 25. The trap is treating × as stronger than ÷. They share the same rank, so you walk left to right: 36 ÷ 4 = 9, then 9 × 6 = 54.",
+      heading: "BODMAS",
+      body: "Think of a mixed sum as a queue of jobs. The clerk finishes brackets first, then squares and roots, then × and ÷, then + and −. Jobs of the same rank wait in a line: whoever is on the left goes first. So 36 ÷ 4 × 6 is not ‘do the times first’. Divide 36 by 4, then multiply by 6.\n\nOn the exam, × and ÷ share one rank, and + and − share one rank. Walk left to right inside each pair. Do not invent a bracket that was not written. If two options look like 16 and 1, you probably grouped a × before a ÷.",
       howTo: [
-        "Write the expression again, leaving space under it for a new line after each pass.",
+        "Write the sum again. Leave a blank line under it for each pass.",
         "Clear the innermost brackets first. Replace that pair with one number.",
         "Do squares and roots next. Replace each with one number.",
-        "Walk left to right doing every × and ÷ as you meet it. Do not skip ahead.",
+        "Walk left to right doing every × and ÷ as you meet it.",
         "Walk left to right doing every + and − as you meet it.",
-        "Check by asking: did I invent a bracket that was not written?",
+        "Ask: did I invent a bracket that was not written?",
       ],
       bullets: [
+        "Queue of jobs: brackets, then orders, then ×÷, then +−.",
         "× and ÷ are equal. + and − are equal. Left to right in each pair.",
         "Brackets beat everything. Squares and roots beat × and ÷.",
-        "If two options are 16 and 1, you probably grouped 9 × 4 before dividing.",
+        "Do not skip ahead to a × that sits after a ÷.",
+        "If two options are 16 and 1, you grouped × before ÷.",
       ],
       examples: [
         {
@@ -182,18 +184,20 @@ export const notesQuant: TopicNote = {
     },
     {
       heading: "Percentage of a number",
-      body: "x% of N means (x ÷ 100) × N. So 15% of 360 is 15 × 360 ÷ 100.\n\nThe exam asks ‘what is 18% of 450?’ or ‘12.5% of 480’. The trap is forgetting the ÷ 100, which makes the answer 100 times too big (8100 instead of 81).",
+      body: "Per cent means ‘out of 100’. If 15 students in a class of 100 wear red, that is 15%. For a different size class you still think ‘how many out of 100?’, then scale. 15% of 360 is 15 × 360 ÷ 100.\n\nOn the exam, write x% of N as x × N ÷ 100. The ÷ 100 is the whole point. Forgetting it makes the answer 100 times too big (8100 instead of 81). 10% is N ÷ 10. 12.5% is 1/8.",
       howTo: [
-        "Write (x / 100) × N as x × N / 100.",
+        "Write x% of N as x × N ÷ 100.",
         "Multiply x × N first. Write the full product.",
         "Divide that product by 100 (or shift the decimal two places left).",
-        "Check with a split: 10% of N is N ÷ 10, then build the rest from that.",
-        "If 12.5% appears, you may use 12.5% = 1/8, so divide N by 8.",
+        "Check with a split: 10% of N is N ÷ 10, then build the rest.",
+        "If 12.5% appears, use 12.5% = 1/8 and divide N by 8.",
       ],
       bullets: [
+        "Per cent = out of 100.",
         "x% of N = x × N ÷ 100. The ÷ 100 is not optional.",
         "10% is N ÷ 10. 5% is half of that. 1% is N ÷ 100.",
         "12.5% = 1/8. 25% = 1/4. 50% = 1/2. 20% = 1/5.",
+        "Forgetting ÷ 100 makes the answer 100 times too big.",
       ],
       examples: [
         {
@@ -335,18 +339,20 @@ export const notesQuant: TopicNote = {
     },
     {
       heading: "Percentage increase and decrease",
-      body: "To increase a number by x%, add x% of that number to it (or multiply by 1 + x/100). To decrease by x%, subtract x% of that number (or multiply by 1 − x/100).\n\nThe exam says ‘240 is increased by 20%’ or ‘salary falls 16%’. The trap is adding 20 to 240 instead of 20% of 240. Twenty percent of 240 is 48, not 20.",
+      body: "A shop raises a ₹240 bag by 20%. Twenty percent is not ₹20. It is 20 out of every 100 rupees already on the bag, so 20% of 240 is ₹48, and the new tag is 240 + 48. A fall works the same way: cut that many rupees off the old price.\n\nOn the exam, the percent is of the starting number. Increase: new = N + (x% of N), or multiply by (100 + x)/100. Decrease: subtract, or multiply by (100 − x)/100. Never add the raw percent as if it were rupees.",
       howTo: [
         "Name the starting number N and the percent x.",
-        "Find x% of N: x × N / 100. Write that rupee (or unit) change.",
-        "For an increase, add the change to N. For a decrease, subtract it from N.",
+        "Find x% of N: x × N ÷ 100. That is the rupee change.",
+        "For an increase, add the change to N. For a decrease, subtract it.",
         "Or multiply: increase uses (100 + x)/100; decrease uses (100 − x)/100.",
         "Check by going backwards: from the new value, undo the same percent.",
       ],
       bullets: [
-        "The percent is of the starting number, not of 100 as a raw add-on.",
+        "The percent is of the starting number, not a raw add-on of 20 rupees.",
         "Increase: new = N + (x% of N). Decrease: new = N − (x% of N).",
-        "A 20% rise then uses 120/100 = 1.20 as a one-step multiply.",
+        "A 20% rise also multiplies by 120/100 = 1.20.",
+        "20% of 240 is 48, not 20.",
+        "Undo the same percent to check the new value.",
       ],
       examples: [
         {
@@ -487,19 +493,21 @@ export const notesQuant: TopicNote = {
       ],
     },
     {
-      heading: "Successive percentage changes",
-      body: "Two percent changes in a row multiply. After the first change you have a new base; the second percent is of that new base, not of the first number.\n\nThe exam says ‘grows 10% then falls 10%’ or ‘up 25% then up 20%’. The trap is adding the percents (10 − 10 = 0, or 25 + 20 = 45). Up 10% then down 10% does not return to the start.",
+      heading: "Successive percentages",
+      body: "Two price tags, one after another. First the shop puts +10% on ₹8,000, so the middle tag is ₹8,800. Then it puts −10% on that new tag, not on the old one. You do not add the percents (10 − 10 = 0). The second sticker uses the number already on the counter.\n\nOn the exam, two percent changes multiply. Do the first change fully, box the middle value, then apply the second percent to that middle. Up x% then down x% leaves a small loss, not zero. +25% then +20% is 1.25 × 1.20, not +45%.",
       howTo: [
         "Write the starting number N.",
         "Do the first change in full. Box the middle value M.",
         "Do the second change on M, not on N.",
         "Multiply check: N × (1 ± first/100) × (1 ± second/100).",
-        "Compare with the wrong add-the-percents value so you can kill that option.",
+        "Kill the option that just added the two percents.",
       ],
       bullets: [
-        "Second percent uses the new number, never the original.",
+        "Two tags, one after another — do not add the percents.",
+        "The second percent uses the new number, never the original.",
         "Up x% then down x% leaves a small loss, not zero change.",
         "Do not add +25% and +20% into +45%. Multiply 1.25 × 1.20 = 1.50.",
+        "Box the middle value so the second percent has a clear base.",
       ],
       examples: [
         {
@@ -645,19 +653,21 @@ export const notesQuant: TopicNote = {
       ],
     },
     {
-      heading: "Reverse percentage (find original)",
-      body: "If a number after a percent change is given, divide by the multiplier to get back to the original. After a 25% rise the multiplier is 1.25, so original = new ÷ 1.25.\n\nThe exam says ‘after a 20% increase the value is 480 — find the original’ or ‘35% of a number is 140’. The trap is taking 20% of the new value and subtracting. That 20% belonged to the unknown original, not to 480.",
+      heading: "Reverse percentage",
+      body: "The shop shows you the new price and asks what the old price was. Walk backwards. After a 25% rise the tag is 125% of the original, so divide the new price by 1.25. You are not taking 25% of the new price and subtracting — that 25% belonged to the unknown old tag.\n\nOn the exam, original × multiplier = new. A rise of x% uses multiplier (100 + x)/100; a fall uses (100 − x)/100. Divide: original = new ÷ multiplier. If ‘x% of N is K’, then N = K × 100 / x. Check by going forward from your answer.",
       howTo: [
-        "Write the sentence as original × multiplier = new value.",
-        "For a rise of x%, multiplier = (100 + x)/100. For a fall, multiplier = (100 − x)/100.",
+        "Write original × multiplier = new value.",
+        "Rise of x%: multiplier = (100 + x)/100. Fall: multiplier = (100 − x)/100.",
         "Divide: original = new ÷ multiplier. Do the division in full.",
         "If ‘x% of N is K’, then N = K × 100 / x.",
-        "Check by going forward: apply the percent to your original and see if you recover the given new value.",
+        "Check by going forward: apply the percent to your original and recover the given new value.",
       ],
       bullets: [
+        "New price is given — walk backwards.",
         "Original = new ÷ (1 ± r). Never subtract x% of the new value.",
-        "A 25% rise means new is 125% of original, so divide by 1.25 (or × 4/5).",
+        "A 25% rise means new is 125% of original, so divide by 1.25.",
         "‘x% of N is K’ ⇒ N = K × 100 / x.",
+        "The percent belonged to the unknown original, not to the new figure.",
       ],
       examples: [
         {
@@ -803,19 +813,21 @@ export const notesQuant: TopicNote = {
     },
     {
       heading: "Simple interest",
-      body: "Simple interest (SI) is a fixed rupee slice of the starting money (principal P) every year. SI = P × r × t / 100, where r is the percent per year and t is the number of years. Amount = P + SI.\n\nThe exam gives P, r, t and asks for SI, or gives SI and asks for P or r. The trap is using a new total each year (that is compound interest). In SI the 8% is always of the original P, so year 1 and year 2 earn the same rupees.",
+      body: "Simple interest is rent on money, the same rent every year. You lend ₹6,000. Each year the borrower pays 8% of that original ₹6,000 — not of a growing pile. Year 1 and year 2 pay the same rupees. After three years you add that rent three times and give the money back with it.\n\nOn the exam, SI = P × r × t / 100. Amount = P + SI. The percent is always of the original principal P. Do not add last year’s interest onto P before computing this year’s slice — that would be compound interest.",
       howTo: [
         "Write P (start), r (percent per year), t (years).",
         "Compute SI = P × r × t / 100. Multiply P × r × t first, then divide by 100.",
         "Amount, if asked, is P + SI.",
-        "If SI is given and P is unknown, rearrange: P = SI × 100 / (r × t).",
+        "If P is unknown: P = SI × 100 / (r × t).",
         "If r is unknown: r = SI × 100 / (P × t).",
         "Check: one year’s interest is P × r / 100; times t years should equal SI.",
       ],
       bullets: [
-        "SI = P × r × t / 100. Same rupees every year, always on original P.",
-        "Amount = P + SI. Do not call SI the amount.",
-        "This is not compound interest. Do not add interest onto P between years.",
+        "SI = same rent on money every year, always on original P.",
+        "SI = P × r × t / 100. Amount = P + SI.",
+        "Do not call SI the amount.",
+        "This is not compound interest. Do not grow P between years.",
+        "Year 1 and year 2 earn the same rupees.",
       ],
       examples: [
         {
@@ -961,19 +973,21 @@ export const notesQuant: TopicNote = {
       ],
     },
     {
-      heading: "Compound interest (year-by-year table)",
-      body: "Compound interest (CI) adds each year’s interest onto the money before the next year starts. Year 1 uses P. Year 2 uses P plus year-1 interest.\n\nThe exam asks for CI over 2 or 3 years. The trap is using the SI formula P r t / 100, which keeps the same slice every year. Draw a three-row table (start, interest, new total) and you will not mix the two.",
+      heading: "Compound interest",
+      body: "Compound interest lets last year’s rent join the pile. Year 1 is the same as simple interest. Then the interest sits in the bag, so next year the pile is bigger and the same percent earns more rupees. Draw a tiny table: start, this year’s interest, new total.\n\nOn the exam, year-1 interest = P × r / 100. Year-2 interest uses the new total, not the first P. CI is (final total − P), which is a little more than SI for the same P, r, and years. Do not use the SI formula P r t / 100 for a CI question.",
       howTo: [
         "Write P and r. Year-1 interest = P × r / 100. New total = P + that interest.",
         "Year-2 interest = (new total) × r / 100. Add again. Repeat for year 3 if needed.",
         "CI is the sum of the yearly interest rows (or final total − P).",
         "If asked, SI = P × r × t / 100 on the side, so you can see CI is a little larger.",
-        "Check the last addition: each new total must equal the previous total plus that year’s interest.",
+        "Check: each new total must equal the previous total plus that year’s interest.",
       ],
       bullets: [
+        "Interest joins the pile, so next year the pile is bigger.",
         "Each year, interest is of the current total, not of the first P after year 1.",
-        "Write a table: start → interest → new total. Do not jump to a memory formula in this paper.",
+        "Write a table: start → interest → new total.",
         "CI is more than SI because extra interest is earned on earlier interest.",
+        "Do not use SI = P r t / 100 on a CI question.",
       ],
       examples: [
         {
@@ -1123,19 +1137,21 @@ export const notesQuant: TopicNote = {
       ],
     },
     {
-      heading: "Profit and loss (profit% always on CP unless said otherwise)",
-      body: "Cost price (CP) is what you pay. Selling price (SP) is what you sell for. Profit = SP − CP when SP is larger. Profit percent = (profit ÷ CP) × 100. Loss percent uses CP in the same way.\n\nThe exam gives CP and SP, or gives SP and a loss % and asks for CP. The trap is putting profit percent on SP. Unless the question says ‘on SP’, the base is always CP.",
+      heading: "Profit and loss",
+      body: "You buy a pen for ₹720 (cost price) and sell it for ₹864 (selling price). The extra ₹144 is profit. Profit percent is ‘how many rupees of profit out of every 100 rupees you spent’, so it sits on cost price, not on the selling price, unless the question says otherwise.\n\nOn the exam, profit = SP − CP when SP is larger; loss = CP − SP when CP is larger. Profit % = (profit ÷ CP) × 100. If SP and a percent are given, SP is (100 ± percent)/100 of CP, so reverse with division: CP = SP × 100 / (100 ± percent).",
       howTo: [
         "Write CP and SP. Profit = SP − CP. Loss = CP − SP.",
         "Profit % = (profit / CP) × 100. Loss % = (loss / CP) × 100.",
-        "If SP and profit % are given, SP is (100 + profit%) / 100 of CP, so CP = SP × 100 / (100 + profit%).",
-        "If there is a loss of x%, SP is (100 − x)/100 of CP, so CP = SP × 100 / (100 − x).",
+        "If SP and profit % are given, CP = SP × 100 / (100 + profit%).",
+        "If there is a loss of x%, CP = SP × 100 / (100 − x).",
         "Check by putting the percent back on your CP and rebuilding SP.",
       ],
       bullets: [
-        "Profit % and loss % sit on CP, not on SP, unless the question says otherwise.",
-        "SP = CP × (100 ± percent) / 100. Reverse with division, not by subtracting rupees from SP.",
+        "Profit % sits on cost price unless the question says otherwise.",
+        "Profit = SP − CP. Loss = CP − SP.",
+        "SP = CP × (100 ± percent) / 100. Reverse with division.",
         "A 10% loss means SP is 90% of CP, so CP = SP / 0.90.",
+        "Do not put profit percent on SP by habit.",
       ],
       examples: [
         {
@@ -1288,19 +1304,21 @@ export const notesQuant: TopicNote = {
     },
     {
       heading: "Marked price and discount",
-      body: "Marked price (MP) is the tag on the article. Discount is a percent off the tag, not off the cost. Selling price = MP minus the discount, or SP = MP × (100 − d)/100.\n\nThe exam gives MP and a discount, or two discounts in a row, or SP after a discount and asks for MP. The trap is adding two discounts (20% + 15% = 35%). The second discount is of the already-reduced price.",
+      body: "The sticker on the shelf is the marked price. Discount is money off that sticker, not off what the shop paid. A 15% off tag on ₹2,000 takes ₹300 away, so you pay ₹1,700. Two discounts are two stickers, one after another: the second cut uses the already-reduced price.\n\nOn the exam, SP = MP × (100 − d)/100. Discount is always of MP. Two discounts multiply leftovers (20% then 15% is × 0.80 × 0.85), they do not add to 35%. If SP after d% off is given, MP = SP × 100 / (100 − d).",
       howTo: [
         "Write the tag MP and the discount d%.",
         "Discount rupees = d × MP / 100. SP = MP − that.",
         "Or leftover = (100 − d)/100 of MP.",
         "For two discounts, do the first fully, then take the second percent of the new figure.",
-        "If SP and d% are given, SP is (100 − d)% of MP, so MP = SP × 100 / (100 − d).",
+        "If SP and d% are given, MP = SP × 100 / (100 − d).",
         "Check: discount rupees plus SP must equal MP.",
       ],
       bullets: [
-        "Discount is always of marked price, not of cost price.",
+        "Discount is off the sticker (MP), not off cost price.",
+        "SP = MP × (100 − d)/100.",
         "Two discounts multiply leftovers: 20% then 15% is × 0.80 × 0.85, not −35%.",
         "To get MP from SP after d% off, divide SP by (100 − d)/100.",
+        "The second discount uses the already-reduced price.",
       ],
       examples: [
         {
@@ -1447,16 +1465,18 @@ export const notesQuant: TopicNote = {
     },
     {
       heading: "Ratio and proportion",
-      body: "A ratio A : B = 3 : 5 means A/B = 3/5, or A = 3k and B = 5k for the same k. To share a total, add the parts, divide the total by that sum, then multiply back.\n\nThe exam asks you to split a rupee amount, to chain A : B and B : C, or to solve 3 : 5 = x : 35. The trap is using the parts as the answers (giving 3, 4, 5 instead of 210, 280, 350) or chaining two ratios without first making the common letter equal.",
+      body: "A ratio is sharing a pizza in parts. 3 : 4 : 5 means three slices, four slices, five slices — twelve slices in all. If the pizza is ₹840, one slice is 840 ÷ 12 = ₹70, so the three people get 210, 280, and 350. The parts 3, 4, 5 are not the rupee answers.\n\nOn the exam, one part = total ÷ (sum of parts). Each share = its part × one part. To chain A : B and B : C, first make the two B-numbers equal. In a proportion a : b = c : d, cross-multiply: a × d = b × c.",
       howTo: [
         "Write each ratio as parts (for 3 : 4 : 5 the parts are 3, 4 and 5).",
         "Add the parts. One part = total ÷ (sum of parts).",
         "Each share = (its part) × (one part). Check that the shares add to the total.",
-        "To chain A : B and B : C, multiply so the two B-numbers become equal, then write A : B : C.",
-        "For a proportion a : b = c : d, the product a × d equals b × c. Solve for the unknown.",
+        "To chain A : B and B : C, make the two B-numbers equal, then write A : B : C.",
+        "For a : b = c : d, the product a × d equals b × c. Solve for the unknown.",
       ],
       bullets: [
+        "Ratio = sharing a pizza in parts.",
         "One part = total / (sum of parts). Shares are parts times that.",
+        "The parts 3, 4, 5 are not the rupee answers.",
         "Chain ratios only after the common term is the same number in both.",
         "In a : b = c : d, a × d = b × c (cross multiply).",
       ],
@@ -1620,8 +1640,8 @@ export const notesQuant: TopicNote = {
       ],
     },
     {
-      heading: "Time, speed, distance (distance = speed × time)",
-      body: "Distance = speed × time. Then time = distance ÷ speed, and speed = distance ÷ time. Keep the units in one family (km with hours, or metres with seconds).\n\nThe exam gives two of the three and asks for the third, sometimes with 2 hours 40 minutes. The trap is mixing hours and minutes (using 2.40 hours for 2 h 40 min). Forty minutes is 40/60 = 2/3 hour, so 2 h 40 min is 8/3 hours, not 2.40.",
+      heading: "Time, speed, distance",
+      body: "Distance is how far you go, speed is how fast, time is how long. They fit one line: distance = speed × time. If you know any two, you get the third by multiplying or dividing. Keep the units in one family: km with hours, or metres with seconds.\n\nOn the exam, time = distance ÷ speed and speed = distance ÷ time. Forty minutes is 40/60 = 2/3 hour, not 0.40. Never write 2 h 40 min as 2.40 hours. Check by putting your answer back: speed × time must rebuild distance.",
       howTo: [
         "Write the three words: distance, speed, time. Circle the two you are given.",
         "Put time in hours if speed is km/h (or in seconds if speed is m/s).",
@@ -1630,9 +1650,11 @@ export const notesQuant: TopicNote = {
         "Check by putting your answer back: speed × time must rebuild distance.",
       ],
       bullets: [
-        "distance = speed × time. The other two are this formula rearranged.",
+        "Distance = speed × time. The other two are this formula rearranged.",
         "40 minutes = 40/60 = 2/3 hour. Never write 2 h 40 min as 2.40 hours.",
-        "km/h with km and hours. m/s with metres and seconds. Do not mix in one line.",
+        "km/h with km and hours. m/s with metres and seconds.",
+        "Do not mix hours and minutes in one line.",
+        "Check: speed × time must rebuild the given distance.",
       ],
       examples: [
         {
@@ -1776,19 +1798,21 @@ export const notesQuant: TopicNote = {
       ],
     },
     {
-      heading: "Relative speed (trains / same vs opposite)",
-      body: "Relative speed is how fast the gap between two moving things closes. Opposite directions: add the speeds. Same direction: subtract the smaller from the larger. A train passing a pole covers its own length; two trains passing each other cover the sum of lengths.\n\nThe exam gives two train lengths and two speeds. The trap is forgetting to convert km/h to m/s (multiply by 5/18) when length is in metres and time is wanted in seconds. Also: same direction uses subtract, not add.",
+      heading: "Trains and relative speed",
+      body: "Two trains on a track. If they run at each other (opposite ways), the gap closes at the sum of their speeds. If they run the same way, the faster one only gains by the difference of speeds. A train passing a pole covers its own length; two trains passing each other cover both lengths added.\n\nOn the exam, opposite → add speeds; same way → subtract. Convert km/h to m/s by multiplying by 5/18 when length is in metres and time is in seconds. Time = distance ÷ relative speed. Same direction uses subtract, not add.",
       howTo: [
         "Decide: same direction (subtract speeds) or opposite (add speeds).",
         "Convert both speeds to m/s if lengths are in metres: km/h × 5/18 = m/s.",
         "Distance to cover = one length (pole or man) or sum of lengths (platform or second train).",
         "Time in seconds = distance in metres ÷ relative speed in m/s.",
-        "Check the conversion: 18 km/h = 5 m/s, 36 km/h = 10 m/s, 54 km/h = 15 m/s, 72 km/h = 20 m/s, 90 km/h = 25 m/s.",
+        "Check the conversion: 18 km/h = 5 m/s, 36 km/h = 10 m/s, 54 km/h = 15 m/s, 72 km/h = 20 m/s.",
       ],
       bullets: [
         "Opposite → add speeds. Same way → subtract speeds.",
         "Pole or standing man: distance = length of the train. Two trains: add the lengths.",
-        "km/h to m/s: multiply by 5/18. Do this before dividing metres by speed.",
+        "km/h to m/s: multiply by 5/18 before dividing metres by speed.",
+        "Same direction uses subtract, not add.",
+        "Time = distance ÷ relative speed.",
       ],
       examples: [
         {
@@ -1938,8 +1962,8 @@ export const notesQuant: TopicNote = {
       ],
     },
     {
-      heading: "Time and work (LCM method)",
-      body: "If A finishes a job in 12 days, A does 1/12 of the job each day. The LCM method turns that into whole units: take the smallest shared multiple of the days (LCM), call that the job size in units, then each person does (LCM ÷ their days) units per day.\n\nThe exam gives two or three people and their days, or ‘A and B together 8 days, A alone 12, find B’. The trap is adding the days (12 + 18 = 30) instead of adding the work rates. Together they are faster, so the time must be less than 12.",
+      heading: "Time and work",
+      body: "A job is a pile of work units. If A finishes in 12 days and B in 18, take the LCM of 12 and 18, which is 36, and call that the whole pile. Then A does 36 ÷ 12 = 3 units a day and B does 2. Together they do 5 units a day, so the pile takes 36 ÷ 5 days.\n\nOn the exam, LCM of the days = total work units. Daily work = LCM ÷ that person’s days. Add rates when people work together; never add the days. Together-time is less than the fastest person working alone.",
       howTo: [
         "List each person’s days to finish the job alone.",
         "Find the LCM of those days. Call that LCM the total units of work.",
@@ -1949,9 +1973,11 @@ export const notesQuant: TopicNote = {
         "Check: together-days must be smaller than the fastest person working alone.",
       ],
       bullets: [
-        "LCM of the days = size of the job in units. Daily work = LCM ÷ days.",
+        "LCM of the days = total work units. Daily work = LCM ÷ days.",
         "Add rates, never add the days, when people work together.",
         "Together-time is less than any one person’s alone-time.",
+        "If A + B is given and A is given, subtract A’s daily units to find B.",
+        "12 + 18 = 30 days is the trap: that adds days, not rates.",
       ],
       examples: [
         {
@@ -2106,7 +2132,7 @@ export const notesQuant: TopicNote = {
     },
     {
       heading: "Averages",
-      body: "The average of a list is (sum of the numbers) ÷ (how many numbers). If the average and the count are given, sum = average × count.\n\nThe exam gives five numbers, or an average of 6 numbers and then one is removed. The trap is averaging the averages without going back to the sum (for example treating a new average as the old average plus the new number).",
+      body: "Average is the fair share if you pour every number into one jug and split it equally. Add them all (the total), then divide by how many numbers there are (the count). If five scores are 12, 18, 24, 30, 16, the total is 100 and the average is 20.\n\nOn the exam, average = sum ÷ count, and sum = average × count. When a number joins or leaves, change the sum first, then divide by the new count. Do not average two averages unless the groups are the same size.",
       howTo: [
         "Write sum = add every number (or sum = average × count if the average is given).",
         "Count the items. Include the new one, or drop the removed one, in the count.",
@@ -2116,9 +2142,11 @@ export const notesQuant: TopicNote = {
         "Check: average × count must rebuild the sum.",
       ],
       bullets: [
-        "Average = sum ÷ count. Sum = average × count.",
+        "Average = total ÷ count. Sum = average × count.",
         "When a number joins or leaves, change the sum first, then divide by the new count.",
         "Do not add two averages and divide by 2 unless both groups have the same size.",
+        "The trap is averaging averages without going back to the sum.",
+        "Check: average × count must rebuild the sum.",
       ],
       examples: [
         {
@@ -2262,8 +2290,8 @@ export const notesQuant: TopicNote = {
       ],
     },
     {
-      heading: "Probability (favourable / total)",
-      body: "Probability of an event = (number of favourable outcomes) ÷ (number of equally likely outcomes). It is a fraction between 0 and 1, sometimes written as a percent.\n\nThe exam uses a die, a pack of 52 cards, or a bag of coloured balls. The trap is counting the same outcome twice, or using 13 red cards as 13 + 13 because ‘hearts and diamonds’. Red cards are 26, kings are 4.",
+      heading: "Probability",
+      body: "Probability is wanted outcomes over all outcomes. A fair die has six faces. ‘Greater than 4’ wants 5 and 6 — two faces — so the chance is 2/6. A pack has 52 cards; four of them are kings, so a random king is 4/52.\n\nOn the exam, P = favourable ÷ total. Total is the whole sample (6 faces, 52 cards, every ball in the bag). Do not count the same card twice (the king of hearts is one card). Favourable cannot exceed total; the fraction cannot exceed 1.",
       howTo: [
         "Write the total number of equally likely outcomes (faces of a die, cards in the pack, balls in the bag).",
         "Count only the outcomes the question wants. That is the favourable count.",
@@ -2272,9 +2300,11 @@ export const notesQuant: TopicNote = {
         "If two groups overlap (king of hearts is both a king and a heart), do not count that card twice.",
       ],
       bullets: [
-        "P = favourable / total. Total is the whole sample (52 cards, 6 faces, all balls).",
+        "P = wanted outcomes / all outcomes.",
         "A pack has 52 cards, 4 suits of 13, 4 kings, 26 red, 26 black.",
         "A fair die has 6 faces. Even faces are 2, 4, 6 — three of them.",
+        "Red cards are 26, not 13 + 13 counted twice as two colours of red.",
+        "Favourable cannot exceed total.",
       ],
       examples: [
         {
@@ -2420,8 +2450,8 @@ export const notesQuant: TopicNote = {
       ],
     },
     {
-      heading: "Number series (difference / multiply / squares)",
-      body: "A number series asks for the next term. First try the gaps (each term minus the one before). If the gaps themselves form a simple pattern, use that. If the gaps explode, try multiplying by a fixed number, or matching squares and cubes (1, 4, 9, 16 or 8, 27, 64, 125).\n\nThe exam shows five or six numbers and a question mark. The trap is fitting the first two gaps and ignoring the rest. A real pattern must work on every step, not just the opening pair.",
+      heading: "Number series",
+      body: "A series is a line of numbers with a hidden jump. First write the gap under each pair: 10 − 4 = 6, 18 − 10 = 8, and so on. If those gaps themselves rise by 2, the next jump is the next even gap. If the gaps explode, try ‘times 2 each time’, or squares 1, 4, 9, 16, or cubes 8, 27, 64, 125.\n\nOn the exam, the pattern must fit every given step, not only the first gap. Write differences first, then multiply, then squares or cubes. Apply the same jump one more time to fill the question mark.",
       howTo: [
         "Write the series with space under it. Under each pair, write the difference (next − previous).",
         "Look at those differences. Do they rise by a fixed amount? If yes, continue that and add to the last term.",
@@ -2430,9 +2460,11 @@ export const notesQuant: TopicNote = {
         "Check the pattern on every step already given, then apply it once more for the missing term.",
       ],
       bullets: [
-        "First tool: write the differences. Second: multiply. Third: squares or cubes.",
+        "Find the jump: differences first, then multiply, then squares or cubes.",
         "The pattern must fit every given step, not only the first gap.",
         "Common cubes: 8, 27, 64, 125, 216. Common squares: 1, 4, 9, 16, 25, 36, 49.",
+        "If gaps rise by 2, the next jump is the next even gap.",
+        "Apply the same jump once more to fill the question mark.",
       ],
       examples: [
         {
@@ -2581,19 +2613,21 @@ export const notesQuant: TopicNote = {
       ],
     },
     {
-      heading: "Quadratic comparison (sum and product of roots, or sign of f(x))",
-      body: "A quadratic x² − (sum)x + (product) = 0 has two roots that add to the middle number (with the sign flipped) and multiply to the last number. For x² − 5x + 6 = 0 the roots add to 5 and multiply to 6, so they are 2 and 3. To compare x and y, list both pairs and test every pairing.\n\nThe exam gives two equations and asks whether x > y, x < y, x ≥ y, or ‘cannot say’. The trap is comparing only the larger roots, or only the sums. If one pairing is x = y and another is x < y, the safe tick is x ≤ y, not x < y. For sign of f(x), a U-shaped graph (positive x²) is negative between the roots and positive outside.",
+      heading: "Quadratic comparison",
+      body: "A quadratic is two numbers hiding in an equation. For x² − 5x + 6 = 0 those two numbers add to −b/a (here 5) and multiply to c/a (here 6). 2 and 3 work, so the roots are 2 and 3. To compare x and y, list both pairs and test every pairing, like lining up two pairs of friends.\n\nOn the exam, for ax² + bx + c = 0 the roots add to −b/a and multiply to c/a. Compare every pairing of roots, not just the bigger ones. If one pairing is x < y and another is x > y, tick ‘cannot say’. If x² is positive, f(x) is negative between the roots and positive outside.",
       howTo: [
-        "For each equation, find two numbers that add to the sum of roots and multiply to the product.",
-        "Sum of roots for x² − s x + p = 0 is s. Product is p. Factor as (x − a)(x − b).",
+        "For each equation, find two numbers that add to −b/a and multiply to c/a.",
+        "For x² − s x + p = 0 the sum is s and the product is p. Factor as (x − a)(x − b).",
         "Write the two x-values and the two y-values as lists.",
         "Check all four pairings (each x with each y). See which of >, <, ≥, ≤ holds in every pairing.",
         "If two pairings disagree (one x < y and one x > y), the relation cannot be said.",
         "For sign of f(x): factor, mark the roots, then plug the given x and compute f(x) in full.",
       ],
       bullets: [
-        "x² − (sum)x + (product) = 0. Find two numbers with that sum and that product.",
+        "Two numbers that add to −b/a and multiply to c/a.",
+        "x² − (sum)x + (product) = 0. Factor as (x − a)(x − b).",
         "Compare every pairing of roots, not just the bigger ones.",
+        "If pairings disagree, tick ‘cannot say’.",
         "If x² is positive, f(x) is negative between the two roots and positive outside.",
       ],
       examples: [
@@ -2760,8 +2794,8 @@ export const notesQuant: TopicNote = {
       ],
     },
     {
-      heading: "Reading a small DI table",
-      body: "Data interpretation (DI) here is a small table of numbers. You add a column, take a percent of a total, or write a ratio of two cells. Read the row name and the column name before you pick a number.\n\nThe exam puts four or five rows and two years. The trap is using the wrong year, or taking a percent of a row instead of of the column total. Point at the cell with your pen, then add.",
+      heading: "Reading a DI table",
+      body: "A DI table is a small grid of numbers, like a mark sheet. Read one cell at a time: first the row name, then the column name, then the number sitting in that box. Copy that cell onto scratch paper before you add or take a percent. Do not add from memory across the page.\n\nOn the exam, for a total, add every cell in that column (or row). For a percent, name the part and the whole, then (part / whole) × 100. For a ratio, write the two cells as a : b and cancel. Check that you did not mix 2023 with 2024.",
       howTo: [
         "Read the title of each column and each row. Copy the cells you need onto scratch paper.",
         "For a total, add every cell in that column (or row). Add in pairs and write the running sum.",
@@ -2770,9 +2804,11 @@ export const notesQuant: TopicNote = {
         "Check that you did not mix 2023 with 2024, and that the whole really is the total you used.",
       ],
       bullets: [
-        "Copy the cells first. Do not add from memory across the table.",
+        "Read one cell at a time. Copy it first.",
+        "Do not add from memory across the table.",
         "A percent needs a clearly named whole (usually a column total).",
         "Cancel a ratio only after both numbers are the right cells.",
+        "Wrong year is the usual trap.",
       ],
       examples: [
         {
