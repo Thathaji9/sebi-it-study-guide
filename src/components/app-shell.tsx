@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+import { ThemePicker } from "@/components/theme-picker";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -83,9 +84,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               className="size-8 shrink-0"
               aria-hidden="true"
             >
-              <rect width="32" height="32" rx="7" fill="#1F4E5F" />
+              <rect width="32" height="32" rx="7" fill="var(--mark)" />
               <path
-                fill="#F7F4EE"
+                fill="var(--mark-letter)"
                 fillRule="evenodd"
                 d="M16 6.2 25.4 23.2h-2.95l-1.72-4.55H11.27L9.55 23.2H6.6L16 6.2Zm0 5.15-2.72 5.5h5.44L16 11.35Z"
               />
@@ -95,7 +96,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 width="11.6"
                 height="1.45"
                 rx="0.72"
-                fill="#C4A35A"
+                fill="var(--mark-gold)"
               />
             </svg>
             <span className="min-w-0">
@@ -110,15 +111,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="hidden md:block">
             <NavLinks />
           </div>
-          <Button
-            variant="outline"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setOpen(true)}
-            aria-label="Open menu"
-          >
-            <Menu />
-          </Button>
+          <div className="flex items-center gap-2">
+            <ThemePicker />
+            <Button
+              variant="outline"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setOpen(true)}
+              aria-label="Open menu"
+            >
+              <Menu />
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -127,8 +131,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <SheetHeader>
             <SheetTitle>{APP_NAME}</SheetTitle>
           </SheetHeader>
-          <div className="px-4">
+          <div className="space-y-6 px-4">
             <NavLinks stacked onClick={() => setOpen(false)} />
+            <ThemePicker stacked />
           </div>
         </SheetContent>
       </Sheet>

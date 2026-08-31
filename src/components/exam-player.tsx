@@ -341,10 +341,10 @@ function ExamPlayer({
                 className={cn(
                   "grid h-9 place-items-center rounded-md text-xs font-medium",
                   state === "unseen" && "bg-muted text-muted-foreground",
-                  state === "seen" && "bg-red-100 text-red-900",
-                  state === "answered" && "bg-emerald-700 text-white",
-                  state === "marked" && "bg-amber-500 text-white",
-                  i === index && "ring-2 ring-primary ring-offset-1",
+                  state === "seen" && "bg-seen text-seen-foreground",
+                  state === "answered" && "bg-ok text-ok-foreground",
+                  state === "marked" && "bg-warn text-warn-foreground",
+                  i === index && "ring-2 ring-primary ring-offset-1 ring-offset-background",
                 )}
               >
                 {i + 1}
