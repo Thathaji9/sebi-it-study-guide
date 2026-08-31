@@ -20,13 +20,13 @@ export function CodeBlock({
   language?: string;
 }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-white/10 bg-[#1b2733]">
+    <div className="overflow-hidden rounded-lg border border-border bg-code">
       {language ? (
-        <div className="border-b border-white/10 px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide text-white/50">
+        <div className="border-b border-white/10 px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide text-code-muted">
           {language}
         </div>
       ) : null}
-      <pre className="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-[#e7eef5]">
+      <pre className="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-code-foreground">
         <code>{code}</code>
       </pre>
     </div>
@@ -163,7 +163,8 @@ export function PracticeSession({ questions }: { questions: Question[] }) {
                 className={cn(
                   "flex items-start gap-3 rounded-lg border px-3 py-2.5 text-left text-sm transition-colors",
                   !revealed && "hover:border-primary/50 hover:bg-accent",
-                  isAnswer && "border-emerald-700/40 bg-emerald-50",
+                  isAnswer &&
+                    "border-emerald-700/40 bg-ok-muted text-ok-muted-foreground",
                   isWrong && "border-destructive/40 bg-destructive/10",
                   !revealed && isChosen && "border-primary bg-accent",
                 )}

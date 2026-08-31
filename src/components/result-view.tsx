@@ -203,7 +203,8 @@ export function ResultView() {
                     key={opt}
                     className={cn(
                       "rounded-md px-2 py-1",
-                      idx === q.answer && "bg-emerald-50",
+                      idx === q.answer &&
+                        "bg-ok-muted text-ok-muted-foreground",
                       chosen === idx && idx !== q.answer && "bg-destructive/10",
                     )}
                   >

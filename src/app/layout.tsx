@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist_Mono, Source_Sans_3, Source_Serif_4 } from "next/font/google";
 
 import { AppShell } from "@/components/app-shell";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeScript } from "@/components/theme-script";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 import "./globals.css";
@@ -35,12 +37,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${sans.variable} ${heading.variable} ${mono.variable} h-full antialiased`}
     >
+      <head>
+        <ThemeScript />
+      </head>
       <body className="min-h-full flex flex-col font-sans">
-        <TooltipProvider>
-          <AppShell>{children}</AppShell>
-        </TooltipProvider>
+        <ThemeProvider>
+          <TooltipProvider>
+            <AppShell>{children}</AppShell>
+          </TooltipProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
