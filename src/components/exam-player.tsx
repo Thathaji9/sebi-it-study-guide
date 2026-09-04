@@ -14,11 +14,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { topicById } from "@/data/exam";
+import { topicById, mockById } from "@/data/exam";
 import { recordMock } from "@/lib/progress";
-import { buildMockPaper, mockConfig, scoreAttempt } from "@/lib/quiz";
+import { buildMockPaper, scoreAttempt } from "@/lib/quiz";
 import type { ExamKind, Question } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn, formatClock } from "@/lib/utils";
 
 const letters = ["A", "B", "C", "D"] as const;
 
@@ -41,12 +41,6 @@ function persistKey(kind: string) {
   return `grade-a-it-desk-live-${kind}`;
 }
 
-function formatTime(total: number) {
-  const m = Math.floor(total / 60);
-  const s = total % 60;
-  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-}
-
 export function MockRunner({
   paperId,
   fresh,
@@ -54,7 +48,7 @@ export function MockRunner({
   paperId: string;
   fresh?: boolean;
 }) {
-  const config = mockConfig(paperId);
+  const config = mockById(paperId);
   const [live, setLive] = useState<LiveExam | null>(null);
 
   useEffect(() => {
@@ -243,7 +237,7 @@ function ExamPlayer({
                 : "bg-muted",
             )}
           >
-            {formatTime(live.remaining)}
+            {formatClock(live.remaining)}
           </div>
         </div>
 

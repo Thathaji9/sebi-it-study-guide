@@ -14,9 +14,10 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { descriptiveBySet } from "@/data/descriptive";
+import { mockById } from "@/data/exam";
 import { recordMock } from "@/lib/progress";
-import { mockConfig, scoreAttempt } from "@/lib/quiz";
-import { cn } from "@/lib/utils";
+import { scoreAttempt } from "@/lib/quiz";
+import { cn, wordCount, formatClock } from "@/lib/utils";
 
 const letters = ["A", "B", "C", "D"] as const;
 
@@ -37,17 +38,6 @@ function persistKey(id: string) {
   return `grade-a-it-desk-live-${id}`;
 }
 
-function formatTime(total: number) {
-  const m = Math.floor(total / 60);
-  const s = total % 60;
-  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-}
-
-function wordCount(text: string) {
-  const t = text.trim();
-  return t ? t.split(/\s+/).length : 0;
-}
-
 export function DescriptiveRunner({
   paperId,
   fresh,
@@ -55,7 +45,7 @@ export function DescriptiveRunner({
   paperId: string;
   fresh?: boolean;
 }) {
-  const config = mockConfig(paperId);
+  const config = mockById(paperId);
   const paper = config ? descriptiveBySet(config.set) : undefined;
   const [live, setLive] = useState<LiveWriting | null>(null);
 
@@ -230,7 +220,7 @@ function DescriptivePlayer({
               : "bg-muted",
           )}
         >
-          {formatTime(live.remaining)}
+          {formatClock(live.remaining)}
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import type { ExamKind, MockResult, ProgressState } from "@/lib/types";
+import type { MockResult, ProgressState } from "@/lib/types";
 
 const KEY = "grade-a-it-desk-progress-v1";
 
@@ -6,7 +6,6 @@ const empty = (): ProgressState => ({
   attempts: {},
   bookmarks: [],
   mocks: [],
-  notesRead: [],
 });
 
 export function loadProgress(): ProgressState {
@@ -19,14 +18,13 @@ export function loadProgress(): ProgressState {
       attempts: parsed.attempts ?? {},
       bookmarks: parsed.bookmarks ?? [],
       mocks: parsed.mocks ?? [],
-      notesRead: parsed.notesRead ?? [],
     };
   } catch {
     return empty();
   }
 }
 
-export function saveProgress(state: ProgressState) {
+function saveProgress(state: ProgressState) {
   localStorage.setItem(KEY, JSON.stringify(state));
 }
 
@@ -59,15 +57,6 @@ export function recordMock(result: MockResult) {
   return state;
 }
 
-export function markNoteRead(topic: string) {
-  const state = loadProgress();
-  if (!state.notesRead.includes(topic)) {
-    state.notesRead = [...state.notesRead, topic];
-    saveProgress(state);
-  }
-  return state;
-}
-
 export function resetProgress() {
   const state = empty();
   saveProgress(state);
@@ -78,8 +67,4 @@ export function wrongQuestionIds(state: ProgressState): string[] {
   return Object.entries(state.attempts)
     .filter(([, v]) => !v.correct)
     .map(([id]) => id);
-}
-
-export function latestMock(kind: ExamKind, state: ProgressState) {
-  return state.mocks.find((m) => m.kind === kind);
 }

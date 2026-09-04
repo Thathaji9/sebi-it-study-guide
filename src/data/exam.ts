@@ -280,9 +280,9 @@ export const strategy = [
   },
 ];
 
-export const MOCKS_PER_PAPER = 6;
+const MOCKS_PER_PAPER = 6;
 /** Phase II Paper 1 has a larger timed bank than the MCQ papers. */
-export const DESCRIPTIVE_MOCKS = 12;
+const DESCRIPTIVE_MOCKS = 12;
 
 export const mockFamilies = [
   {

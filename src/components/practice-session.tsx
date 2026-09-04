@@ -110,10 +110,7 @@ export function PracticeSession({ questions }: { questions: Question[] }) {
     setPass((n) => n + 1);
   };
 
-  const remaining = useMemo(
-    () => queue.length - index - (revealed ? 0 : 0),
-    [queue.length, index, revealed],
-  );
+  const remaining = queue.length - index;
 
   if (queue.length === 0) {
     return (

@@ -14,16 +14,13 @@ import {
   persistTheme,
   prefersDark,
   readStoredTheme,
-  resolvePalette,
   subscribeDarkPref,
   subscribeTheme,
-  type PaletteId,
   type ThemeId,
 } from "@/lib/theme";
 
 type ThemeContextValue = {
   theme: ThemeId;
-  palette: PaletteId;
   setTheme: (theme: ThemeId) => void;
 };
 
@@ -52,10 +49,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo(
     () => ({
       theme,
-      palette: resolvePalette(theme, darkPref),
       setTheme,
     }),
-    [theme, darkPref, setTheme],
+    [theme, setTheme],
   );
 
   return (

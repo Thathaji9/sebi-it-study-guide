@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import {
   allInterviewItems,
   categoryLabel,
+  itemsForCategory,
   type InterviewCategory,
 } from "@/data/interview";
 
@@ -30,10 +31,7 @@ export function InterviewBank({
 }) {
   const [cat, setCat] = useState<InterviewCategory | "all">(initialCategory);
   const items = useMemo(
-    () =>
-      cat === "all"
-        ? allInterviewItems
-        : allInterviewItems.filter((item) => item.category === cat),
+    () => (cat === "all" ? allInterviewItems : itemsForCategory(cat)),
     [cat],
   );
 
@@ -51,7 +49,7 @@ export function InterviewBank({
             <Badge variant="secondary" className="ml-2">
               {c === "all"
                 ? allInterviewItems.length
-                : allInterviewItems.filter((item) => item.category === c).length}
+                : itemsForCategory(c).length}
             </Badge>
           </Button>
         ))}

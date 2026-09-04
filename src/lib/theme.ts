@@ -1,6 +1,6 @@
-export const THEME_STORAGE_KEY = "grade-a-it-desk-theme-v1";
+const THEME_STORAGE_KEY = "grade-a-it-desk-theme-v1";
 
-export const themeIds = ["desk", "paper", "night", "system"] as const;
+const themeIds = ["desk", "paper", "night", "system"] as const;
 
 export type ThemeId = (typeof themeIds)[number];
 export type PaletteId = "desk" | "paper" | "night";

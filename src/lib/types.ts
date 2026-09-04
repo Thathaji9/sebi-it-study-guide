@@ -93,5 +93,4 @@ export type ProgressState = {
   attempts: Record<string, { correct: boolean; at: number }>;
   bookmarks: string[];
   mocks: MockResult[];
-  notesRead: string[];
 };
