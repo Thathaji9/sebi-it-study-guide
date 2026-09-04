@@ -49,7 +49,7 @@ export const interviewPlaybook = [
   },
 ];
 
-export const interviewItems: InterviewItem[] = [
+const interviewItems: InterviewItem[] = [
   // —— Mock panel 1: technical-heavy ——
   {
     id: "iv-1-01",

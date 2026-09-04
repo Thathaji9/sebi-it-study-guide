@@ -19,14 +19,9 @@ import {
   type RcDrill,
 } from "@/data/descriptive-practice";
 import { recordAttempt } from "@/lib/progress";
-import { cn } from "@/lib/utils";
+import { cn, wordCount } from "@/lib/utils";
 
 const letters = ["A", "B", "C", "D"] as const;
-
-function wordCount(text: string) {
-  const t = text.trim();
-  return t ? t.split(/\s+/).length : 0;
-}
 
 export function DescriptivePracticeDesk({
   defaultTab = "essay",

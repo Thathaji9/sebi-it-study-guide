@@ -1,7 +1,6 @@
 import { descriptiveBySet } from "@/data/descriptive";
 import { allQuestions, questionsByTopic } from "@/data/questions";
-import { mockById, mocks } from "@/data/exam";
-import type { ExamKind, MockPaper, Question, TopicId } from "@/lib/types";
+import type { MockPaper, Question, TopicId } from "@/lib/types";
 
 function mulberry32(seed: number) {
   return function rng() {
@@ -127,18 +126,6 @@ export function buildMockPaper(paper: MockPaper): Question[] {
     picked.push(...extras.slice(0, paper.questions - picked.length));
   }
   return shuffle(picked.slice(0, paper.questions), rng);
-}
-
-/** @deprecated Prefer buildMockPaper; kept for callers that only have a kind. */
-export function buildMock(kind: ExamKind, seed = Date.now()): Question[] {
-  const paper = mocks.find((m) => m.kind === kind);
-  if (!paper) return [];
-  if (kind === "topic" || kind === "revise-wrong") return [];
-  return buildMockPaper({ ...paper, set: (seed % 6) + 1 });
-}
-
-export function mockConfig(id: string) {
-  return mockById(id);
 }
 
 export function scoreAttempt(
