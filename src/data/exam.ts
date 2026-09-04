@@ -394,10 +394,10 @@ const pyqYears: {
   kind: keyof typeof pyqKindMeta;
   years: number[];
 }[] = [
-  { kind: "phase1-paper1", years: [2020, 2022, 2024, 2025] },
-  { kind: "phase1-paper2", years: [2020, 2022, 2024, 2025] },
+  { kind: "phase1-paper1", years: [2018, 2020, 2022, 2024, 2025] },
+  { kind: "phase1-paper2", years: [2018, 2020, 2022, 2024, 2025] },
   { kind: "phase2-paper1", years: [2024, 2026] },
-  { kind: "phase2-paper2", years: [2022, 2024, 2025, 2026] },
+  { kind: "phase2-paper2", years: [2018, 2022, 2024, 2025, 2026] },
 ];
 
 export const pyqPapers = pyqYears.flatMap(({ kind, years }) =>

@@ -43,9 +43,10 @@ export default function PracticeIndexPage() {
       <header>
         <h1 className="font-heading text-3xl">Topic practice</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Immediate feedback and explanations. Start with programming — it is
-          30% of Phase I Paper 2 — then SQL, networks, and security. Phase II
-          topics train dry-runs.
+          Immediate feedback and explanations. Each topic bank aims at 200
+          original mock MCQs plus memory-based PYQ reconstructions. Start with
+          programming (30% of Phase I Paper 2), then SQL, networks, and
+          security. Phase II topics train dry-runs.
         </p>
         <p className="mt-3 text-sm">
           <Link href="/revise" className="text-primary underline-offset-2 hover:underline">

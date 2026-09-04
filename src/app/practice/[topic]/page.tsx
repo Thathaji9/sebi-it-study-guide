@@ -8,6 +8,17 @@ import { noteFor } from "@/data/notes";
 import { questionsByTopic } from "@/lib/quiz";
 import type { TopicId } from "@/lib/types";
 
+function shuffle<T>(items: T[], seed: number): T[] {
+  const a = [...items];
+  let t = seed;
+  for (let i = a.length - 1; i > 0; i--) {
+    t = (t + 0x6d2b79f5) >>> 0;
+    const j = t % (i + 1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 export default async function PracticeTopicPage({
   params,
 }: {
@@ -16,7 +27,10 @@ export default async function PracticeTopicPage({
   const { topic } = await params;
   const meta = topicById[topic as TopicId];
   if (!meta) notFound();
-  const questions = questionsByTopic(topic as TopicId);
+  const questions = shuffle(
+    questionsByTopic(topic as TopicId),
+    Date.now() % 1_000_003,
+  );
   const note = noteFor(topic as TopicId);
 
   return (
