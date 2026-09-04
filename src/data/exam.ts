@@ -281,6 +281,8 @@ export const strategy = [
 ];
 
 export const MOCKS_PER_PAPER = 6;
+/** Phase II Paper 1 has a larger timed bank than the MCQ papers. */
+export const DESCRIPTIVE_MOCKS = 12;
 
 export const mockFamilies = [
   {
@@ -309,7 +311,7 @@ export const mockFamilies = [
     kind: "phase2-paper1" as const,
     familyTitle: "Phase II · Paper 1 (descriptive English)",
     familyBlurb:
-      "Official pattern: Essay 30 + Precis 30 + Comprehension 40 · 60 minutes · 30% cut-off. Six papers. Type essay and precis; RC is auto-marked MCQ.",
+      "Official pattern: Essay 30 + Precis 30 + Comprehension 40 · 60 minutes · 30% cut-off. Twelve timed papers. Type essay and precis; RC is auto-marked MCQ. Untimed essay, precis, and RC drills live under Practice.",
     questions: 5,
     minutes: 60,
     marksEach: 8,
@@ -329,8 +331,10 @@ export const mockFamilies = [
   },
 ];
 
-export const mocks = mockFamilies.flatMap((family) =>
-  Array.from({ length: MOCKS_PER_PAPER }, (_, i) => {
+export const mocks = mockFamilies.flatMap((family) => {
+  const count =
+    family.kind === "phase2-paper1" ? DESCRIPTIVE_MOCKS : MOCKS_PER_PAPER;
+  return Array.from({ length: count }, (_, i) => {
     const set = i + 1;
     return {
       id: `${family.kind}-m${set}`,
@@ -345,8 +349,8 @@ export const mocks = mockFamilies.flatMap((family) =>
       cutoffPercent: family.cutoffPercent,
       mode: family.mode,
     };
-  }),
-);
+  });
+});
 
 const PYQ_NOTE =
   "Memory-based reconstruction. SEBI does not publish official papers. Original items in the style of reported PYQ topics — not a verbatim coaching PDF.";
@@ -394,10 +398,10 @@ const pyqYears: {
   kind: keyof typeof pyqKindMeta;
   years: number[];
 }[] = [
-  { kind: "phase1-paper1", years: [2020, 2022, 2024, 2025] },
-  { kind: "phase1-paper2", years: [2020, 2022, 2024, 2025] },
+  { kind: "phase1-paper1", years: [2018, 2020, 2022, 2024, 2025] },
+  { kind: "phase1-paper2", years: [2018, 2020, 2022, 2024, 2025] },
   { kind: "phase2-paper1", years: [2024, 2026] },
-  { kind: "phase2-paper2", years: [2022, 2024, 2025, 2026] },
+  { kind: "phase2-paper2", years: [2018, 2022, 2024, 2025, 2026] },
 ];
 
 export const pyqPapers = pyqYears.flatMap(({ kind, years }) =>

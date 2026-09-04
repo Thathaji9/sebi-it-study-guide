@@ -12,6 +12,27 @@ import { cn } from "@/lib/utils";
 
 const letters = ["A", "B", "C", "D"] as const;
 
+function shuffle<T>(items: T[], seed: number): T[] {
+  const a = [...items];
+  let t = seed;
+  for (let i = a.length - 1; i > 0; i--) {
+    t = (t + 0x6d2b79f5) >>> 0;
+    const j = t % (i + 1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function seedFromIds(ids: string[], pass: number): number {
+  let t = (pass + 1) * 0x9e3779b9;
+  for (const id of ids) {
+    for (let i = 0; i < id.length; i++) {
+      t = (t + id.charCodeAt(i) * (i + 1)) >>> 0;
+    }
+  }
+  return t;
+}
+
 export function CodeBlock({
   code,
   language,
@@ -41,8 +62,14 @@ export function PracticeSession({ questions }: { questions: Question[] }) {
   const [correctCount, setCorrectCount] = useState(0);
   const [attempted, setAttempted] = useState(0);
   const [done, setDone] = useState(false);
+  const [pass, setPass] = useState(0);
 
-  const q = questions[index];
+  const queue = useMemo(
+    () => shuffle(questions, seedFromIds(questions.map((item) => item.id), pass)),
+    [questions, pass],
+  );
+
+  const q = queue[index];
   const topic = q ? topicById[q.topic] : undefined;
 
   const accuracy = attempted === 0 ? 0 : Math.round((correctCount / attempted) * 100);
@@ -58,7 +85,7 @@ export function PracticeSession({ questions }: { questions: Question[] }) {
   };
 
   const next = () => {
-    if (index + 1 >= questions.length) {
+    if (index + 1 >= queue.length) {
       setDone(true);
       return;
     }
@@ -80,14 +107,15 @@ export function PracticeSession({ questions }: { questions: Question[] }) {
     setCorrectCount(0);
     setAttempted(0);
     setDone(false);
+    setPass((n) => n + 1);
   };
 
   const remaining = useMemo(
-    () => questions.length - index - (revealed ? 0 : 0),
-    [questions.length, index, revealed],
+    () => queue.length - index - (revealed ? 0 : 0),
+    [queue.length, index, revealed],
   );
 
-  if (questions.length === 0) {
+  if (queue.length === 0) {
     return (
       <p className="text-muted-foreground">No questions in this topic yet.</p>
     );
@@ -113,7 +141,7 @@ export function PracticeSession({ questions }: { questions: Question[] }) {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2 text-sm">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary">
-            {index + 1} / {questions.length}
+            {index + 1} / {queue.length}
           </Badge>
           {topic ? <Badge variant="outline">{topic.name}</Badge> : null}
           <Badge variant="outline" className="capitalize">
@@ -185,7 +213,7 @@ export function PracticeSession({ questions }: { questions: Question[] }) {
             </p>
             <p className="mt-1 text-muted-foreground">{q.explanation}</p>
             <Button className="mt-4" onClick={next}>
-              {index + 1 >= questions.length ? "Finish" : "Next question"}
+              {index + 1 >= queue.length ? "Finish" : "Next question"}
             </Button>
           </div>
         ) : (

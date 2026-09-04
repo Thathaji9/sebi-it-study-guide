@@ -57,12 +57,15 @@ export default function PatternPage() {
         </p>
         <p className="mt-2 text-muted-foreground">
           Phase II Paper 1 (descriptive English) is Essay 30 + Precis 30 +
-          Comprehension 40. Sit it under a 60-minute clock on the Mocks desk —
-          essay and precis are typed and keyed for self-check; RC is auto-marked.
-          Memory-based PYQ themes (2024, 2026) sit in the same list as the six
-          mocks.
+          Comprehension 40. Drill essay, precis, and RC untimed under Practice,
+          then sit a 60-minute paper on the Mocks desk — essay and precis are
+          typed and keyed for self-check; RC is auto-marked. Memory-based PYQ
+          themes (2024, 2026) sit in the same list as the twelve mocks.
         </p>
         <p className="mt-4 flex flex-wrap gap-4">
+          <Link href="/practice/descriptive" className="text-primary underline-offset-2 hover:underline">
+            Descriptive English drill →
+          </Link>
           <Link href="/mock" className="text-primary underline-offset-2 hover:underline">
             Sit a timed mock or PYQ →
           </Link>

@@ -1,0 +1,16 @@
+export { bankAlgorithms } from "@/data/banks/algorithms";
+export { bankDatabase } from "@/data/banks/database";
+export { bankDs } from "@/data/banks/ds";
+export { bankEnglish } from "@/data/banks/english";
+export { bankGa } from "@/data/banks/ga";
+export { bankNetworking } from "@/data/banks/networking";
+export { bankOops } from "@/data/banks/oops";
+export { bankProgramming } from "@/data/banks/programming";
+export { bankPython } from "@/data/banks/python";
+export { bankQuant } from "@/data/banks/quant";
+export { bankReasoning } from "@/data/banks/reasoning";
+export { bankSecurity } from "@/data/banks/security";
+export { bankShell } from "@/data/banks/shell";
+export { bankSql } from "@/data/banks/sql";
+export { bankStrings } from "@/data/banks/strings";
+export { bankWarehouse } from "@/data/banks/warehouse";
