@@ -1,3 +1,8 @@
+import {
+  extraInterviewItems,
+  extraInterviewSets,
+} from "@/data/interview-extra";
+
 export type InterviewCategory =
   | "technical"
   | "sebi"
@@ -6,7 +11,7 @@ export type InterviewCategory =
 
 export type InterviewItem = {
   id: string;
-  set: 1 | 2 | 3;
+  set: number;
   category: InterviewCategory;
   question: string;
   talkingPoints: string[];
@@ -482,29 +487,40 @@ export const interviewItems: InterviewItem[] = [
   },
 ];
 
-export const interviewSets = [
+const coreInterviewSets = [
   {
-    id: 1 as const,
+    id: 1,
     title: "Mock panel 1 — Technical deep-dive",
     blurb:
       "Surveillance DS, serializability, TCP congestion, secrets, T+1, PIT/PFUTP, vendor access.",
   },
   {
-    id: 2 as const,
+    id: 2,
     title: "Mock panel 2 — Markets, filings, systems",
     blurb:
       "SEBI vs RBI vs depositories, SCORES, HA filings, CIA, SQL NULL trap, UCC, cloud.",
   },
   {
-    id: 3 as const,
+    id: 3,
     title: "Mock panel 3 — Coding logic, cyber, integrity",
     blurb:
       "Trees, Java locks, C++ destructors, Python defaults, KMP, spoofing evidence, UPSI.",
   },
 ];
 
-export function itemsForSet(set: 1 | 2 | 3) {
-  return interviewItems.filter((item) => item.set === set);
+export const interviewSets = [...coreInterviewSets, ...extraInterviewSets];
+
+export const allInterviewItems: InterviewItem[] = [
+  ...interviewItems,
+  ...extraInterviewItems,
+];
+
+export function itemsForSet(set: number) {
+  return allInterviewItems.filter((item) => item.set === set);
+}
+
+export function itemsForCategory(category: InterviewCategory) {
+  return allInterviewItems.filter((item) => item.category === category);
 }
 
 export const categoryLabel: Record<InterviewCategory, string> = {

@@ -17,6 +17,7 @@ import {
   bankWarehouse,
 } from "@/data/banks";
 import { descriptiveRcQuestions } from "@/data/descriptive";
+import { descriptivePracticeRcQuestions } from "@/data/descriptive-practice";
 import { paper1Hard } from "@/data/questions-paper1-hard";
 import { paper1Questions } from "@/data/questions-paper1";
 import { phase1HardDbSql, phase1HardRest } from "@/data/questions-phase1-hard";
@@ -91,5 +92,8 @@ export function questionsByTopic(topic: TopicId): Question[] {
 }
 
 export function questionById(id: string): Question | undefined {
-  return allQuestions.find((q) => q.id === id);
+  return (
+    allQuestions.find((q) => q.id === id) ??
+    descriptivePracticeRcQuestions.find((q) => q.id === id)
+  );
 }

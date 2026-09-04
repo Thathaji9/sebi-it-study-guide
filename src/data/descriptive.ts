@@ -1,5 +1,6 @@
-import { makeQuestion } from "@/data/make-question";
+import { descriptiveExtraPapers } from "@/data/descriptive-extra";
 import { descriptivePyqPapers } from "@/data/descriptive-pyq";
+import { makeQuestion } from "@/data/make-question";
 import type { Question } from "@/lib/types";
 
 const rc = makeQuestion(2, 1);
@@ -38,7 +39,7 @@ function rcq(
   );
 }
 
-export const descriptivePapers: DescriptivePaper[] = [
+const descriptiveCore: DescriptivePaper[] = [
   {
     set: 1,
     essayWordLimit: 250,
@@ -633,6 +634,11 @@ IT officers who treat golden-record work as janitorial will spend their careers 
       ),
     ],
   },
+];
+
+export const descriptivePapers: DescriptivePaper[] = [
+  ...descriptiveCore,
+  ...descriptiveExtraPapers,
 ];
 
 export function descriptiveBySet(set: number) {

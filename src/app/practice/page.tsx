@@ -43,9 +43,9 @@ export default function PracticeIndexPage() {
       <header>
         <h1 className="font-heading text-3xl">Topic practice</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Immediate feedback and explanations. Each topic bank aims at 200
-          original mock MCQs plus memory-based PYQ reconstructions. Start with
-          programming (30% of Phase I Paper 2), then SQL, networks, and
+          Immediate feedback and explanations. Each MCQ topic bank aims at 200
+          original mock questions plus memory-based PYQ reconstructions. Start
+          with programming (30% of Phase I Paper 2), then SQL, networks, and
           security. Phase II topics train dry-runs.
         </p>
         <p className="mt-3 text-sm">
@@ -54,6 +54,35 @@ export default function PracticeIndexPage() {
           </Link>
         </p>
       </header>
+
+      <section className="grid gap-3 md:grid-cols-2">
+        <Link
+          href="/practice/descriptive"
+          className="rounded-xl border bg-card p-4 hover:border-primary/40"
+        >
+          <p className="font-heading text-lg">Phase II Paper 1 · Descriptive</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Untimed essay prompts, precis passages, and ~200 RC MCQs. Not a
+            200-item MCQ topic — sit the clock on Mocks.
+          </p>
+          <p className="mt-3 text-sm font-medium text-primary">
+            Open descriptive drill →
+          </p>
+        </Link>
+        <Link
+          href="/interview"
+          className="rounded-xl border bg-card p-4 hover:border-primary/40"
+        >
+          <p className="font-heading text-lg">Phase III · Interview</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Ten mock panels plus a talking-point bank across technical,
+            SEBI/markets, HR, and situational prompts.
+          </p>
+          <p className="mt-3 text-sm font-medium text-primary">
+            Open interview desk →
+          </p>
+        </Link>
+      </section>
 
       <TopicGrid
         title="Phase I Paper 2"

@@ -9,10 +9,11 @@ export default function MockIndexPage() {
       <header>
         <h1 className="font-heading text-3xl">Timed mocks &amp; PYQs</h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Six distinct mocks for every official written paper, plus memory-based
+          Six distinct MCQ mocks for Papers that are multiple-choice, twelve
+          timed descriptive papers for Phase II Paper 1, plus memory-based
           previous-year reconstructions and interview panels. IT MCQs are SEBI
-          Grade A or a notch harder. Descriptive English is a 60-minute typing
-          paper (essay, precis, RC).
+          Grade A or a notch harder. Untimed essay, precis, and RC drills live
+          under Practice.
         </p>
       </header>
 
@@ -141,7 +142,7 @@ export default function MockIndexPage() {
       <section className="rounded-xl border bg-card p-5">
         <h2 className="font-heading text-2xl">Phase III · Interview</h2>
         <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-          15% of final merit. Three mock panels plus a browsable bank of
+          15% of final merit. Ten mock panels plus a browsable bank of
           technical, SEBI-market, HR, and situational prompts with talking
           points — not a timed MCQ paper.
         </p>

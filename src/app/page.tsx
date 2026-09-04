@@ -21,8 +21,9 @@ export default function HomePage() {
             </h1>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
               A working desk for the IT stream: official-weightage syllabus,
-              high-yield notes, topic MCQs, six timed mocks per stage, memory-based
-              PYQs, and interview panels. Progress stays in this browser.
+              high-yield notes, topic MCQs, timed mocks, descriptive English
+              drills, memory-based PYQs, and interview talking points. Progress
+              stays in this browser.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
               <Button asChild>
@@ -33,6 +34,9 @@ export default function HomePage() {
               </Button>
               <Button variant="outline" asChild>
                 <Link href="/practice/programming">Drill programming (30%)</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/practice/descriptive">Descriptive English</Link>
               </Button>
               <Button variant="outline" asChild>
                 <Link href="/interview">Interview panels</Link>
@@ -74,10 +78,9 @@ export default function HomePage() {
             >
               <p className="font-heading text-lg">{f.familyTitle}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                6 distinct mocks ·{" "}
                 {"mode" in f && f.mode === "descriptive"
-                  ? "essay, precis, RC"
-                  : `${f.questions} questions`}{" "}
+                  ? "12 timed papers · essay, precis, RC"
+                  : `6 distinct mocks · ${f.questions} questions`}{" "}
                 · {f.minutes} min
               </p>
               <p className="mt-3 text-sm font-medium text-primary">
