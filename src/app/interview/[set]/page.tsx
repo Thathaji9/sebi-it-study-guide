@@ -12,7 +12,7 @@ export default async function InterviewPanelPage({
 }) {
   const { set } = await params;
   const n = Number(set);
-  if (n !== 1 && n !== 2 && n !== 3) notFound();
+  if (!Number.isInteger(n) || n < 1) notFound();
   const meta = interviewSets.find((s) => s.id === n);
   const items = itemsForSet(n);
   if (!meta || items.length === 0) notFound();

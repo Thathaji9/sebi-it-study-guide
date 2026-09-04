@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import {
+  allInterviewItems,
   interviewPattern,
   interviewPlaybook,
   interviewSets,
@@ -43,13 +44,26 @@ export default function InterviewIndexPage() {
         </div>
       </section>
 
+      <section className="rounded-xl border bg-card p-5">
+        <h2 className="font-heading text-2xl">Talking-point bank</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {allInterviewItems.length} prompts you can filter by technical,
+          SEBI/markets, HR, or situational — not a timed MCQ paper.
+        </p>
+        <Button className="mt-4" asChild>
+          <Link href="/interview/bank">Browse all talking points</Link>
+        </Button>
+      </section>
+
       <section>
-        <h2 className="font-heading text-2xl">Three mock panels</h2>
+        <h2 className="font-heading text-2xl">
+          {interviewSets.length} mock panels
+        </h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Twelve prompts each. Speak the answer, then open the talking points.
           Difficulty is meant to sit at or above a typical SEBI Grade A IT viva.
         </p>
-        <div className="mt-4 grid gap-3 md:grid-cols-3">
+        <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {interviewSets.map((s) => (
             <article
               key={s.id}

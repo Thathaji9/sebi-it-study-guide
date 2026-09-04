@@ -1,7 +1,5 @@
 import type { InterviewItem } from "@/data/interview";
 
-type ExtraInterviewItem = Omit<InterviewItem, "set"> & { set: number };
-
 export const extraInterviewSets: {
   id: number;
   title: string;
@@ -51,7 +49,7 @@ export const extraInterviewSets: {
   },
 ];
 
-export const extraInterviewItems: ExtraInterviewItem[] = [
+export const extraInterviewItems: InterviewItem[] = [
   // —— Mock panel 4: DBMS and filings ——
   {
     id: "iv-4-01",
