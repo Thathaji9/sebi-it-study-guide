@@ -13,7 +13,7 @@ export const bankPython = [
       "IBES",
     ],
     1,
-    "Python slices are [start:stop) and 0-based. s[1:3] on 'SEBI' is 'EB'.",
+    "Write the string with both index systems:\n\nletter    S  E  B  I\n+index    0  1  2  3\n-index   -4 -3 -2 -1\n\ns[1:3] is a slice: [start:stop:step]. The stop index is exclusive.\n- start: 1 → letter 'E'\n- stop: 3 → stop BEFORE 'I' (exclusive)\n- step: omitted → +1 (walk left to right)\n\nLetters taken: E → B → 'EB'.\n\nWhy nearby options are usually wrong:\n- 'SEBI' is the whole string (s[:] or s[0:]).\n- 'IBES' is the reverse (s[::-1]).\n- 'SE' is the first two letters (s[:2]).",
     { code: "s = 'SEBI'\nprint(s[1:3])", language: "python" },
   ),
   p1p2(
@@ -28,7 +28,7 @@ export const bankPython = [
       "BI",
     ],
     0,
-    "Python slices are [start:stop) and 0-based. s[:2] on 'SEBI' is 'SE'.",
+    "Write the string with both index systems:\n\nletter    S  E  B  I\n+index    0  1  2  3\n-index   -4 -3 -2 -1\n\ns[:2] is a slice: [start:stop:step]. The stop index is exclusive.\n- start: omitted → start of the string\n- stop: 2 → stop BEFORE 'B' (exclusive)\n- step: omitted → +1 (walk left to right)\n\nLetters taken: S → E → 'SE'.\n\nWhy nearby options are usually wrong:\n- 'SEBI' is the whole string (s[:] or s[0:]).\n- 'IBES' is the reverse (s[::-1]).\n- 'BI' is the last two letters (s[-2:]).",
     { code: "s = 'SEBI'\nprint(s[:2])", language: "python" },
   ),
   p1p2(
@@ -43,7 +43,7 @@ export const bankPython = [
       "IBES",
     ],
     1,
-    "Python slices are [start:stop) and 0-based. s[2:] on 'SEBI' is 'BI'.",
+    "Write the string with both index systems:\n\nletter    S  E  B  I\n+index    0  1  2  3\n-index   -4 -3 -2 -1\n\ns[2:] is a slice: [start:stop:step]. The stop index is exclusive.\n- start: 2 → letter 'B'\n- stop: omitted → run through the last character\n- step: omitted → +1 (walk left to right)\n\nLetters taken: B → I → 'BI'.\n\nWhy nearby options are usually wrong:\n- 'SEBI' is the whole string (s[:] or s[0:]).\n- 'IBES' is the reverse (s[::-1]).\n- 'SE' is the first two letters (s[:2]).",
     { code: "s = 'SEBI'\nprint(s[2:])", language: "python" },
   ),
   p1p2(
@@ -58,7 +58,7 @@ export const bankPython = [
       "I",
     ],
     3,
-    "Python slices are [start:stop) and 0-based. s[-1] on 'SEBI' is 'I'.",
+    "Write the string with both index systems:\n\nletter    S  E  B  I\n+index    0  1  2  3\n-index   -4 -3 -2 -1\n\ns[-1] is one character, not a slice. Index -1 is letter 'I'.\nThat letter is 'I'.\n\nWhy nearby options are usually wrong:\n- 'SEBI' is the whole string (s[:] or s[0:]).\n- 'IBES' is the reverse (s[::-1]).\n- 'SE' is the first two letters (s[:2]).",
     { code: "s = 'SEBI'\nprint(s[-1])", language: "python" },
   ),
   p1p2(
@@ -73,7 +73,7 @@ export const bankPython = [
       "IBES",
     ],
     1,
-    "Python slices are [start:stop) and 0-based. s[-2:] on 'SEBI' is 'BI'.",
+    "Write the string with both index systems:\n\nletter    S  E  B  I\n+index    0  1  2  3\n-index   -4 -3 -2 -1\n\ns[-2:] is a slice: [start:stop:step]. The stop index is exclusive.\n- start: -2 (same as index 2) → letter 'B'\n- stop: omitted → run through the last character\n- step: omitted → +1 (walk left to right)\n\nLetters taken: B → I → 'BI'.\n\nWhy nearby options are usually wrong:\n- 'SEBI' is the whole string (s[:] or s[0:]).\n- 'IBES' is the reverse (s[::-1]).\n- 'SE' is the first two letters (s[:2]).",
     { code: "s = 'SEBI'\nprint(s[-2:])", language: "python" },
   ),
   p1p2(
@@ -88,7 +88,7 @@ export const bankPython = [
       "SE",
     ],
     1,
-    "Python slices are [start:stop) and 0-based. s[::-1] on 'SEBI' is 'IBES'.",
+    "Write the string with both index systems:\n\nletter    S  E  B  I\n+index    0  1  2  3\n-index   -4 -3 -2 -1\n\ns[::-1] is a slice: [start:stop:step]. The stop index is exclusive.\n- start: omitted → end of the string\n- stop: omitted → run through the first character\n- step: -1 (walk right to left, i.e. reverse)\n\nLetters taken: I → B → E → S → 'IBES'.\n\nWhy nearby options are usually wrong:\n- 'SEBI' is the whole string (s[:] or s[0:]).\n- 'SE' is the first two letters (s[:2]).\n- 'BI' is the last two letters (s[-2:]).",
     { code: "s = 'SEBI'\nprint(s[::-1])", language: "python" },
   ),
   p1p2(
@@ -103,7 +103,7 @@ export const bankPython = [
       "SB",
     ],
     3,
-    "Python slices are [start:stop) and 0-based. s[::2] on 'SEBI' is 'SB'.",
+    "Write the string with both index systems:\n\nletter    S  E  B  I\n+index    0  1  2  3\n-index   -4 -3 -2 -1\n\ns[::2] is a slice: [start:stop:step]. The stop index is exclusive.\n- start: omitted → start of the string\n- stop: omitted → run through the last character\n- step: 2 (skip letters; take every 2th)\n\nLetters taken: S → B → 'SB'.\n\nWhy nearby options are usually wrong:\n- 'SEBI' is the whole string (s[:] or s[0:]).\n- 'IBES' is the reverse (s[::-1]).\n- 'SE' is the first two letters (s[:2]).",
     { code: "s = 'SEBI'\nprint(s[::2])", language: "python" },
   ),
   p1p2(
@@ -118,7 +118,7 @@ export const bankPython = [
       "EDARG",
     ],
     1,
-    "Python slices are [start:stop) and 0-based. s[1:-1] on 'GRADE' is 'RAD'.",
+    "Write the string with both index systems:\n\nletter    G  R  A  D  E\n+index    0  1  2  3  4\n-index   -5 -4 -3 -2 -1\n\ns[1:-1] is a slice: [start:stop:step]. The stop index is exclusive.\n- start: 1 → letter 'R'\n- stop: -1 (same as index 4) → stop BEFORE 'E' (exclusive)\n- step: omitted → +1 (walk left to right)\n\nLetters taken: R → A → D → 'RAD'.\n\nWhy nearby options are usually wrong:\n- 'GRADE' is the whole string (s[:] or s[0:]).\n- 'EDARG' is the reverse (s[::-1]).\n- 'GR' is the first two letters (s[:2]).",
     { code: "s = 'GRADE'\nprint(s[1:-1])", language: "python" },
   ),
   p1p2(
@@ -133,7 +133,7 @@ export const bankPython = [
       "NOHTYP",
     ],
     1,
-    "Python slices are [start:stop) and 0-based. s[2:5] on 'PYTHON' is 'THO'.",
+    "Write the string with both index systems:\n\nletter    P  Y  T  H  O  N\n+index    0  1  2  3  4  5\n-index   -6 -5 -4 -3 -2 -1\n\ns[2:5] is a slice: [start:stop:step]. The stop index is exclusive.\n- start: 2 → letter 'T'\n- stop: 5 → stop BEFORE 'N' (exclusive)\n- step: omitted → +1 (walk left to right)\n\nLetters taken: T → H → O → 'THO'.\n\nWhy nearby options are usually wrong:\n- 'PYTHON' is the whole string (s[:] or s[0:]).\n- 'NOHTYP' is the reverse (s[::-1]).\n- 'PY' is the first two letters (s[:2]).",
     { code: "s = 'PYTHON'\nprint(s[2:5])", language: "python" },
   ),
   p1p2(
@@ -148,7 +148,7 @@ export const bankPython = [
       "MOCK",
     ],
     2,
-    "Python slices are [start:stop) and 0-based. s[::-1] on 'MOCK' is 'KCOM'.",
+    "Write the string with both index systems:\n\nletter    M  O  C  K\n+index    0  1  2  3\n-index   -4 -3 -2 -1\n\ns[::-1] is a slice: [start:stop:step]. The stop index is exclusive.\n- start: omitted → end of the string\n- stop: omitted → run through the first character\n- step: -1 (walk right to left, i.e. reverse)\n\nLetters taken: K → C → O → M → 'KCOM'.\n\nWhy nearby options are usually wrong:\n- 'MOCK' is the whole string (s[:] or s[0:]).\n- 'MO' is the first two letters (s[:2]).\n- 'CK' is the last two letters (s[-2:]).",
     { code: "s = 'MOCK'\nprint(s[::-1])", language: "python" },
   ),
   p1p2(
@@ -163,7 +163,7 @@ export const bankPython = [
       "DATA",
     ],
     2,
-    "Python slices are [start:stop) and 0-based. s[1:] on 'DATA' is 'ATA'.",
+    "Write the string with both index systems:\n\nletter    D  A  T  A\n+index    0  1  2  3\n-index   -4 -3 -2 -1\n\ns[1:] is a slice: [start:stop:step]. The stop index is exclusive.\n- start: 1 → letter 'A'\n- stop: omitted → run through the last character\n- step: omitted → +1 (walk left to right)\n\nLetters taken: A → T → A → 'ATA'.\n\nWhy nearby options are usually wrong:\n- 'DATA' is the whole string (s[:] or s[0:]).\n- 'ATAD' is the reverse (s[::-1]).\n- 'DA' is the first two letters (s[:2]).",
     { code: "s = 'DATA'\nprint(s[1:])", language: "python" },
   ),
   p1p2(
@@ -178,7 +178,7 @@ export const bankPython = [
       "IN",
     ],
     0,
-    "Python slices are [start:stop) and 0-based. s[:4] on 'INDEX' is 'INDE'.",
+    "Write the string with both index systems:\n\nletter    I  N  D  E  X\n+index    0  1  2  3  4\n-index   -5 -4 -3 -2 -1\n\ns[:4] is a slice: [start:stop:step]. The stop index is exclusive.\n- start: omitted → start of the string\n- stop: 4 → stop BEFORE 'X' (exclusive)\n- step: omitted → +1 (walk left to right)\n\nLetters taken: I → N → D → E → 'INDE'.\n\nWhy nearby options are usually wrong:\n- 'INDEX' is the whole string (s[:] or s[0:]).\n- 'XEDNI' is the reverse (s[::-1]).\n- 'IN' is the first two letters (s[:2]).",
     { code: "s = 'INDEX'\nprint(s[:4])", language: "python" },
   ),
   p1p2(
@@ -193,7 +193,7 @@ export const bankPython = [
       "EUEUQ",
     ],
     1,
-    "Python slices are [start:stop) and 0-based. s[::2] on 'QUEUE' is 'QEE'.",
+    "Write the string with both index systems:\n\nletter    Q  U  E  U  E\n+index    0  1  2  3  4\n-index   -5 -4 -3 -2 -1\n\ns[::2] is a slice: [start:stop:step]. The stop index is exclusive.\n- start: omitted → start of the string\n- stop: omitted → run through the last character\n- step: 2 (skip letters; take every 2th)\n\nLetters taken: Q → E → E → 'QEE'.\n\nWhy nearby options are usually wrong:\n- 'QUEUE' is the whole string (s[:] or s[0:]).\n- 'EUEUQ' is the reverse (s[::-1]).\n- 'QU' is the first two letters (s[:2]).",
     { code: "s = 'QUEUE'\nprint(s[::2])", language: "python" },
   ),
   p1p2(
@@ -208,7 +208,7 @@ export const bankPython = [
       "KCATS",
     ],
     1,
-    "Python slices are [start:stop) and 0-based. s[-3:] on 'STACK' is 'ACK'.",
+    "Write the string with both index systems:\n\nletter    S  T  A  C  K\n+index    0  1  2  3  4\n-index   -5 -4 -3 -2 -1\n\ns[-3:] is a slice: [start:stop:step]. The stop index is exclusive.\n- start: -3 (same as index 2) → letter 'A'\n- stop: omitted → run through the last character\n- step: omitted → +1 (walk left to right)\n\nLetters taken: A → C → K → 'ACK'.\n\nWhy nearby options are usually wrong:\n- 'STACK' is the whole string (s[:] or s[0:]).\n- 'KCATS' is the reverse (s[::-1]).\n- 'ST' is the first two letters (s[:2]).",
     { code: "s = 'STACK'\nprint(s[-3:])", language: "python" },
   ),
   p1p2(
@@ -223,7 +223,7 @@ export const bankPython = [
       "HA",
     ],
     0,
-    "Python slices are [start:stop) and 0-based. s[0] on 'HASH' is 'H'.",
+    "Write the string with both index systems:\n\nletter    H  A  S  H\n+index    0  1  2  3\n-index   -4 -3 -2 -1\n\ns[0] is one character, not a slice. Index 0 is letter 'H'.\nThat letter is 'H'.\n\nWhy nearby options are usually wrong:\n- 'HASH' is the whole string (s[:] or s[0:]).\n- 'HSAH' is the reverse (s[::-1]).\n- 'HA' is the first two letters (s[:2]).",
     { code: "s = 'HASH'\nprint(s[0])", language: "python" },
   ),
   p1p2(
