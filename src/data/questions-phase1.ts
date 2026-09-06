@@ -576,7 +576,7 @@ p.show();`,
     "What is the value of s[1:4] if s = 'SEBI'?",
     ["'SEB'", "'EBI'", "'EB'", "'SEBI'"],
     1,
-    "Python slices are [start, end). s[0]='S', [1]='E', [2]='B', [3]='I', so [1:4] is 'EBI'.",
+    "Write the string with both index systems:\n\nletter    S  E  B  I\n+index    0  1  2  3\n-index   -4 -3 -2 -1\n\ns[1:4] is a slice: [start:stop:step]. The stop index is exclusive.\n- start: 1 → letter 'E'\n- stop: 4 → just after the last letter (exclusive end)\n- step: omitted → +1 (walk left to right)\n\nLetters taken: E → B → I → 'EBI'.\n\nWhy nearby options are usually wrong:\n- 'SEBI' is the whole string (s[:] or s[0:]).\n- 'IBES' is the reverse (s[::-1]).\n- 'SE' is the first two letters (s[:2]).",
   ),
   q(
     "py-02",

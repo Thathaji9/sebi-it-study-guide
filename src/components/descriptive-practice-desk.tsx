@@ -297,7 +297,9 @@ function RcPassage({ item }: { item: RcDrill }) {
               })}
             </div>
             {open ? (
-              <p className="mt-3 text-sm text-muted-foreground">{q.explanation}</p>
+              <p className="mt-3 whitespace-pre-wrap font-mono text-[13px] leading-relaxed text-muted-foreground">
+                {q.explanation}
+              </p>
             ) : null}
           </article>
         );

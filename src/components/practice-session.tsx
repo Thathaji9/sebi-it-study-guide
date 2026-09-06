@@ -208,7 +208,9 @@ export function PracticeSession({ questions }: { questions: Question[] }) {
             <p className="font-medium">
               {chosen === q.answer ? "Correct" : "Not quite"}
             </p>
-            <p className="mt-1 text-muted-foreground">{q.explanation}</p>
+            <p className="mt-1 whitespace-pre-wrap font-mono text-[13px] leading-relaxed text-muted-foreground">
+              {q.explanation}
+            </p>
             <Button className="mt-4" onClick={next}>
               {index + 1 >= queue.length ? "Finish" : "Next question"}
             </Button>
