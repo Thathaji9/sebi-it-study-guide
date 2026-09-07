@@ -28,7 +28,8 @@ export default async function PracticeTopicPage({
           </p>
           <h1 className="font-heading text-3xl">{meta.name}</h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            {meta.details}
+            {meta.details} Unanswered questions resume from this browser when you
+            reopen the topic.
           </p>
         </div>
         {note ? (
@@ -37,7 +38,7 @@ export default async function PracticeTopicPage({
           </Button>
         ) : null}
       </header>
-      <PracticeSession questions={questions} />
+      <PracticeSession questions={questions} resumeUnanswered />
     </div>
   );
 }
