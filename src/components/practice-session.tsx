@@ -1,13 +1,18 @@
 "use client";
 
 import { Bookmark, BookmarkCheck } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { topicById } from "@/data/exam";
-import { loadProgress, recordAttempt, toggleBookmark } from "@/lib/progress";
-import type { Question } from "@/lib/types";
+import {
+  loadProgress,
+  recordAttempt,
+  toggleBookmark,
+  unansweredQuestions,
+} from "@/lib/progress";
+import type { ProgressState, Question } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const letters = ["A", "B", "C", "D"] as const;
@@ -54,7 +59,13 @@ export function CodeBlock({
   );
 }
 
-export function PracticeSession({ questions }: { questions: Question[] }) {
+export function PracticeSession({
+  questions,
+  resumeUnanswered = false,
+}: {
+  questions: Question[];
+  resumeUnanswered?: boolean;
+}) {
   const [index, setIndex] = useState(0);
   const [chosen, setChosen] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);
@@ -63,14 +74,43 @@ export function PracticeSession({ questions }: { questions: Question[] }) {
   const [attempted, setAttempted] = useState(0);
   const [done, setDone] = useState(false);
   const [pass, setPass] = useState(0);
+  const [ready, setReady] = useState(!resumeUnanswered);
+  const [attempts, setAttempts] = useState<ProgressState["attempts"]>({});
+  const [resumeQueue, setResumeQueue] = useState<Question[]>([]);
+  const [openedWithAnswered, setOpenedWithAnswered] = useState(0);
 
-  const queue = useMemo(
+  useEffect(() => {
+    if (!resumeUnanswered) return;
+    const state = loadProgress();
+    queueMicrotask(() => {
+      const shuffled = shuffle(
+        questions,
+        seedFromIds(
+          questions.map((item) => item.id),
+          0,
+        ),
+      );
+      const remaining = unansweredQuestions(shuffled, state.attempts);
+      setResumeQueue(remaining);
+      setOpenedWithAnswered(questions.length - remaining.length);
+      setAttempts(state.attempts);
+      setBookmarked(new Set(state.bookmarks));
+      setReady(true);
+    });
+  }, [questions, resumeUnanswered]);
+
+  const fullQueue = useMemo(
     () => shuffle(questions, seedFromIds(questions.map((item) => item.id), pass)),
     [questions, pass],
   );
 
+  const queue = resumeUnanswered && pass === 0 ? resumeQueue : fullQueue;
+  const alreadyAnswered = resumeUnanswered && pass === 0 ? openedWithAnswered : 0;
+  const covered = questions.filter((item) => attempts[item.id]).length;
+  const topicCorrect = questions.filter((item) => attempts[item.id]?.correct).length;
+
   const q = queue[index];
-  const topic = q ? topicById[q.topic] : undefined;
+  const topic = q ? topicById[q.topic] : questions[0] ? topicById[questions[0].topic] : undefined;
 
   const accuracy = attempted === 0 ? 0 : Math.round((correctCount / attempted) * 100);
 
@@ -79,7 +119,8 @@ export function PracticeSession({ questions }: { questions: Question[] }) {
     setChosen(i);
     setRevealed(true);
     const ok = i === q.answer;
-    recordAttempt(q.id, ok);
+    const nextState = recordAttempt(q.id, ok);
+    setAttempts(nextState.attempts);
     setAttempted((n) => n + 1);
     if (ok) setCorrectCount((n) => n + 1);
   };
@@ -112,20 +153,44 @@ export function PracticeSession({ questions }: { questions: Question[] }) {
 
   const remaining = queue.length - index;
 
-  if (queue.length === 0) {
+  if (resumeUnanswered && !ready) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        Resuming unanswered questions…
+      </p>
+    );
+  }
+
+  if (questions.length === 0) {
     return (
       <p className="text-muted-foreground">No questions in this topic yet.</p>
     );
   }
 
-  if (done) {
+  if (done || queue.length === 0) {
+    const finishedBank =
+      resumeUnanswered && pass === 0 && alreadyAnswered >= questions.length;
     return (
       <div className="mx-auto max-w-lg rounded-xl border bg-card p-6 text-center">
-        <p className="text-sm text-muted-foreground">Topic drill complete</p>
-        <p className="mt-2 font-heading text-3xl">
-          {correctCount}/{attempted}
+        <p className="text-sm text-muted-foreground">
+          {finishedBank ? "Topic coverage complete" : "Topic drill complete"}
         </p>
-        <p className="mt-1 text-sm text-muted-foreground">{accuracy}% accuracy</p>
+        {attempted > 0 ? (
+          <>
+            <p className="mt-2 font-heading text-3xl">
+              {correctCount}/{attempted}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {accuracy}% accuracy this session
+            </p>
+          </>
+        ) : null}
+        {resumeUnanswered ? (
+          <p className="mt-2 text-sm text-muted-foreground">
+            {covered}/{questions.length} answered in this topic · {topicCorrect}{" "}
+            correct
+          </p>
+        ) : null}
         <Button className="mt-5" onClick={restart}>
           Drill again
         </Button>
@@ -139,6 +204,7 @@ export function PracticeSession({ questions }: { questions: Question[] }) {
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary">
             {index + 1} / {queue.length}
+            {alreadyAnswered > 0 ? " remaining" : ""}
           </Badge>
           {topic ? <Badge variant="outline">{topic.name}</Badge> : null}
           <Badge variant="outline" className="capitalize">
@@ -147,6 +213,7 @@ export function PracticeSession({ questions }: { questions: Question[] }) {
         </div>
         <p className="text-muted-foreground">
           Session accuracy {attempted ? `${accuracy}%` : "—"} · {remaining} left
+          {alreadyAnswered > 0 ? ` · ${alreadyAnswered} already answered` : ""}
         </p>
       </div>
 

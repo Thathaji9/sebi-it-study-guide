@@ -68,3 +68,10 @@ export function wrongQuestionIds(state: ProgressState): string[] {
     .filter(([, v]) => !v.correct)
     .map(([id]) => id);
 }
+
+export function unansweredQuestions<T extends { id: string }>(
+  questions: T[],
+  attempts: ProgressState["attempts"],
+): T[] {
+  return questions.filter((question) => !attempts[question.id]);
+}
