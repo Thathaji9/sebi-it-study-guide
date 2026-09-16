@@ -23,11 +23,12 @@ export default function HomePage() {
               A working desk for the IT stream: official-weightage syllabus,
               high-yield notes, topic MCQs, timed mocks, descriptive English
               drills, memory-based PYQs, and interview talking points. Progress
-              stays in this browser.
+              stays in this browser — export it to keep the same desk on your
+              phone and laptop.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
               <Button asChild>
-                <Link href="/mock/phase1-paper2-m1?new=1">
+                <Link href="/mock/phase1-paper2-m1">
                   Sit Phase I Paper 2 · Mock 1
                   <ArrowRight />
                 </Link>

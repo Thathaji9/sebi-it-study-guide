@@ -14,8 +14,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { MockCompleteGate } from "@/components/mock-complete-gate";
 import { topicById, mockById } from "@/data/exam";
-import { recordMock } from "@/lib/progress";
+import {
+  clearLiveExam,
+  latestResultForPaper,
+  readLiveExam,
+  recordMock,
+  saveLastResult,
+  writeLiveExam,
+} from "@/lib/progress";
 import { buildMockPaper, scoreAttempt } from "@/lib/quiz";
 import type { ExamKind, Question } from "@/lib/types";
 import { cn, formatClock } from "@/lib/utils";
@@ -37,8 +45,20 @@ type LiveExam = {
   startedAt: number;
 };
 
-function persistKey(kind: string) {
-  return `grade-a-it-desk-live-${kind}`;
+function startPaper(paperId: string, config: NonNullable<ReturnType<typeof mockById>>): LiveExam {
+  const questions = buildMockPaper(config);
+  return {
+    kind: config.kind,
+    paperId,
+    title: config.title,
+    questions,
+    answers: {},
+    marked: [],
+    seen: questions[0] ? [questions[0].id] : [],
+    index: 0,
+    remaining: config.minutes * 60,
+    startedAt: Date.now(),
+  };
 }
 
 export function MockRunner({
@@ -50,39 +70,36 @@ export function MockRunner({
 }) {
   const config = mockById(paperId);
   const [live, setLive] = useState<LiveExam | null>(null);
+  const [completed, setCompleted] = useState<ReturnType<typeof latestResultForPaper>>(undefined);
 
   useEffect(() => {
     if (!config) return;
-    const key = persistKey(paperId);
-    if (fresh) sessionStorage.removeItem(key);
-    const raw = !fresh ? sessionStorage.getItem(key) : null;
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw) as LiveExam;
-        if (parsed.questions?.length) {
-          parsed.paperId = parsed.paperId ?? paperId;
-          queueMicrotask(() => setLive(parsed));
-          return;
-        }
-      } catch {
-        /* fall through */
+    if (fresh) clearLiveExam(paperId);
+    const existing = !fresh ? readLiveExam<LiveExam>(paperId) : null;
+    if (existing?.questions?.length) {
+      existing.paperId = existing.paperId ?? paperId;
+      queueMicrotask(() => {
+        setCompleted(undefined);
+        setLive(existing);
+      });
+      return;
+    }
+    if (!fresh) {
+      const done = latestResultForPaper(paperId);
+      if (done) {
+        queueMicrotask(() => {
+          setLive(null);
+          setCompleted(done);
+        });
+        return;
       }
     }
-    const questions = buildMockPaper(config);
-    queueMicrotask(() =>
-      setLive({
-        kind: config.kind,
-        paperId,
-        title: config.title,
-        questions,
-        answers: {},
-        marked: [],
-        seen: questions[0] ? [questions[0].id] : [],
-        index: 0,
-        remaining: config.minutes * 60,
-        startedAt: Date.now(),
-      }),
-    );
+    queueMicrotask(() => {
+      const next = startPaper(paperId, config);
+      writeLiveExam(paperId, next);
+      setCompleted(undefined);
+      setLive(next);
+    });
   }, [paperId, fresh, config]);
 
   useEffect(() => {
@@ -91,7 +108,7 @@ export function MockRunner({
       setLive((prev) => {
         if (!prev || prev.remaining <= 0) return prev;
         const next = { ...prev, remaining: prev.remaining - 1 };
-        sessionStorage.setItem(persistKey(paperId), JSON.stringify(next));
+        writeLiveExam(paperId, next);
         return next;
       });
     }, 1000);
@@ -110,13 +127,16 @@ export function MockRunner({
           ? { ...prev.answers, ...partial.answers }
           : prev.answers,
       };
-      sessionStorage.setItem(persistKey(paperId), JSON.stringify(next));
+      writeLiveExam(paperId, next);
       return next;
     });
   };
 
   if (!config) {
     return <p className="text-muted-foreground">Unknown paper.</p>;
+  }
+  if (completed) {
+    return <MockCompleteGate result={completed} paperId={paperId} />;
   }
   if (!live) {
     return (
@@ -162,7 +182,8 @@ function ExamPlayer({
     }
     const tallied = scoreAttempt(questions, filled, marksEach);
     const result = {
-      id: `${live.paperId ?? live.kind}-${live.startedAt}`,
+      id: `${live.paperId}-${live.startedAt}`,
+      paperId: live.paperId,
       kind: live.kind,
       title: live.title,
       startedAt: live.startedAt,
@@ -181,9 +202,9 @@ function ExamPlayer({
       })),
     };
     recordMock(result);
-    sessionStorage.setItem("grade-a-it-desk-last-result", JSON.stringify(result));
-    sessionStorage.removeItem(persistKey(live.paperId ?? live.kind));
-    router.push("/result");
+    saveLastResult(result);
+    clearLiveExam(live.paperId);
+    router.push(`/result?paper=${encodeURIComponent(live.paperId)}`);
   }, [questions, live, marksEach, cutoffPercent, router]);
 
   useEffect(() => {
@@ -215,6 +236,11 @@ function ExamPlayer({
 
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_16rem]">
+      <p className="text-xs text-muted-foreground lg:col-span-2">
+        Stay in this tab while the paper is open. The clock keeps running.
+        Unanswered questions score 0; a wrong answer costs one-fourth of the
+        marks for that question.
+      </p>
       <section className="rounded-xl border bg-card p-4 sm:p-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b pb-3">
           <div>

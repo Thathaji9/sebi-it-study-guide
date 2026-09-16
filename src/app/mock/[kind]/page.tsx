@@ -16,18 +16,22 @@ export default async function MockPaperPage({
   const paper = sitPapers.find((m) => m.id === kind);
   if (!paper) notFound();
 
+  const fresh = query.new === "1";
+
   return (
     <div className="space-y-4">
-      <p className="text-xs text-muted-foreground">
-        Stay in this tab. The clock keeps running.
-        {paper.mode === "descriptive"
-          ? " Essay and precis are typed; only comprehension MCQs are auto-marked (unanswered 0, wrong −¼)."
-          : " Unanswered questions score 0; a wrong answer costs one-fourth of the marks for that question."}
-      </p>
       {paper.mode === "descriptive" ? (
-        <DescriptiveRunner paperId={kind} fresh={query.new === "1"} />
+        <DescriptiveRunner
+          key={`${kind}-${fresh ? "new" : "resume"}`}
+          paperId={kind}
+          fresh={fresh}
+        />
       ) : (
-        <MockRunner paperId={kind} fresh={query.new === "1"} />
+        <MockRunner
+          key={`${kind}-${fresh ? "new" : "resume"}`}
+          paperId={kind}
+          fresh={fresh}
+        />
       )}
     </div>
   );
