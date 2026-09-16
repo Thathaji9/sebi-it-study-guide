@@ -16,12 +16,22 @@ export default async function MockPaperPage({
   const paper = sitPapers.find((m) => m.id === kind);
   if (!paper) notFound();
 
+  const fresh = query.new === "1";
+
   return (
     <div className="space-y-4">
       {paper.mode === "descriptive" ? (
-        <DescriptiveRunner paperId={kind} fresh={query.new === "1"} />
+        <DescriptiveRunner
+          key={`${kind}-${fresh ? "new" : "resume"}`}
+          paperId={kind}
+          fresh={fresh}
+        />
       ) : (
-        <MockRunner paperId={kind} fresh={query.new === "1"} />
+        <MockRunner
+          key={`${kind}-${fresh ? "new" : "resume"}`}
+          paperId={kind}
+          fresh={fresh}
+        />
       )}
     </div>
   );

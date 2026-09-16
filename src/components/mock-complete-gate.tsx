@@ -1,10 +1,32 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { MockResult } from "@/lib/types";
+
+export function TryAgainButton({
+  paperId,
+  variant = "default",
+}: {
+  paperId: string;
+  variant?: "default" | "outline";
+}) {
+  const router = useRouter();
+  return (
+    <Button
+      variant={variant}
+      onClick={() => {
+        router.push(`/mock/${paperId}?new=1`);
+        router.refresh();
+      }}
+    >
+      Try again
+    </Button>
+  );
+}
 
 export function MockCompleteGate({
   result,
@@ -48,9 +70,7 @@ export function MockCompleteGate({
             Review
           </Link>
         </Button>
-        <Button asChild>
-          <Link href={`/mock/${paperId}?new=1`}>Try again</Link>
-        </Button>
+        <TryAgainButton paperId={paperId} />
       </div>
     </div>
   );

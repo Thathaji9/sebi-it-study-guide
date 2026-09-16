@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { TryAgainButton } from "@/components/mock-complete-gate";
 import {
   latestResultForPaper,
   liveExamKey,
@@ -78,9 +79,7 @@ export function MockPaperCard({
             <Button asChild>
               <Link href={`/mock/${paperId}`}>Continue</Link>
             </Button>
-            <Button variant="outline" asChild>
-              <Link href={`/mock/${paperId}?new=1`}>Try again</Link>
-            </Button>
+            <TryAgainButton paperId={paperId} variant="outline" />
           </>
         ) : null}
         {status === "done" ? (
@@ -90,9 +89,7 @@ export function MockPaperCard({
                 Review
               </Link>
             </Button>
-            <Button asChild>
-              <Link href={`/mock/${paperId}?new=1`}>Try again</Link>
-            </Button>
+            <TryAgainButton paperId={paperId} />
           </>
         ) : null}
       </div>

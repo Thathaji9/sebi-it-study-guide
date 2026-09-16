@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { TryAgainButton } from "@/components/mock-complete-gate";
 import { CodeBlock } from "@/components/practice-session";
 import { descriptiveBySet } from "@/data/descriptive";
 import { topicById } from "@/data/exam";
@@ -106,9 +107,7 @@ export function ResultView({ paperId }: { paperId?: string }) {
         </div>
         {retryId ? (
           <div className="mt-4 flex flex-wrap gap-2">
-            <Button asChild>
-              <Link href={`/mock/${retryId}?new=1`}>Try again</Link>
-            </Button>
+            <TryAgainButton paperId={retryId} />
             <Button variant="outline" asChild>
               <Link href="/mock">All papers</Link>
             </Button>
