@@ -187,7 +187,7 @@ export const bankAlgorithms = [
     "algo-b-014",
     "algorithms",
     "moderate",
-    "Binary tree: 8 / 3 10; 3 has 1 and 6; 6 has 4 and 7; 10 has right 14; 14 has left 13. In-order traversal is:",
+    "Binary tree rooted at 8. In-order traversal is:",
     [
       "none of these",
       "1 3 4 6 7 8 10 13 14",
@@ -195,13 +195,22 @@ export const bankAlgorithms = [
       "1 4 7 6 3 13 14 10 8",
     ],
     1,
-    "In-order is left-root-right: 1 3 4 6 7 8 10 13 14.",
+    "In-order is left-root-right. Walk left of 8 first (the 3-subtree: 1, 3, then 4, 6, 7), then 8, then the 10-subtree (10, 13, 14).\nResult: 1 3 4 6 7 8 10 13 14.",
+    {
+      code: `        8
+      /   \\
+     3     10
+    / \\      \\
+   1   6      14
+      / \\    /
+     4   7  13`,
+    },
   ),
   p1p2(
     "algo-b-015",
     "algorithms",
     "moderate",
-    "Same tree. Pre-order traversal is:",
+    "Binary tree rooted at 8. Pre-order traversal is:",
     [
       "none of these",
       "8 3 1 6 4 7 10 14 13",
@@ -209,13 +218,22 @@ export const bankAlgorithms = [
       "1 4 7 6 3 13 14 10 8",
     ],
     1,
-    "Pre-order is root-left-right: 8 3 1 6 4 7 10 14 13.",
+    "Pre-order is root-left-right: visit 8, then the 3-subtree (3, 1, 6, 4, 7), then the 10-subtree (10, 14, 13).\nResult: 8 3 1 6 4 7 10 14 13.",
+    {
+      code: `        8
+      /   \\
+     3     10
+    / \\      \\
+   1   6      14
+      / \\    /
+     4   7  13`,
+    },
   ),
   p1p2(
     "algo-b-016",
     "algorithms",
     "moderate",
-    "Same tree. Post-order traversal is:",
+    "Binary tree rooted at 8. Post-order traversal is:",
     [
       "8 10 14 13 3 6 7 4 1",
       "1 4 7 6 3 13 14 10 8",
@@ -223,13 +241,22 @@ export const bankAlgorithms = [
       "1 3 4 6 7 8 10 13 14",
     ],
     1,
-    "Post-order is left-right-root: 1 4 7 6 3 13 14 10 8.",
+    "Post-order is left-right-root: finish the 3-subtree (1, 4, 7, 6, 3), then the 10-subtree (13, 14, 10), then 8.\nResult: 1 4 7 6 3 13 14 10 8.",
+    {
+      code: `        8
+      /   \\
+     3     10
+    / \\      \\
+   1   6      14
+      / \\    /
+     4   7  13`,
+    },
   ),
   p1p2(
     "algo-b-017",
     "algorithms",
     "easy",
-    "Level-order (BFS) of the same tree starting at 8 is:",
+    "Binary tree rooted at 8. Level-order (BFS) starting at 8 is:",
     [
       "8 10 3 14 6 1 13 7 4",
       "8 3 10 1 6 14 4 7 13",
@@ -237,7 +264,16 @@ export const bankAlgorithms = [
       "1 4 7 6 3 13 14 10 8",
     ],
     1,
-    "Queue: 8; then 3,10; then 1,6,14; then 4,7,13.",
+    "Queue by depth: 8; then children 3, 10; then 1, 6, 14; then 4, 7, 13.\nResult: 8 3 10 1 6 14 4 7 13.",
+    {
+      code: `        8
+      /   \\
+     3     10
+    / \\      \\
+   1   6      14
+      / \\    /
+     4   7  13`,
+    },
   ),
   p1p2(
     "algo-b-018",

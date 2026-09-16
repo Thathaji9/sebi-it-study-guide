@@ -1223,7 +1223,7 @@ export const bankSql = [
     "sql-b-088",
     "sql",
     "moderate",
-    "Table t(x): 1, 2, 2, NULL. SELECT COUNT(x) FROM t returns:",
+    "Table t has four rows in column x. What does SELECT COUNT(x) FROM t return?",
     [
       "4",
       "3",
@@ -1231,13 +1231,25 @@ export const bankSql = [
       "NULL",
     ],
     1,
-    "COUNT(x) skips the NULL; two 2s both count. COUNT(*) would be 4. COUNT(DISTINCT x) would be 2.",
+    "COUNT(x) counts non-null values only. The rows are 1, 2, 2, NULL → three numbers, one NULL skipped. Result 3.\nCOUNT(*) would be 4 (it counts rows). COUNT(DISTINCT x) would be 2 (values {1, 2}).",
+    {
+      language: "sql",
+      code: `t
+ x
+----
+  1
+  2
+  2
+ NULL
+
+SELECT COUNT(x) FROM t;`,
+    },
   ),
   p1p2(
     "sql-b-089",
     "sql",
     "moderate",
-    "Same t(x): 1, 2, 2, NULL. SELECT COUNT(DISTINCT x) FROM t returns:",
+    "Table t has four rows in column x. What does SELECT COUNT(DISTINCT x) FROM t return?",
     [
       "4",
       "3",
@@ -1245,13 +1257,25 @@ export const bankSql = [
       "1",
     ],
     2,
-    "Distinct non-null values: 1 and 2.",
+    "COUNT(DISTINCT x) ignores NULL, then collapses duplicates.\nNon-null values: 1, 2, 2 → the set {1, 2} → 2.",
+    {
+      language: "sql",
+      code: `t
+ x
+----
+  1
+  2
+  2
+ NULL
+
+SELECT COUNT(DISTINCT x) FROM t;`,
+    },
   ),
   p1p2(
     "sql-b-090",
     "sql",
     "moderate",
-    "Same t(x): 1, 2, 2, NULL. SELECT SUM(x) FROM t returns:",
+    "Table t has four rows in column x. What does SELECT SUM(x) FROM t return?",
     [
       "5",
       "NULL",
@@ -1259,13 +1283,25 @@ export const bankSql = [
       "3",
     ],
     0,
-    "1+2+2 = 5. NULL is skipped, not treated as 0 unless you NVL it.",
+    "SUM skips NULL (it is not treated as 0 unless you NVL/COALESCE it).\n1 + 2 + 2 = 5.",
+    {
+      language: "sql",
+      code: `t
+ x
+----
+  1
+  2
+  2
+ NULL
+
+SELECT SUM(x) FROM t;`,
+    },
   ),
   p1p2(
     "sql-b-091",
     "sql",
     "moderate",
-    "Same t(x): 1, 2, 2, NULL. SELECT AVG(x) FROM t returns:",
+    "Table t has four rows in column x. What does SELECT AVG(x) FROM t return?",
     [
       "5/4 = 1.25",
       "5/3 ≈ 1.666…",
@@ -1273,7 +1309,19 @@ export const bankSql = [
       "2",
     ],
     1,
-    "AVG uses the same non-null count as SUM: 5/3.",
+    "AVG = (sum of non-null x) / (count of non-null x).\nSum = 1+2+2 = 5. Count = 3. AVG = 5/3 ≈ 1.666…\nDo not divide by 4: NULL is not a zero in the denominator.",
+    {
+      language: "sql",
+      code: `t
+ x
+----
+  1
+  2
+  2
+ NULL
+
+SELECT AVG(x) FROM t;`,
+    },
   ),
   p1p2(
     "sql-b-092",
@@ -1307,7 +1355,7 @@ export const bankSql = [
     "sql-b-094",
     "sql",
     "moderate",
-    "Employees (dept, sal): (10,100), (10,200), (20,300). SELECT dept, SUM(sal) GROUP BY dept. Number of result rows:",
+    "Table employees has three rows (dept, sal). How many rows does SELECT dept, SUM(sal) FROM employees GROUP BY dept return?",
     [
       "1",
       "2",
@@ -1315,13 +1363,26 @@ export const bankSql = [
       "0",
     ],
     1,
-    "One group per dept: 10 and 20.",
+    "GROUP BY dept builds one group per distinct dept value.\nDept 10: two rows. Dept 20: one row.\nResult has two rows: (10, 300) and (20, 300).",
+    {
+      language: "sql",
+      code: `employees
+dept | sal
+-----+-----
+  10 | 100
+  10 | 200
+  20 | 300
+
+SELECT dept, SUM(sal)
+FROM employees
+GROUP BY dept;`,
+    },
   ),
   p1p2(
     "sql-b-095",
     "sql",
     "moderate",
-    "Same data. SELECT SUM(sal) FROM employees. Result:",
+    "Table employees has three rows (dept, sal). What does SELECT SUM(sal) FROM employees return?",
     [
       "100",
       "200",
@@ -1329,13 +1390,24 @@ export const bankSql = [
       "300",
     ],
     2,
-    "100+200+300 = 600. One group: the whole table.",
+    "No GROUP BY, so the whole table is one group.\nSUM(sal) = 100 + 200 + 300 = 600.",
+    {
+      language: "sql",
+      code: `employees
+dept | sal
+-----+-----
+  10 | 100
+  10 | 200
+  20 | 300
+
+SELECT SUM(sal) FROM employees;`,
+    },
   ),
   p1p2(
     "sql-b-096",
     "sql",
     "hard",
-    "Same data. SELECT dept FROM employees GROUP BY dept HAVING AVG(sal) > 150. Result dept(s):",
+    "Table employees has three rows (dept, sal). Which department(s) does SELECT dept FROM employees GROUP BY dept HAVING AVG(sal) > 150 return?",
     [
       "10 only",
       "20 only",
@@ -1343,7 +1415,21 @@ export const bankSql = [
       "none",
     ],
     1,
-    "Dept 10 average 150, not > 150. Dept 20 average 300.",
+    "GROUP BY dept, then HAVING keeps only groups whose average salary is strictly greater than 150.\n\nDept 10: salaries 100 and 200.\n  AVG = (100 + 200) / 2 = 150.\n  150 > 150 is false, so dept 10 is dropped.\n\nDept 20: salary 300.\n  AVG = 300 / 1 = 300.\n  300 > 150 is true, so dept 20 is kept.\n\nResult: 20 only.",
+    {
+      language: "sql",
+      code: `employees
+dept | sal
+-----+-----
+  10 | 100
+  10 | 200
+  20 | 300
+
+SELECT dept
+FROM employees
+GROUP BY dept
+HAVING AVG(sal) > 150;`,
+    },
   ),
   p1p2(
     "sql-b-097",

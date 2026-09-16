@@ -322,16 +322,37 @@ export const phase1HardDbSql = [
     "T1(a,b) = {(1,2),(1,3)}; T2(b,c) = {(2,9),(4,8)}. SELECT COUNT(*) FROM T1 NATURAL JOIN T2;",
     ["0", "1", "2", "4"],
     1,
-    "Natural join on b: only b=2 matches, one pair (1,2,9). COUNT(*) = 1.",
+    "Natural join matches on the shared column b.\nOnly b=2 matches: T1 (1,2) with T2 (2,9) → one row (1,2,9).\nb=3 in T1 has no partner. T2 (4,8) has no T1 partner.\nCOUNT(*) = 1.",
+    {
+      language: "sql",
+      code: `T1(a, b)          T2(b, c)
+a | b             b | c
+--+--             --+--
+1 | 2             2 | 9
+1 | 3             4 | 8
+
+SELECT COUNT(*) FROM T1 NATURAL JOIN T2;`,
+    },
   ),
   q(
     "sql-16",
     "sql",
     "hard",
-    "T1 as above, T2 as above. SELECT COUNT(*) FROM T1 LEFT OUTER JOIN T2 ON T1.b = T2.b;",
+    "T1(a,b) = {(1,2),(1,3)}; T2(b,c) = {(2,9),(4,8)}. SELECT COUNT(*) FROM T1 LEFT OUTER JOIN T2 ON T1.b = T2.b;",
     ["1", "2", "3", "4"],
     1,
-    "Left join keeps both T1 rows: (1,2,9) and (1,3,NULL). COUNT(*) = 2.",
+    "LEFT JOIN keeps every T1 row.\nT1 (1,2) matches T2 (2,9) → one result row (1,2,9).\nT1 (1,3) has no T2 row with b=3 → one padded row (1,3,NULL).\nCOUNT(*) = 2.",
+    {
+      language: "sql",
+      code: `T1(a, b)          T2(b, c)
+a | b             b | c
+--+--             --+--
+1 | 2             2 | 9
+1 | 3             4 | 8
+
+SELECT COUNT(*)
+FROM T1 LEFT OUTER JOIN T2 ON T1.b = T2.b;`,
+    },
   ),
   q(
     "sql-17",
