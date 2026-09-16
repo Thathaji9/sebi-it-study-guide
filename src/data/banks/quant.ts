@@ -1587,7 +1587,7 @@ export const bankQuant = [
     "qt-b-114",
     "quant",
     "moderate",
-    "Same table: Nashik 25 (2023) to Nagpur 30 (2024). Ratio Nashik 2023 : Nagpur 2024 is:",
+    "A 2023–2024 sales table. Ratio Nashik 2023 : Nagpur 2024 is:",
     [
       "5 : 6",
       "25 : 30",
@@ -1595,7 +1595,13 @@ export const bankQuant = [
       "1 : 1",
     ],
     0,
-    "25:30 = 5:6.",
+    "Nashik 2023 = 25, Nagpur 2024 = 30.\n25 : 30 = 5 : 6 (divide both by 5).",
+    {
+      code: `City    2023  2024
+Pune      40     —
+Nashik    25     —
+Nagpur    35    30`,
+    },
   ),
   p1p1(
     "qt-b-115",
