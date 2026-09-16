@@ -5,9 +5,10 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { ProgressSync } from "@/components/progress-sync";
 import { allQuestions } from "@/data/questions";
 import { phase1Paper2 } from "@/data/exam";
-import { loadProgress, resetProgress } from "@/lib/progress";
+import { loadProgress, paperIdOf, resetProgress } from "@/lib/progress";
 import type { ProgressState } from "@/lib/types";
 import { questionsByTopic } from "@/lib/quiz";
 
@@ -110,22 +111,35 @@ export function HomeProgress() {
               : "— below cut-off"}
           </p>
           <Button variant="outline" size="sm" asChild>
-            <Link href="/result">Review</Link>
+            <Link
+              href={
+                paperIdOf(stats.last)
+                  ? `/result?paper=${encodeURIComponent(paperIdOf(stats.last)!)}`
+                  : "/result"
+              }
+            >
+              Review
+            </Link>
           </Button>
         </div>
       ) : null}
 
-      {stats.attempted > 0 ? (
-        <button
-          type="button"
-          className="text-xs text-muted-foreground underline-offset-2 hover:underline"
-          onClick={() => {
-            setState(resetProgress());
-          }}
-        >
-          Reset local progress on this browser
-        </button>
-      ) : null}
+      {stats.attempted > 0 || stats.mockCount > 0 ? (
+        <div className="space-y-3">
+          <ProgressSync onImported={() => setState(loadProgress())} />
+          <button
+            type="button"
+            className="text-xs text-muted-foreground underline-offset-2 hover:underline"
+            onClick={() => {
+              setState(resetProgress());
+            }}
+          >
+            Reset local progress on this browser
+          </button>
+        </div>
+      ) : (
+        <ProgressSync onImported={() => setState(loadProgress())} />
+      )}
     </div>
   );
 }

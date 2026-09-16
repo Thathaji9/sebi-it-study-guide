@@ -70,6 +70,7 @@ export type AttemptRecord = {
 
 export type MockResult = {
   id: string;
+  paperId?: string;
   kind: ExamKind;
   title: string;
   startedAt: number;

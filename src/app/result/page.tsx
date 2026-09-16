@@ -1,6 +1,11 @@
 import { ResultView } from "@/components/result-view";
 
-export default function ResultPage() {
+export default async function ResultPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ paper?: string }>;
+}) {
+  const { paper } = await searchParams;
   return (
     <div className="space-y-4">
       <header>
@@ -10,7 +15,7 @@ export default function ResultPage() {
           include the −¼ penalty in the total.
         </p>
       </header>
-      <ResultView />
+      <ResultView paperId={paper} />
     </div>
   );
 }

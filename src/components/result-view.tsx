@@ -9,23 +9,25 @@ import { CodeBlock } from "@/components/practice-session";
 import { descriptiveBySet } from "@/data/descriptive";
 import { topicById } from "@/data/exam";
 import { questionById } from "@/data/questions";
-import { loadProgress } from "@/lib/progress";
+import { loadLastResult, latestResultForPaper, loadProgress, paperIdOf } from "@/lib/progress";
 import { topicStats } from "@/lib/quiz";
 import type { MockResult } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const letters = ["A", "B", "C", "D"] as const;
 
-export function ResultView() {
+export function ResultView({ paperId }: { paperId?: string }) {
   const [result, setResult] = useState<MockResult | null>(null);
 
   useEffect(() => {
-    const raw = sessionStorage.getItem("grade-a-it-desk-last-result");
-    const parsed = raw
-      ? (JSON.parse(raw) as MockResult)
-      : (loadProgress().mocks[0] ?? null);
-    queueMicrotask(() => setResult(parsed));
-  }, []);
+    queueMicrotask(() => {
+      if (paperId) {
+        setResult(latestResultForPaper(paperId) ?? null);
+        return;
+      }
+      setResult(loadLastResult() ?? loadProgress().mocks[0] ?? null);
+    });
+  }, [paperId]);
 
   const questions = useMemo(
     () =>
@@ -72,6 +74,7 @@ export function ResultView() {
   const needed = (result.cutoffPercent / 100) * result.maxScore;
   const cleared = result.score + 1e-9 >= needed;
   const isWriting = Boolean(result.writing);
+  const retryId = paperId ?? paperIdOf(result);
 
   return (
     <div className="space-y-6">
@@ -101,6 +104,16 @@ export function ResultView() {
             </Badge>
           )}
         </div>
+        {retryId ? (
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button asChild>
+              <Link href={`/mock/${retryId}?new=1`}>Try again</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/mock">All papers</Link>
+            </Button>
+          </div>
+        ) : null}
         <dl className="mt-4 grid grid-cols-3 gap-3 text-center text-sm">
           <div className="rounded-lg bg-muted/60 py-2">
             <dt className="text-xs text-muted-foreground">Correct</dt>

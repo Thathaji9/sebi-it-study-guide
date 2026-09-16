@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { MockPaperCard } from "@/components/mock-paper-card";
+import { ProgressSync } from "@/components/progress-sync";
 import { Button } from "@/components/ui/button";
 import { mockFamilies, mocks, pyqFamilies, pyqPapers } from "@/data/exam";
 
@@ -53,18 +55,13 @@ export default function MockIndexPage() {
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {papers.map((m) => (
-                <article
+                <MockPaperCard
                   key={m.id}
-                  className="flex flex-col rounded-lg border bg-background p-4"
-                >
-                  <h3 className="font-heading text-lg">Mock {m.set}</h3>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Distinct paper · same pattern as the real exam
-                  </p>
-                  <Button className="mt-3" asChild>
-                    <Link href={`/mock/${m.id}?new=1`}>Start Mock {m.set}</Link>
-                  </Button>
-                </article>
+                  paperId={m.id}
+                  title={`Mock ${m.set}`}
+                  blurb="Distinct paper · same pattern as the real exam"
+                  startLabel={`Start Mock ${m.set}`}
+                />
               ))}
             </div>
           </section>
@@ -121,18 +118,13 @@ export default function MockIndexPage() {
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {papers.map((m) => (
-                <article
+                <MockPaperCard
                   key={m.id}
-                  className="flex flex-col rounded-lg border bg-background p-4"
-                >
-                  <h3 className="font-heading text-lg">PYQ {m.year}</h3>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Memory-based · {m.questions} items
-                  </p>
-                  <Button className="mt-3" asChild>
-                    <Link href={`/mock/${m.id}?new=1`}>Start PYQ {m.year}</Link>
-                  </Button>
-                </article>
+                  paperId={m.id}
+                  title={`PYQ ${m.year}`}
+                  blurb={`Memory-based · ${m.questions} items`}
+                  startLabel={`Start PYQ ${m.year}`}
+                />
               ))}
             </div>
           </section>
@@ -151,9 +143,11 @@ export default function MockIndexPage() {
         </Button>
       </section>
 
+      <ProgressSync />
+
       <p className="text-sm text-muted-foreground">
-        If a paper is already in progress in this tab, open it without{" "}
-        <code className="rounded bg-muted px-1">?new=1</code> to resume.
+        Submitted papers stay on Review until you tap Try again. An unfinished
+        paper continues from this browser after you close the tab.
       </p>
     </div>
   );

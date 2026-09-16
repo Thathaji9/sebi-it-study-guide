@@ -13,9 +13,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MockCompleteGate } from "@/components/mock-complete-gate";
 import { descriptiveBySet } from "@/data/descriptive";
 import { mockById } from "@/data/exam";
-import { recordMock } from "@/lib/progress";
+import {
+  clearLiveExam,
+  latestResultForPaper,
+  readLiveExam,
+  recordMock,
+  saveLastResult,
+  writeLiveExam,
+} from "@/lib/progress";
 import { scoreAttempt } from "@/lib/quiz";
 import { cn, wordCount, formatClock } from "@/lib/utils";
 
@@ -34,10 +42,6 @@ type LiveWriting = {
   answers: Record<string, number | null>;
 };
 
-function persistKey(id: string) {
-  return `grade-a-it-desk-live-${id}`;
-}
-
 export function DescriptiveRunner({
   paperId,
   fresh,
@@ -48,37 +52,46 @@ export function DescriptiveRunner({
   const config = mockById(paperId);
   const paper = config ? descriptiveBySet(config.set) : undefined;
   const [live, setLive] = useState<LiveWriting | null>(null);
+  const [completed, setCompleted] = useState<ReturnType<typeof latestResultForPaper>>(undefined);
 
   useEffect(() => {
     if (!config || !paper) return;
-    const key = persistKey(paperId);
-    if (fresh) sessionStorage.removeItem(key);
-    const raw = !fresh ? sessionStorage.getItem(key) : null;
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw) as LiveWriting;
-        if (parsed.set === paper.set) {
-          queueMicrotask(() => setLive(parsed));
-          return;
-        }
-      } catch {
-        /* fall through */
+    if (fresh) clearLiveExam(paperId);
+    const existing = !fresh ? readLiveExam<LiveWriting>(paperId) : null;
+    if (existing?.set === paper.set) {
+      queueMicrotask(() => {
+        setCompleted(undefined);
+        setLive(existing);
+      });
+      return;
+    }
+    if (!fresh) {
+      const done = latestResultForPaper(paperId);
+      if (done) {
+        queueMicrotask(() => {
+          setLive(null);
+          setCompleted(done);
+        });
+        return;
       }
     }
-    queueMicrotask(() =>
-      setLive({
+    queueMicrotask(() => {
+      const next = {
         paperId,
         set: paper.set,
         title: config.title,
         remaining: config.minutes * 60,
         startedAt: Date.now(),
-        tab: "essay",
+        tab: "essay" as const,
         chosenEssay: null,
         essay: "",
         precis: "",
         answers: {},
-      }),
-    );
+      };
+      writeLiveExam(paperId, next);
+      setCompleted(undefined);
+      setLive(next);
+    });
   }, [paperId, fresh, config, paper]);
 
   useEffect(() => {
@@ -87,7 +100,7 @@ export function DescriptiveRunner({
       setLive((prev) => {
         if (!prev || prev.remaining <= 0) return prev;
         const next = { ...prev, remaining: prev.remaining - 1 };
-        sessionStorage.setItem(persistKey(paperId), JSON.stringify(next));
+        writeLiveExam(paperId, next);
         return next;
       });
     }, 1000);
@@ -105,13 +118,16 @@ export function DescriptiveRunner({
           ? { ...prev.answers, ...partial.answers }
           : prev.answers,
       };
-      sessionStorage.setItem(persistKey(paperId), JSON.stringify(next));
+      writeLiveExam(paperId, next);
       return next;
     });
   };
 
   if (!config || !paper) {
     return <p className="text-muted-foreground">Unknown descriptive paper.</p>;
+  }
+  if (completed) {
+    return <MockCompleteGate result={completed} paperId={paperId} />;
   }
   if (!live) {
     return (
@@ -158,6 +174,7 @@ function DescriptivePlayer({
     const tallied = scoreAttempt(paper.rc, filled, marksEach);
     const result = {
       id: `${live.paperId}-${live.startedAt}`,
+      paperId: live.paperId,
       kind: "phase2-paper1" as const,
       title: live.title,
       startedAt: live.startedAt,
@@ -182,9 +199,9 @@ function DescriptivePlayer({
       },
     };
     recordMock(result);
-    sessionStorage.setItem("grade-a-it-desk-last-result", JSON.stringify(result));
-    sessionStorage.removeItem(persistKey(live.paperId));
-    router.push("/result");
+    saveLastResult(result);
+    clearLiveExam(live.paperId);
+    router.push(`/result?paper=${encodeURIComponent(live.paperId)}`);
   }, [paper, live, marksEach, cutoffPercent, router]);
 
   useEffect(() => {
@@ -202,6 +219,11 @@ function DescriptivePlayer({
 
   return (
     <div className="space-y-4">
+      <p className="text-xs text-muted-foreground">
+        Stay in this tab while the paper is open. The clock keeps running. Essay
+        and precis are typed; only comprehension MCQs are auto-marked
+        (unanswered 0, wrong −¼).
+      </p>
       <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border bg-card px-4 py-3">
         <div>
           <p className="text-xs tracking-wide text-muted-foreground uppercase">
