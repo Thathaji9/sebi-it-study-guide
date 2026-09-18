@@ -97,8 +97,8 @@ export default function HomePage() {
           <div>
             <p className="font-heading text-lg">Previous-year papers</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Memory-based PYQs for 2020–2026 cycles · Phase I Papers 1–2, Phase
-              II Papers 1–2
+              Memory-based PYQs for 2018–2026 cycles, plus a Paper 2 recall
+              set · Phase I Papers 1–2, Phase II Papers 1–2
             </p>
           </div>
           <p className="text-sm font-medium text-primary">Open PYQs →</p>

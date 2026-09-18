@@ -3,7 +3,7 @@ import Link from "next/link";
 import { MockPaperCard } from "@/components/mock-paper-card";
 import { ProgressSync } from "@/components/progress-sync";
 import { Button } from "@/components/ui/button";
-import { mockFamilies, mocks, pyqFamilies, pyqPapers } from "@/data/exam";
+import { mockFamilies, mocks, pyqFamilies, pyqPapers, recallPapers } from "@/data/exam";
 
 export default function MockIndexPage() {
   return (
@@ -130,6 +130,29 @@ export default function MockIndexPage() {
           </section>
         );
       })}
+
+      <section className="rounded-xl border bg-card p-5">
+        <p className="text-xs tracking-[0.16em] text-muted-foreground uppercase">
+          PYQ
+        </p>
+        <h2 className="font-heading text-2xl">Paper 2 · candidate memory recall</h2>
+        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+          Recalled after a Paper 2 sitting. Phase I vs Phase II was not
+          confirmed, so this is a mixed IT / coding-logic set. Send more items
+          if you remember them.
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {recallPapers.map((m) => (
+            <MockPaperCard
+              key={m.id}
+              paperId={m.id}
+              title="Recall set"
+              blurb={`Memory-based · ${m.questions} items · ${m.minutes} min`}
+              startLabel="Start recall paper"
+            />
+          ))}
+        </div>
+      </section>
 
       <section className="rounded-xl border bg-card p-5">
         <h2 className="font-heading text-2xl">Phase III · Interview</h2>

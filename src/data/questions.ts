@@ -41,6 +41,7 @@ import { pyqP2P2_2022 } from "@/data/questions-pyq-p2p2-2022";
 import { pyqP2P2_2024 } from "@/data/questions-pyq-p2p2-2024";
 import { pyqP2P2_2025 } from "@/data/questions-pyq-p2p2-2025";
 import { pyqP2P2_2026 } from "@/data/questions-pyq-p2p2-2026";
+import { pyqP2Recall } from "@/data/questions-pyq-p2-recall";
 import type { Question, TopicId } from "@/lib/types";
 
 export const allQuestions: Question[] = [
@@ -68,6 +69,7 @@ export const allQuestions: Question[] = [
   ...pyqP2P2_2024,
   ...pyqP2P2_2025,
   ...pyqP2P2_2026,
+  ...pyqP2Recall,
   ...pyqExtra,
   ...bankDatabase,
   ...bankSql,
