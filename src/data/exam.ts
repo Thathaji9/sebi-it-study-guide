@@ -432,7 +432,25 @@ export const pyqFamilies = pyqYears.map(({ kind, years }) => ({
 }));
 
 /** Named mocks plus memory-based PYQ papers. */
-export const sitPapers = [...mocks, ...pyqPapers];
+export const recallPapers = [
+  {
+    id: "pyq-recall-paper2",
+    kind: "phase2-paper2" as const,
+    set: 99,
+    source: "pyq" as const,
+    idPrefix: "pyq-recall-p2-",
+    title: "Paper 2 (IT) · Candidate memory recall",
+    blurb:
+      "69 items a candidate recalled from a Paper 2 sitting (Phase I vs Phase II not confirmed). Original reconstructions in that topic mix — not a coaching PDF.",
+    questions: 69,
+    minutes: 60,
+    marksEach: 1,
+    cutoffPercent: 40,
+    mode: "mcq" as const,
+  },
+];
+
+export const sitPapers = [...mocks, ...pyqPapers, ...recallPapers];
 
 export function mockById(id: string) {
   return sitPapers.find((m) => m.id === id);
